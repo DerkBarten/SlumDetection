@@ -55,29 +55,55 @@ information as an alternative to traditional survey
 
 % pe
 
-When classifying entire neighborhoods, most studies tend to use a combination
+When classifying entire neighborhoods, it is common for studies to use a combination
 of characteristic that are used in the classification between formal and
 informal \cite{graesser2012image}. As previously mentioned, the orientation of
 buildings is used as a way of discriminating between formal and informal
-settlements. A technique used to qualify the orientation is the aptly named Histogram of
-Oriented Gradients.
-
+settlements. A technique used to qualify the orientation is the Histogram of
+Oriented Gradients (HoG)\cite{}. This algorithm iterates over blocks of pixels in a given
+image and calculate the gradient. The gradients are binned into
+the bin that most closely represents their orientation. This effectively
+translates the infinitely many orientations of the gradients to just a few.
+Structured objects, such as the walls, are characterized by peaks in a few
+bins because the gradients in the block will be very alike
 
 
 % talk about what feature extraction to use
 
-\subsection{Pixel-based image analysis} Object based does not necessarily be
-better than pixel based 
+% There are a multitude of features that
 
-\subsubsection*{Slums from Space—15 Years of Slum Mapping Using Remote Sensing}
-\cite{blaschke2014geographic}
-\cite{bian2007object}
+% \cite{blaschke2014geographic}
+% \cite{bian2007object}
 
-\cite{kuffer2016slums} is a comprehensive study
 
 \section{Research Question}
 
-\nocite{*}
+Besides HoG, there are numerous other features that can be used to characterize
+neighborhoods. This project will use Line Support Regions \cite{}, Line Feature
+Distribution as additional features for classification in a similar manner
+to \cite{graesser2012image}. These conventional features will be expanded with
+a new feature concerning the density of road intersections in an area. The
+features will be classified with a number of unsupervised learning algorithms.
+In constrast to supervised learning methods, unsupervised algorithms do not
+require labeled data. Considering the fast amount of available remote sensing
+imagery, this would be a welcome property.
+
+The overall objective of the project is the successfull classification and
+detection of informal settlements from sattelite image data. This description
+can be broken down into two seperate objectives. The first objective is the
+assessment of various features that could characterize neigborhoods. This could
+be for instance an assesment of generizabilty, accuracy and other measures
+concerning the effectiveness of the feature. The second objective concerns the
+evaluation of a number of unsupervised learning algorithms. This will be
+approached with in a similar manner as the assessment of the features to
+discover the method that best suits the problem domain. Both objectives
+together, this project would provide a method for classifying neighborhoods
+from potentially fast amounts of unlabeled remote sensing imagery.
+
+
+\section{Method and Approach}
+
+% \nocite{*}
 \printbibliography
 \end{document}
 
@@ -91,6 +117,7 @@ resolution remote sensing imagery
 
 Automated classification of landform elements using object-based image analysis
 
+discriminative random fields
 
 ############################ related research ##########################
 
