@@ -80,7 +80,7 @@ bins because the gradients in the block will be very alike
 
 Besides HoG, there are numerous other features that can be used to characterize
 neighborhoods. This project will use Line Support Regions \cite{}, Line Feature
-Distribution as additional features for classification in a similar manner
+Distribution \cite{} as additional features for classification in a similar manner
 to \cite{graesser2012image}. These conventional features will be expanded with
 a new feature concerning the density of road intersections in an area. The
 features will be classified with a number of unsupervised learning algorithms.
@@ -102,6 +102,25 @@ from potentially fast amounts of unlabeled remote sensing imagery.
 
 
 \section{Method and Approach}
+
+This project continues using a software package written for detection of slums
+of a previous research project \cite{graesser2012image}. The package is written
+in python and has most of the features discussed in the paper already
+implemented. These features will be reused and extended with an additional
+feature. The usability of the features for classification will be analyzed with
+measures that are still to be determined. Once the set of features is validated
+to provide an acurate characterization of neighborhoods, the project continues
+with the analyzation of different unsupervised approaches.
+
+\section{Evaluation}
+
+The supervisor of the project has provided labeled remote sensing imagery that
+will be used for validation. The areas detected as informal settlements using
+the developed product will be compared side to side with the ground truth. The
+difference overlap will be the margin of error. We could use the measures
+accuracy, recall and the F1 score to characterize the results.
+
+\section{Plan}
 
 % \nocite{*}
 \printbibliography
