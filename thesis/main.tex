@@ -1,11 +1,32 @@
 \documentclass[a4paper]{article}
 
+\usepackage[backend=biber]{biblatex}
+\usepackage[margin=1.4in]{geometry}
+\usepackage{multicol}
+\usepackage{titlesec}
+
+\addbibresource{references.bib}
+
+\renewcommand{\thesection}{\Roman{section}}
+\renewcommand{\thesubsection}{\thesection.\Roman{subsection}}
+
+\titleformat{\subsection}{\large\it}{\thesubsection}{0.9em}{}
+\titleformat{\section}{\large\sc\filcenter}{\thesection}{1em}{}
+
 \begin{document}
+\begin{multicols}{2}
+[
+  \include{title}
+]
 
-\include{title}
+\input{introduction}
 
-\include{introduction}
+\input{previous_work}
 
-\include{previous_work}
+\input{features/hog}
+
+\end{multicols}
+
+\printbibliography
 
 \end{document}
