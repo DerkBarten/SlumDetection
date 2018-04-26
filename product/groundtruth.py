@@ -6,22 +6,23 @@ from rasterio.features import shapes
 import matplotlib.pyplot as plt
 import numpy as np
 import math
+import pandas as pd
 
 
-def create_groundtruth(mask, block_size=25, threshold=0.5):
+def create_groundtruth(mask, block_size=25, threshold=0.1):
     minum_pixels = pow(block_size, 2) * threshold
     slum_cnt = 0
     nonslum_cnt = 0
     height = mask.shape[0]
     width = mask.shape[1]
-    groundtruth = np.zeros((int(math.ceil(height / block_size) + 1),
-                            int(math.ceil(width / block_size) + 1)))
+    groundtruth = np.zeros((int(math.ceil(height / block_size)),
+                            int(math.ceil(width / block_size) - 1)))
 
     i = 0
     j = 0
-    while i * block_size < height:
+    while i < groundtruth.shape[0]:
         j = 0
-        while j * block_size < width:
+        while j < groundtruth.shape[1]:
             chunck = mask[i * block_size:i * block_size + block_size,
                           j * block_size:j * block_size + block_size]
             if np.count_nonzero(chunck) > minum_pixels:
@@ -56,6 +57,21 @@ def create_mask(shapefile, imagefile, maskname=None):
     return out_image
 
 
+def create_dataset(feature, groundtruth):
+    height, width = groundtruth.shape
+    dataset = {'feature': [], 'formality': []}
+
+    for i in range(height):
+        for j in range(width):
+            if (groundtruth[i, j] != 0):
+                dataset['formality'].append(0)
+            else:
+                dataset['formality'].append(1)
+            dataset['feature'].append(feature[i, j])
+
+    return pd.DataFrame.from_dict(dataset)
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Create mask from shape file")
     parser.add_argument("shapefile",  nargs="?",
@@ -70,6 +86,7 @@ if __name__ == "__main__":
     # use the red band
     mask = create_mask(args.shapefile, args.imagefile, args.maskname)[4]
     groundtruth = create_groundtruth(mask)
+    print(groundtruth.shape)
 
     plt.imshow(groundtruth, cmap='gray')
     plt.title('Binary mask')    
