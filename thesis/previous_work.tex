@@ -1,36 +1,32 @@
 \section{Previous Work}
 
-There have been quite a few studies concerning the detection of informal
+There have been multiple studies concerning the detection of informal
 settlements using remote sensing in the last decade \cite{kuffer2016slums}.
-Informal settlements inside and in the proximity of cities have been studied
-from all around the world using remote sensing imagery, for instance Colombo
-\cite{colombo}, Johannesburg \cite{williams2016automatic}, Accra \cite{accra},
-Mumbai \cite{mumbai}, and Hyderabad \cite{hyderabad}. There are numerous
-characteristics that can be used to differentiate between formal and informal
-settlements. This could be the number vegetation, the width of the roads, the
-size and orientations of dwellings \cite{owen2013approach}.
+Informal settlements in the proximity of cities have been studied throughout
+the globe using remote sensing imagery, e.g. Colombo \cite{colombo},
+Johannesburg \cite{williams2016automatic}, Accra \cite{accra}, Mumbai
+\cite{mumbai}, and Hyderabad \cite{hyderabad}. There are numerous
+characteristics that are suitable to differentiate between formal and informal
+settlements. This could, for example,  be the number vegetation, the width of
+the roads, the size and orientations of dwellings \cite{owen2013approach}.
 
-In general, there is a shift towards the usage of objects to classify geographical
-features, also known as Geographic Object-based imaga analysis or GEOBIA
-\cite{hay2008geographic}.Due to the increase in availability of remote sensing
-high resolution imagery, it became possible to distinguish individual objects
-on a large scale.  This allows for the
-interpretation of geographical imagery with individual objects at its basis.
-As a result,  this enable the characterization of regions based on the type of objects
-that inhabit it.  As and example, a study classified rooftop objects from
-aerial imagery of an informal settlements in Johannesburg to gather demographic
-information as an alternative to traditional survey
+In general, there is a shift towards the usage of objects for the
+classification of geographical features. This is broadly known as Geographic
+Object-based imaga analysis or GEOBIA \cite{hay2008geographic}.Due to the
+increase in availability of remote sensing high resolution imagery, it became
+feasible to distinguish individual objects on a large scale.  This allows for
+the interpretation of geographical imagery with individual objects at its
+basis.  As a result, the characterization of regions may be based on the type
+of objects that inhabit it.  To illustrate, a study classified rooftop objects
+from aerial imagery of an informal settlements in Johannesburg to gather
+demographic information as an alternative to traditional ground based survey
 \cite{williams2016automatic}.
 
-When classifying entire neighborhoods, it is common for studies to use a combination
-of characteristic that are used in the classification between formal and
-informal \cite{graesser2012image}. As previously mentioned, the orientation of
-buildings is used as a way of discriminating between formal and informal
-settlements. A technique used to qualify the orientation is the Histogram of
-Oriented Gradients (HoG)\cite{kumar2006discriminative}. This algorithm iterates over blocks of pixels in a given
-image and calculate the gradient. The gradients are binned into
-the bin that most closely represents their orientation. This effectively
-translates the infinitely many orientations of the gradients to just a few.
-Structured objects, such as the walls, are characterized by peaks in a few
-bins because the gradients in the block will be very alike
+When classifying entire neighborhoods, it is common for studies to use
+a combination of features for the classification between formal and informal.
+Our research will use methods for feature extraction that performed well in
+previous research \cite{graesser2012image}. The methods used are: the Histogram
+of Oriented Gradients, Line Support Region features and Linear Feature
+Distribution.
+
 
