@@ -1,35 +1,59 @@
 \subsection{Histogram of Oriented Gradients}
-The spatial distribution of buildings in formal and informal settlements varies
-significantly. The placement of houses in formal settlements are often placed
-in a regular pattern with fixed orientations. Informal settlements, in
-contrast, usually constructed without a design or regular pattern. This
-difference in regularity is a characteristic that will be used
-for classification of formal or informal settlements.
+% designed for only settlement detection
+% as supporting feature
+% theory part
+% however, Graesser does work for differentiating
+% picture for explaination?
+
+
+The Histogram of Oriented Gradients (HoG) was originally used for the detection of
+man-made structures in images. The features retrieved from the histogram were
+able to differentiate between natural and man-made sections in an image. This
+approach of man-made structure detection relies on the difference in the
+distrubution of gradients in a particular region of the image. Because man-made
+structures are often consists of straight lines and regular forms, this
+contrasts the irregular forms that are naturally formed. This difference in
+appearance translates to a difference in the distribution of gradients in
+man-made structures and nature.
+
+In satellite images, the difference of the Histogram of Oriented Gradients
+between nature and human settlements is quite large. Eventhough HoG was
+originallly used for differentiating between nature and man-made structures,
+the paper of Graesser et al was able to succesfully to use HoG between formal
+and informal neighborhoods. The paper uses the disparate spatial distribution of
+buildings in formal and informal regions. The
+placement of houses in formal regions are often placed in a regular pattern
+with fixed orientations. Informal areas, in contrast, are usually constructed
+without a design or regular pattern. This difference in regularity is
+a characteristic that can be used for classification of formal or informal
+settlements.
 
 The order of regularity of an area can be captured using the number of
-orientations in which buildings are constructed. Few orientations suggest
+orientations in which buildings are constructed. Few distinct orientations suggest
 a formal settlements while many orientations suggest informal. The orientations
 of buildings are calculated using the gradients returned by the application of
 a sobel filter on the image. The gradients are quantized into a set of
 orientations or bins. This results in a histogram commonly named the Histogram
-of Oriented Gradients (HoG). High peaks the HoG correspond to a multitude of
+of Oriented Gradients. High peaks in the HoG correspond to a multitude of
 similar gradients, thus uniformity in the image. Since uniformity is linked
 to formal settlements, high peaks in the histogram correlate with formal
 settlements. The informal settlements, on the other hand, are characterized by
 the absence of peaks in the HoG due to the multitude of different gradients
 caused by the irregular placement of buildings.
 
-The HoG itself cannot reasonably be used as a feature, therefore the properties
-of its distribution are used instead. One property of the HoG that well defines the
-difference between formal and informal are the heaved central-shift moments.
-The heaved central-shift moments are a method for the calculation of the
-weighted mean of a histogram for any order.  The orders correspond to the
-impact that high peaks in the histogram have on the mean. 
+%The HoG itself cannot reasonably be used as a feature, therefore the properties
+%of its distribution are used instead. One property of the HoG that well defines the
+%difference between formal and informal are the heaved central-shift moments.
+%The heaved central-shift moments are a method for the calculation of the
+%weighted mean of a histogram for any order.  The orders correspond to the
+%impact that high peaks in the histogram have on the mean. 
 
 
-Histogram of Oriented Gradients
-that characterize a certain area.
+%Histogram of Oriented Gradients
+%that characterize a certain area.
 
 
 % praktisch hoe het hier gedaan is
+
+The paper from Graesser et al extracts five features from the HoG ...
 

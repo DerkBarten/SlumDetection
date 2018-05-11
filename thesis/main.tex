@@ -9,10 +9,10 @@
 \addbibresource{references.bib}
 
 \renewcommand{\thesection}{\Roman{section}}
-\renewcommand{\thesubsection}{\thesection.\Roman{subsection}}
+\renewcommand{\thesubsection}{\Alph{subsection}}
 
-\titleformat{\subsection}{\large\it}{\thesubsection}{0.9em}{}
-\titleformat{\section}{\large\sc\filcenter}{\thesection}{1em}{}
+\titleformat{\subsection}{\small\it}{\thesubsection.}{0.9em}{}
+\titleformat{\section}{\large\sc\filcenter}{\thesection.}{1em}{}
 
 \begin{document}
 %\begin{multicols}{2}
@@ -27,6 +27,8 @@
 \input{features}
 
 \input{method/method}
+
+% evaluation
 
 %\end{multicols}
 

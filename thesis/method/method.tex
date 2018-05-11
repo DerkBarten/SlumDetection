@@ -4,18 +4,20 @@
 
 \subsection{Data}
 
+The image data used are captured by the earth observation satellite WorldView3
+owned by DigitalGlobe. The WorldView3 satellite produces multiple categories of
+imagery with varying degrees of resolution. The panchromatic images have
+a resolution of 0.31 meter in contrast to  the multiband images have
+a significantly lower resolution of
+1.24 meter. The project uses pansharpened images, which combines the high
+resolution panchromatic- and the low resolution multiband images to create
+high resolution RGB images.
 
-The satellite images used are captured by the earth observation satellite
-WorldView3. The satellite produces panchromatic images with a resolution of
-0.31 meter together with multiband images with a resolution of 1.24 meter. The
-  project uses pansharpened images using the high resolution panchromatic- and
-  the multiband low resolution images.
-
-  The content of the images contain regions of Bangalore, which is the capital
-  city of the indian state of Karnataka, located in south central India. The
-  population of the city is over ten million and is recognised as a mega city.
-  Banglore is known to have problems concerning informal settlements. According
-  to a report from 2012, there are 862 reported slums in the city
+The content of the images contain regions of Bangalore, which is the capital
+city of the indian state of Karnataka, located in south central India. The
+population of the city is over ten million and is recognized as a mega city.
+Banglore is known to have problems concerning informal settlements. According
+to a report from 2012, there are 862 reported slums in the city
 
 
 \begin{figure*}
@@ -51,9 +53,9 @@ between formal and informal regions.
 
 To reduce the skewedness between informal and formal, only subsections of Figure \ref{fig:west-bangalore} are
 used where the proportion formal to informal is less one-sided. An example of
-such a region is Figure \ref{fig:section_3}. The improved ratio between
-formal and informal will result in a more balanced dataset. A balanced dataset
-might improve the distinction between formal and informal settlements. 
+such a region is Figure \ref{fig:section_3}. A smaller difference in formal
+informal ratio allows for a better understanding of the effectiveness of
+various features. The features are assesed using these area's 
 
 \begin{figure}
 \centering
@@ -63,5 +65,18 @@ might improve the distinction between formal and informal settlements.
   \label{fig:section_3}
 \end{figure}
 
+\subsection{Feature Evaluation}
+An important part is the evaluation of the value of estimation that a certain
+feature posesses. This allows to conclude if a certain feature is useful in the
+discrimination between formal and informal. The use of a set of features allows
+for a more solid estimation compared to a single feature by itself. 
 
+The measure of predictive value of a feature is visualized using a boxplot and
+the spatial distribution of values. A boxplot for a certain feature, consists
+of two classes: the formal and informal class. To latter belong chunks of
+pixels that are situated inside formal settlements. The former contains chuncks
+that are not within informal regions. In the case that a feature is
+distinctive, the distribution of the values in the two classes will be
+different. The boxplot visualizes the difference in distribution well, showing
+the usefulness of a feature.
 
