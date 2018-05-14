@@ -5,6 +5,8 @@
 %\usepackage{multicol}
 \usepackage{titlesec}
 \usepackage{graphicx}
+\usepackage{cuted}
+
 
 \addbibresource{references.bib}
 
@@ -17,8 +19,12 @@
 \begin{document}
 %\begin{multicols}{2}
 %[
-%  \include{title}
 %]
+
+\twocolumn[
+  \input{title}
+]
+\clearpage
 
 \input{introduction}
 
@@ -28,27 +34,18 @@
 
 \input{method/method}
 
-% evaluation
+\input{evaluation}
+
+% feature evaluation
+%
+%
 
 %\end{multicols}
 
-\newpage
+\clearpage
 
 \printbibliography
 
 \end{document}
-
-
-Man-Made
-Structur
-e Detection
-in
-Natural
-Images
-using
-a Causal
-Multiscale
-Random
-Fiel
 
 Gradient-Magnitude-Based Support Regions in Structural Land Use Classification

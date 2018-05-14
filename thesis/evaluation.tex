@@ -1,0 +1,37 @@
+
+\section{Feature Evaluation}
+
+In order produce a functioning classifier, the predictive value of the features
+must be evaluated. This assesses wether a certain feature is useful in the
+discrimination between formal and informal. The evaluation requires the
+knowledge of what parts in a satellite image are formal and informal to create
+a distinction between the two classes. This knowledge is represented in
+a ground truth, this is a mask covering the satellite image indicating the
+informal regions.
+
+The mask is used to divide each block of pixels into the two classes, formal
+and informal. Each block has a vector of values, also called features,
+characterizing that particular block. Because the blocks are grouped together,
+the features associated with the same class are grouped together as well. This
+allows for the analysis of the distribution of the features in both classes. If
+the distribution of a certain feature varies quite distinctly between the two
+classes, this indicates as a suitable candidate for classification of informal
+regions.
+
+The groundtruth mask is constructed using a vector file containing the
+boundaries of informal areas. The boundary file is rasterized and applied on
+top of the satellite image, creating a mask of the informal settlements.
+Because classification and feature calculation is performed on blocks instead
+of pixels, the pixel based mask transformed into a block based mask. In this
+mask, every pixel represents a block where the zero represents formal and one
+represents informal. This effectively creates a ground truth.  
+
+The predictive value of a feature can be visualized using a boxplot of the two
+classes. When a feature is distinctive on its own, the distribution of the
+values in the two classes will be different. Eventhough there might not be
+a significant difference between two distribution, by using multiple features
+in combination, the grand total might more distinctive that the sum of its
+parts. 
+
+
+
