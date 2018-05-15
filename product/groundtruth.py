@@ -16,7 +16,7 @@ def create_groundtruth(mask, block_size=25, threshold=0.1):
     height = mask.shape[0]
     width = mask.shape[1]
     groundtruth = np.zeros((int(math.ceil(height / block_size)),
-                            int(math.ceil(width / block_size) - 1)))
+                            int(math.ceil(width / block_size))))
 
     i = 0
     j = 0
@@ -71,6 +71,18 @@ def create_dataset(feature, groundtruth):
 
     return pd.DataFrame.from_dict(dataset)
 
+def create_dict(feature, groundtruth):
+    height, width = groundtruth.shape
+    dataset = {'formal': [], 'informal': []}
+
+    for i in range(height):
+        for j in range(width):
+            if (groundtruth[i, j] != 0):
+                dataset['formal'].append(feature[i, j])
+            else:
+                dataset['informal'].append(feature[i, j])
+            
+    return dataset
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Create mask from shape file")
@@ -84,7 +96,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     # use the red band
-    mask = create_mask(args.shapefile, args.imagefile, args.maskname)[4]
+    mask = create_mask(args.shapefile, args.imagefile, args.maskname)[0]
     groundtruth = create_groundtruth(mask)
     print(groundtruth.shape)
 
