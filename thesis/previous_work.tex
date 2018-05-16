@@ -1,4 +1,4 @@
-\section{Previous Work}
+\section{Related works and contribution}
 
 There have been multiple studies concerning the detection of informal
 settlements using remote sensing in the last decade \cite{kuffer2016slums}.
@@ -29,7 +29,7 @@ problem, the characterization of formal and informal neighborhoods.  This study
 uses a collection of different features to capture the difference in
 characteristics between formal and informal neighborhoods in urban
 environments. Our research will evaluate if the results obtained by Graesser et
-al translates well to different cities with imagery from a different
+al translates well to a different city with imagery from a different
 satellite. Beyond the replication of previous research, the features used by
 Graesser will be extended by an additional feature. This feature will be
 compared to the existing features in various measures. The features combined
@@ -44,7 +44,13 @@ Graesser et al proposed a method for the detection of informal regions using
 a set of different features. The features used where GLCM, HoG, Lacunarity,
 LFD, LSR, NDVI, SIFT, and TEXTON. These features were calculated on satellite
 image. In the processing, the paper uses blocks of pixels instead of each
-individual pixel to ease the computational load. Since features depend on their
-surroundings, the paper uses scales to capture the surrounding pixels. 
+individual pixel to ease the computational load. In the paper, these the size
+of these blocks are 20 pixels. In our project, the block size will differ from
+this for a value that works well with the features and the image data.
+In addition to blocks, the paper also uses a set of different scales for the
+calculation of features. A scale specifies the pixels around a block that
+are used for the calculation of that block. This allows blocks to be more
+spatially connected to the surrounding areas, which can increase the
+performance of a feature. 
 
-% difference everything not informal automatically fromal
+

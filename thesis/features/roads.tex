@@ -1,4 +1,4 @@
-\subsection{Intersection Density}
+\subsection{Road Intersection Density}
 
 % how density could indicate formal
 % the estimated accuracy?
@@ -23,5 +23,43 @@ roads easily identifiable from the suroundings for the human eye. Edge
 detection uses the sharp contrast between a road and the roadside to identify
 the road.
 
-Since, in our case, were only interested in the positions of the intersection
-and not the entirety of the road. 
+Besides tradional image processing methods, another promising approach in the
+detection of road networks from satellite images are Neural Networks
+\cite{mangala2011extraction} \cite{mokhtarzade2007road}. A study from 2017 was
+able to extract both the road network together with buildings with high
+accuracy using a Convolutional Neural Network \cite{alshehhi2017simultaneous}.
+
+We used a seperate implementation of the convolutional neural network since the
+research paper did not include the software used \cite{airs}. This
+implementation includes a set of images, that could be used for the training
+and validation of the neural network \cite{MnihThesis}. After the training of
+the network on the provided images, was used to extract the roads from our own
+satellite images.  Unfortunately, the mask of the road network was erroneous as
+it did not represent the road network in the provided image. The suspected
+cause of this failure is the difference in the training data to our satellite
+imagery data.
+
+To illustrate the difference, the trainingset contained satellite images
+obtained from partly rural area's of the state of Massachusetts in the United
+States while the data used in our research is from Bangalore in India which is
+mostly urban.  As a result, the geographical features and the road systems are
+quite different in the two area's. This could cause the network not to
+recognize the roads in the images from Bangalore. The difference in resolutions
+of the two image sets could be another cause. The images of Massachusets were
+of a lower resolution than the images of Bangalore which could have hindered
+the neural network in the correct classification of the roads, although this is
+ungrounded speculation.
+
+% TODO: cite Otsu
+As a alternative to neural network, conventional image processes were used. The
+image is subjected to a number of operations that will extract the road network
+from the image. The first operation is the transformation of the RGB satellite
+image to grayscale values. This is done in preparation for Otsu's method for 
+threshold, which effectively separates buildings from roads. The resulting
+image, although quite crude, is a mask of the road network in the satellite image.   
+
+% TODO: hough transform
+% perhaps expand otsu more
+
+% Use opencv canny stuff with hough lines
+

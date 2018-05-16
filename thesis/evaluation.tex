@@ -28,10 +28,45 @@ represents informal. This effectively creates a ground truth.
 
 The predictive value of a feature can be visualized using a boxplot of the two
 classes. When a feature is distinctive on its own, the distribution of the
-values in the two classes will be different. Eventhough there might not be
-a significant difference between two distribution, by using multiple features
-in combination, the grand total might more distinctive that the sum of its
-parts. 
+values in the two classes will be different. The data used for the evaluation
+comes from three small sections of the image. As priorly mentioned, this
+creates a more even division of classes which should provide a more accurate
+evaluation of the selected feature.
 
+The features will be calculated for every image at different block sizes and
+scales. Because block size and scale impact the predictiveness of a feature,
+various combinations are used to discover the most favorable combination.
 
+% TODO: insert concatenated image of the three sections
 
+%Eventhough there might not be
+%a significant difference between two distribution, by using multiple features
+%in combination, the grand total might more distinctive that the sum of its
+%parts. 
+
+\subsection{Histogram of Oriented Gradients}
+
+In the analysis of the historgram used block sizes of 20, 40, and 60 combined
+with scales of 50, 100, 150, and 200. These combinations should capture the
+difference that either an increase of block size or scale causes to the
+predictiveness of a feature. 
+
+The use of a constant scale with a variable block size does not seem to
+increase the difference in the distributions of both classes significantly. As
+a result the increase in the size of a block has a neglible influence on the
+predictive value of the HoG.
+
+A variable scale, on the otherhand, seems to indicate an increase in
+predictability.
+
+% TODO: add images of results
+
+For the results shown above, the second section is used, although
+the two other sections are comparative in result.
+
+\subsection{Line Support Region}
+
+Similar to the analysis of the Histogram of Oriented Gradients, the analysis of
+Line Support Region uses a combination of different block sizes and scales.
+Unlike HoG, however, the scale 200 is not included due to the high
+computational cost. 

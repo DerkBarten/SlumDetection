@@ -100,20 +100,20 @@ def analyze_features(imagefile, blocks, scales, bands, features):
                 groundtruth = create_groundtruth(mask, block_size=block,
                                      threshold=0)
                 groundtruth = reshape_image(groundtruth, image, block, scale)
-                
+
                 for i, feature_ in enumerate(features_):
                     foldername = "analysis/{}_BK{}_SC{}"
                     featurename = "{}_{}_BK{}_SC{}_F{}.png"
                     base = os.path.basename(os.path.splitext(imagefile)[0])
 
                     featurefolder = foldername.format(base, block, scale)
-                    
+
                     if not os.path.exists(featurefolder):
                         os.mkdir(featurefolder)
 
                     name = featurename.format(base, 'boxplot', block, scale, i)
                     boxplot(groundtruth, feature_, featurefolder, name)
-   
+
 
 def analysis(imagefile, blocks, scales, bands, features):
     create_features(imagefile, blocks, scales, bands, features)

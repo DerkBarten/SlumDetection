@@ -3,15 +3,15 @@ source activate dynaslum2
 set -euo pipefail
 
 # Worldview2 image of Bangalore
-image=~/projects/dynaslum/thesis/product/data/Bangalore.TIF
-#image=~/projects/dynaslum/thesis/product/data/section_1_fixed.tif
+#image=~/projects/dynaslum/thesis/product/data/Bangalore.TIF
+image=~/projects/dynaslum/thesis/product/data/new_section_1.tif
 output=~/projects/dynaslum/thesis/product/features
 
 # GLCM PanTex (3)
 #spfeas -i $image -o $output --block 8 --band-positions 5 3 2 --scales 8 16 32 --triggers pantex
 
 # Histogram of Gradients (15)
-spfeas -i $image -o $output --block 24 --band-positions 5 3 2 --scales 50 --triggers hog
+spfeas -i $image -o $output --block 20 --band-positions 1 2 3 --scales 50 --triggers lsr
 
 # Lacunarity (3)
 # Cannot compute at scales 15m (8 pixels) and 30m (16 pixels) because our data are 1.84m instead of 0.6m resolution,
