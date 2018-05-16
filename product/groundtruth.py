@@ -64,9 +64,9 @@ def create_dataset(feature, groundtruth):
     for i in range(height):
         for j in range(width):
             if (groundtruth[i, j] != 0):
-                dataset['formality'].append(0)
+                dataset['formality'].append('informal')
             else:
-                dataset['formality'].append(1)
+                dataset['formality'].append('formal')
             dataset['feature'].append(feature[i, j])
 
     return pd.DataFrame.from_dict(dataset)

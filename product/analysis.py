@@ -10,23 +10,13 @@ import math
 import matplotlib.ticker as mtick
 import re
 import os
+import sys
 
 
 
 def value_distribution(feature):
     seaborn.kdeplot(np.ravel(feature))
     plt.show()
-
-
-def feature_distribution(dataset, axis):
-    seaborn.kdeplot(dataset['formal'], ax=axis, label="formal")
-    seaborn.kdeplot(dataset['informal'], ax=axis, label="informal")
-
-
-def spatial_distribution(feature):
-    plt.imshow(feature, cmap="hot")
-    plt.show()
-
 
 def analyze(feature):
     value_distribution(feature)
@@ -67,17 +57,24 @@ def parse_name(filename):
 
 def get_featurefile(imagename, block=20, scale=50, bands=[1, 2, 3],
                     feature='hog'):
-    return "testfeatures/{}__BD{}-{}-{}_BK{}_SC{}_TR{}.vrt".format(
+    file = "features/{}__BD{}-{}-{}_BK{}_SC{}_TR{}.vrt".format(
                 os.path.basename(os.path.splitext(imagename)[0]), bands[0],
                 bands[1], bands[2], block, scale, feature)
+    if os.path.exists(file):
+        return file
+    return None
 
 
 def create_features(image, blocks, scales, bands, features):
-    cmd = 'spfeas -i {} -o testfeatures --block {} --band-positions {} {} {} --scales {} --triggers {}'
+    cmd = 'spfeas -i {} -o features --block {} --band-positions {} {} {} --scales {} --triggers {}'
 
     for feature in features:
         for block in blocks:
             for scale in scales:
+
+                if block > scale:
+                    print("Block cannot be larger than scale")
+                    continue
                 spfeas = cmd.format(image, block, bands[0], bands[1], bands[2],
                                     scale, feature)
                 os.system(spfeas)
@@ -96,41 +93,74 @@ def analyze_features(imagefile, blocks, scales, bands, features):
             for scale in scales:
                 featurefile = get_featurefile(imagefile, block, scale, bands,
                                               feature)
+                sys.stdout.write("Processing\tfeature: {}\tblock: {}\tscale: {}\t...\t".
+                                 format(feature, block, scale))
+                sys.stdout.flush()
+
+                if featurefile is None:
+                    print("can't find feature file")
+                    continue
+
                 features_ = np.array(read_geotiff(featurefile))
                 groundtruth = create_groundtruth(mask, block_size=block,
-                                     threshold=0)
+                                                 threshold=0)
                 groundtruth = reshape_image(groundtruth, image, block, scale)
 
                 for i, feature_ in enumerate(features_):
-                    foldername = "analysis/{}_BK{}_SC{}"
-                    featurename = "{}_{}_BK{}_SC{}_F{}.png"
+                    foldername = "analysis/{}_{}_BK{}_SC{}"
+                    featurename = "{}_{}_{}_BK{}_SC{}_F{}.png"
                     base = os.path.basename(os.path.splitext(imagefile)[0])
 
-                    featurefolder = foldername.format(base, block, scale)
+                    featurefolder = foldername.format(base, feature, block, scale)
 
                     if not os.path.exists(featurefolder):
                         os.mkdir(featurefolder)
 
-                    name = featurename.format(base, 'boxplot', block, scale, i)
-                    boxplot(groundtruth, feature_, featurefolder, name)
+                    dataset = create_dataset(feature_, groundtruth)
+                    name = featurename.format(base, 'boxplot', feature, block, scale, i)
+                    boxplot(dataset, featurefolder, name)
 
+                    dataset = create_dict(feature_, groundtruth)
+                    name = featurename.format(base, 'kde', feature, block, scale, i)
+                    kde(dataset, featurefolder, name)
+
+                    name = featurename.format(base, 'spatial', feature, block, scale, i)
+                    spatial_distribution(feature_, featurefolder, name)
+
+                print("done")
 
 def analysis(imagefile, blocks, scales, bands, features):
-    create_features(imagefile, blocks, scales, bands, features)
+    #create_features(imagefile, blocks, scales, bands, features)
     analyze_features(imagefile, blocks, scales, bands, features)
 
 
-def boxplot(groundtruth, feature, folder, name):
-    dataset = create_dataset(feature, groundtruth)
+def boxplot(dataset, folder, name):
     seaborn.boxplot(x="formality", y="feature", data=dataset)
     plt.title(name)
     plt.savefig(os.path.join(folder, name))
-    plt.clf()    
+    plt.clf()
 
+
+def kde(dataset, folder, name):
+    seaborn.kdeplot(dataset['formal'], label="formal")
+    seaborn.kdeplot(dataset['informal'], label="informal")
+    plt.title(name)
+    plt.savefig(os.path.join(folder, name))
+    plt.clf()
+
+
+def spatial_distribution(feature, folder, name):
+    plt.imshow(feature, cmap="gray")
+    plt.title(name)
+    plt.savefig(os.path.join(folder, name))
+    plt.clf()
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Analyze LSR features")
     parser.add_argument("imagefile",  nargs="?",
                         help="The imagefile to use")
     args = parser.parse_args()
-    analysis(args.imagefile, [20, 40], [50, 100], [1, 2, 3], ['hog', 'lsr'])
+    #data/new_section_2.tif
+    analysis('data/section_3.tif', [20, 40, 60], [50, 100, 150, 200], [1, 2, 3], ['hog'])
+    analysis('data/section_2.tif', [20, 40, 60], [50, 100, 150, 200], [1, 2, 3], ['hog'])
+    #analysis('data/section_1.tif', [20, 40, 60], [200], [1, 2, 3], ['hog'])
