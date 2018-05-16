@@ -49,20 +49,51 @@ various combinations are used to discover the most favorable combination.
 In the analysis of the historgram used block sizes of 20, 40, and 60 combined
 with scales of 50, 100, 150, and 200. These combinations should capture the
 difference that either an increase of block size or scale causes to the
-predictiveness of a feature. 
+predictiveness of a feature. For visualization purposes, only a single feature
+of the 15 features of HoG of a single section is displayed here. This feature
+is the most distinct between formal and informal. The other two sections are
+comparable to the section used here. Moreover, not all combinations of the
+block sizes and scales are presented here, only a few examples which illustrate
+the distinctiveness of the features of the Histogram of Oriented Gradients.
 
-The use of a constant scale with a variable block size does not seem to
-increase the difference in the distributions of both classes significantly. As
-a result the increase in the size of a block has a neglible influence on the
-predictive value of the HoG.
+\begin{figure}
+\begin{tabular}{cc}
+  \subfloat{\includegraphics[width=4cm]{images/HoG/inc_bk/section_1_boxplot_hog_BK20_SC100_F2}}&
+  \subfloat{\includegraphics[width=4cm]{images/HoG/inc_bk/section_1_boxplot_hog_BK60_SC100_F2}}\\ 
+  \subfloat{\includegraphics[width=4cm]{images/HoG/inc_bk/section_1_kde_hog_BK20_SC100_F2}}&
+  \subfloat{\includegraphics[width=4cm]{images/HoG/inc_bk/section_1_kde_hog_BK60_SC100_F2}}
+\end{tabular}
+\caption{The effect of increased block size on a HoG feature. From left to
+right: a block size of 20 and 60 respectively.}
+\label{hog_inc_bk}
+\end{figure}
 
-A variable scale, on the otherhand, seems to indicate an increase in
-predictability.
+Figure \ref{hog_inc_bk} shows the effect that an increased block size has on
+the distribution of values in both classes. This example uses a constant scale
+of 100 pixels and a variable block size of 20 and 60 pixels. The experiment
+with a block size of 40 is performed as well, but is ommited from the figure to
+keep the results brief. A more comprehensive visualization of the evaluation
+can be found in the appendix. It seems that the block size, in this case, does
+not influence the both distrutions significantly. As a result an increase in
+the size of a block will have little influence on the predictive value of the
+HoG.
 
-% TODO: add images of results
+\begin{figure}
+\begin{tabular}{cc}
+  \subfloat{\includegraphics[width=4cm]{images/HoG/inc_sc/section_1_boxplot_hog_BK20_SC50_F2}}&
+  \subfloat{\includegraphics[width=4cm]{images/HoG/inc_sc/section_1_boxplot_hog_BK20_SC200_F2}}\\
+  \subfloat{\includegraphics[width=4cm]{images/HoG/inc_sc/section_1_kde_hog_BK20_SC50_F2}}&
+  \subfloat{\includegraphics[width=4cm]{images/HoG/inc_sc/section_1_kde_hog_BK20_SC200_F2}}\\
+\end{tabular}
+\caption{The effect of increased scale on a HoG feature. From left to
+right: a scale of 50 and 200 respectively}
+\label{hog_inc_sc}
+\end{figure}
 
-For the results shown above, the second section is used, although
-the two other sections are comparative in result.
+Figure \ref{hog_inc_sc} illustrates the effect of increased scale on a constant
+block size. It seems to indicate that an increased scale leads to an increased
+separatation of the two distribution, thus increasing the predictiveness of the
+feature.
 
 \subsection{Line Support Region}
 
