@@ -93,10 +93,19 @@ def print_dimensions(imagefile, featurefile, block, scale):
 # featurefile = 'features/new_section_1__BD1-2-3_BK20_SC50_TRhog.vrt'
 # print_dimensions(imagefile, featurefile, 20, 50)
 
-imagefile = 'data/new_section_1.tif'
-featurefile = 'testfeatures/new_section_1__BD1-2-3_BK20_SC50_TRhog.vrt'
-print_dimensions(imagefile, featurefile, 20, 50)
+# imagefile = 'data/new_section_1.tif'
+# featurefile = 'testfeatures/new_section_1__BD1-2-3_BK20_SC50_TRhog.vrt'
+# print_dimensions(imagefile, featurefile, 20, 50)
 
+
+imagefile = 'data/section_1.tif'
+#featurefile = '/home/derk/projects/dynaslum/thesis/product/features/section_1__BD1-2-3_BK20_SC30_TRhog.vrt'
+featurefile = '/home/derk/projects/dynaslum/thesis/product/features/features/section_1__BD1-2-3_BK20_SC30_TRhog/section_1__BD1-2-3_BK20_SC30__ST1-015__TL000001.tif'
+print_dimensions(imagefile, featurefile, 20, 30)
+
+# feature = read_geotiff(featurefile)
+# plt.imshow(feature[2])
+# plt.show()
 
 # imagefile = 'data/Bangalore.TIF'
 # featurefile = 'features/Bangalore__BD5-3-2_BK24_SC50_TRhog.vrt'

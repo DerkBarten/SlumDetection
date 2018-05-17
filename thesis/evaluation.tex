@@ -33,28 +33,28 @@ comes from three small sections of the image. As priorly mentioned, this
 creates a more even division of classes which should provide a more accurate
 evaluation of the selected feature.
 
-The features will be calculated for every image at different block sizes and
-scales. Because block size and scale impact the predictiveness of a feature,
-various combinations are used to discover the most favorable combination.
+The features will be calculated for all combinations of image sections, color
+bands, block sizes, and scales. This resulted in large amounts of data, of
+which only a selection will be shown in the following sections. For both HoG
+and LSR, the features are extracted from the three sections presented in Figure
+\ref{fig:sections} on all the three color bands. To analyze the impact of the
+blocksize and scale parameters, block sizes 20, 40 and 60 will be used in
+combination with scales 50, 100, 150 and 200. The block sizes will be combined
+together with the scales, resulting in a large number of combinations of
+parameters.  Some combinations, however, are not valid, e.g when the scale is
+smaller than the block size, and will therefore be omitted. The individual
+impact of each of the two parameters, is evaluated by the use of a comparison
+between the baseline and the increased parameter. This is, for example,
+a comparison between the results obtained from a block size of 20 compared to
+a block size of 60, with all other parameters constant. 
 
-% TODO: insert concatenated image of the three sections
-
-%Eventhough there might not be
-%a significant difference between two distribution, by using multiple features
-%in combination, the grand total might more distinctive that the sum of its
-%parts. 
+Because every combination of image section, block size and scale will have
+three different results due to the RGB color bands, we refrain from visualizing
+all bands and pick the first band, which is red. The results do actually vary
+a bit between the red, green, and blue band, but it is not significant enough
+to explicitly visualize all three versions of the results.
 
 \subsection{Histogram of Oriented Gradients}
-
-In the analysis of the historgram used block sizes of 20, 40, and 60 combined
-with scales of 50, 100, 150, and 200. These combinations should capture the
-difference that either an increase of block size or scale causes to the
-predictiveness of a feature. For visualization purposes, only a single feature
-of the 15 features of HoG of a single section is displayed here. This feature
-is the most distinct between formal and informal. The other two sections are
-comparable to the section used here. Moreover, not all combinations of the
-block sizes and scales are presented here, only a few examples which illustrate
-the distinctiveness of the features of the Histogram of Oriented Gradients.
 
 \begin{figure}
 \begin{tabular}{cc}
@@ -68,15 +68,15 @@ right: a block size of 20 and 60 respectively.}
 \label{hog_inc_bk}
 \end{figure}
 
-Figure \ref{hog_inc_bk} shows the effect that an increased block size has on
+Figure \ref{hog_inc_bk} shows the effect of an increased block size on
 the distribution of values in both classes. This example uses a constant scale
 of 100 pixels and a variable block size of 20 and 60 pixels. The experiment
 with a block size of 40 is performed as well, but is ommited from the figure to
 keep the results brief. A more comprehensive visualization of the evaluation
 can be found in the appendix. It seems that the block size, in this case, does
 not influence the both distrutions significantly. As a result an increase in
-the size of a block will have little influence on the predictive value of the
-HoG.
+the size of a block should have little to no influence on the predictive value of the
+feature.
 
 \begin{figure}
 \begin{tabular}{cc}
@@ -95,9 +95,58 @@ block size. It seems to indicate that an increased scale leads to an increased
 separatation of the two distribution, thus increasing the predictiveness of the
 feature.
 
+% TODO: explain why this happens?
+
 \subsection{Line Support Region}
 
-Similar to the analysis of the Histogram of Oriented Gradients, the analysis of
-Line Support Region uses a combination of different block sizes and scales.
-Unlike HoG, however, the scale 200 is not included due to the high
-computational cost. 
+The most distinctive feature of LSR was chosen for visualization, in this case,
+it was the second feature. The second feature is the mean, which seems to work
+quite well. The mean of the first section is visualized in since this section
+produced the most distinct results from the three sections. Similar to the
+analysis of HoG, the increase of the block size does not influence the
+distribution of the two classes. The difference is as neglible as displayed in
+the comparison of the HoG in Figure \ref{hog_inc_bk}
+
+%\begin{figure}
+%\begin{tabular}{cc}
+%  \subfloat{\includegraphics[width=4cm]{images/LSR/inc_bk/s1/section_1_boxplot_lsr_BK20_SC100_F1}}&
+%  \subfloat{\includegraphics[width=4cm]{images/LSR/inc_bk/s1/section_1_boxplot_lsr_BK60_SC100_F1}}\\
+%  \subfloat{\includegraphics[width=4cm]{images/LSR/inc_bk/s1/section_1_kde_lsr_BK20_SC100_F1}}&
+%  \subfloat{\includegraphics[width=4cm]{images/LSR/inc_bk/s1/section_1_kde_lsr_BK60_SC100_F1}}
+%\end{tabular}
+%\caption{The effect of increased block size on the second SLR feature. From left to
+%right: a block size of 20 and 60 respectively.}
+%\label{lsr_inc_bk}
+%\end{figure}
+
+\begin{figure}
+\begin{tabular}{cc}
+  \subfloat{\includegraphics[width=4cm]{images/LSR/inc_sc/s1/section_1_boxplot_lsr_BK20_SC50_F1}}&
+  \subfloat{\includegraphics[width=4cm]{images/LSR/inc_sc/s1/section_1_boxplot_lsr_BK20_SC150_F1}}\\
+  \subfloat{\includegraphics[width=4cm]{images/LSR/inc_sc/s1/section_1_kde_lsr_BK20_SC50_F1}}&
+  \subfloat{\includegraphics[width=4cm]{images/LSR/inc_sc/s1/section_1_kde_lsr_BK20_SC150_F1}}
+\end{tabular}
+\caption{The effect of increased scale on the second SLR feature. From left to
+right: a scale of 50 and 150 respectively.}
+\label{lsr_inc_sc}
+\end{figure}
+
+An increase in scale of the LSR feature is visualized in Figure
+\ref{lsr_inc_sc}. Similar to the Histogram of Oriented gradients, it appears
+that an increase in scale seems to increase the difference between the
+distributions of the formal and informal classes.  However, the the clear
+division between distrubutions does not translate to the other two sections. In
+section 2 the distributions are somewhat distinct. Section 3 has barely any
+distinction between the two distributions. The use of the other LSR features
+together with the two different color bands does not seem to help.  It might be
+that the features of LSR fail to produce correct results in areas with
+vegetation, which section 2 and 3 both posess. The difference in vegetation can
+be seen in Figure \ref{fig:sections} where the image sections are displayed.
+
+
+\subsection{Conclusion}
+
+% Conclude the usefullness of the features
+% One paragraph per feature?
+
+

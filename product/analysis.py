@@ -57,30 +57,39 @@ def parse_name(filename):
 
 def get_featurefile(imagename, block=20, scale=50, bands=[1, 2, 3],
                     feature='hog'):
-    file = "features/{}__BD{}-{}-{}_BK{}_SC{}_TR{}.vrt".format(
+
+    if feature == 'hog':
+        n_features = str(5 * len(bands))
+    if feature == 'lsr':
+        n_features = str(3 * len(bands))
+
+    folder = "features/features/{}__BD{}-{}-{}_BK{}_SC{}_TR{}/".format(
                 os.path.basename(os.path.splitext(imagename)[0]), bands[0],
                 bands[1], bands[2], block, scale, feature)
-    if os.path.exists(file):
-        return file
+
+    filename = "{}__BD{}-{}-{}_BK{}_SC{}__ST1-0{}__TL000001.tif".format(
+                os.path.basename(os.path.splitext(imagename)[0]), bands[0],
+                bands[1], bands[2], block, scale, n_features)
+
+    path = os.path.join(folder, filename)
+
+    if os.path.exists(path):
+        return path
     return None
 
 
-def create_features(image, blocks, scales, bands, features):
-    cmd = 'spfeas -i {} -o features --block {} --band-positions {} {} {} --scales {} --triggers {}'
-
-    for feature in features:
-        for block in blocks:
-            for scale in scales:
-
-                if block > scale:
-                    print("Block cannot be larger than scale")
-                    continue
-                spfeas = cmd.format(image, block, bands[0], bands[1], bands[2],
-                                    scale, feature)
-                os.system(spfeas)
+def create_feature(image, block, scale, bands, feature):
+    cmd = 'spfeas -i {} -o features --sect-size 100000 --block {} --band-positions {} {} {} --scales {} --triggers {} > /dev/null'
+    
+    if block > scale:
+        print("Block cannot be larger than scale")
+        return
+    spfeas = cmd.format(image, block, bands[0], bands[1], bands[2],
+                        scale, feature)
+    os.system(spfeas)
 
 
-def analyze_features(imagefile, blocks, scales, bands, features):
+def analyze_feature(imagefile, block, scale, bands, feature):
     image = np.array(read_geotiff(imagefile))
     shapefile = 'data/slums_approved.shp'
     mask = create_mask(shapefile, imagefile)[1]
@@ -88,50 +97,49 @@ def analyze_features(imagefile, blocks, scales, bands, features):
     THRESHOLD = 1000000
     mask[mask > THRESHOLD] = 0
 
+    featurefile = get_featurefile(imagefile, block, scale, bands,
+                                    feature)
+
+    if featurefile is None:
+        print("can't find feature file")
+        return
+
+    features_ = np.array(read_geotiff(featurefile))
+    groundtruth = create_groundtruth(mask, block_size=block,
+                                        threshold=0)
+    groundtruth = reshape_image(groundtruth, image, block, scale)
+
+    for i, feature_ in enumerate(features_):
+        foldername = "analysis/{}_{}_BK{}_SC{}"
+        featurename = "{}_{}_{}_BK{}_SC{}_F{}.png"
+        base = os.path.basename(os.path.splitext(imagefile)[0])
+
+        featurefolder = foldername.format(base, feature, block, scale)
+
+        if not os.path.exists(featurefolder):
+            os.mkdir(featurefolder)
+
+        dataset = create_dataset(feature_, groundtruth)
+        name = featurename.format(base, 'boxplot', feature, block, scale, i)
+        boxplot(dataset, featurefolder, name)
+
+        dataset = create_dict(feature_, groundtruth)
+        name = featurename.format(base, 'kde', feature, block, scale, i)
+        kde(dataset, featurefolder, name)
+
+        name = featurename.format(base, 'spatial', feature, block, scale, i)
+        spatial_distribution(feature_, featurefolder, name)
+
+    
+
+def analysis(imagefile, blocks, scales, bands, features):
     for feature in features:
         for block in blocks:
             for scale in scales:
-                featurefile = get_featurefile(imagefile, block, scale, bands,
-                                              feature)
-                sys.stdout.write("Processing\tfeature: {}\tblock: {}\tscale: {}\t...\t".
-                                 format(feature, block, scale))
-                sys.stdout.flush()
-
-                if featurefile is None:
-                    print("can't find feature file")
-                    continue
-
-                features_ = np.array(read_geotiff(featurefile))
-                groundtruth = create_groundtruth(mask, block_size=block,
-                                                 threshold=0)
-                groundtruth = reshape_image(groundtruth, image, block, scale)
-
-                for i, feature_ in enumerate(features_):
-                    foldername = "analysis/{}_{}_BK{}_SC{}"
-                    featurename = "{}_{}_{}_BK{}_SC{}_F{}.png"
-                    base = os.path.basename(os.path.splitext(imagefile)[0])
-
-                    featurefolder = foldername.format(base, feature, block, scale)
-
-                    if not os.path.exists(featurefolder):
-                        os.mkdir(featurefolder)
-
-                    dataset = create_dataset(feature_, groundtruth)
-                    name = featurename.format(base, 'boxplot', feature, block, scale, i)
-                    boxplot(dataset, featurefolder, name)
-
-                    dataset = create_dict(feature_, groundtruth)
-                    name = featurename.format(base, 'kde', feature, block, scale, i)
-                    kde(dataset, featurefolder, name)
-
-                    name = featurename.format(base, 'spatial', feature, block, scale, i)
-                    spatial_distribution(feature_, featurefolder, name)
-
-                print("done")
-
-def analysis(imagefile, blocks, scales, bands, features):
-    #create_features(imagefile, blocks, scales, bands, features)
-    analyze_features(imagefile, blocks, scales, bands, features)
+                print("Processing {},\tfeature: {}\tblock: {}\tscale: {}\t".
+                       format(os.path.basename(imagefile), feature, block, scale))
+                create_feature(imagefile, block, scale, bands, feature)
+                analyze_feature(imagefile, block, scale, bands, feature)
 
 
 def boxplot(dataset, folder, name):
@@ -161,6 +169,6 @@ if __name__ == "__main__":
                         help="The imagefile to use")
     args = parser.parse_args()
     #data/new_section_2.tif
-    analysis('data/section_3.tif', [20, 40, 60], [50, 100, 150, 200], [1, 2, 3], ['hog'])
-    analysis('data/section_2.tif', [20, 40, 60], [50, 100, 150, 200], [1, 2, 3], ['hog'])
-    #analysis('data/section_1.tif', [20, 40, 60], [200], [1, 2, 3], ['hog'])
+    analysis('data/section_3.tif', [20, 40, 60], [50, 100, 150], [1, 2, 3], ['hog'])
+    analysis('data/section_2.tif', [20, 40, 60], [50, 100, 150], [1, 2, 3], ['hog'])
+    analysis('data/section_1.tif', [20, 40, 60], [50, 100, 150], [1, 2, 3], ['hog'])

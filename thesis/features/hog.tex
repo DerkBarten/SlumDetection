@@ -41,12 +41,12 @@ settlements. The informal settlements, on the other hand, are characterized by
 the absence of peaks in the HoG due to the multitude of different gradients
 caused by the irregular placement of buildings.
 
-
-% praktisch hoe het hier gedaan is
-
-Applied in practice, the paper from Graesser et al extracts five features from
-the HoG together with three different scales, resulting in 15 features in
-total. These features characterize the distribution of the histogram and
-distinct to formal and informal areas. According the the paper, this alone would
-result in an accuracy of 65 to 75 \% all by itself.
+Applied in practice, the paper from Graesser et al extracts five
+characteristics from the HoG: two types of mean, variance, skew, and
+kurtosis. These properties of the histogram are used as features to
+describe the histogram and differentiate between formal and informal regions.
+These 5 features will be calculated for every color band of the image,
+resulting in a grand total of 15 features for the Histogram of Gradients.
+According to the results presented in the paper, these 15 features alone could
+result in an accuracy of 65 to 75 \%.
 
