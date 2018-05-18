@@ -16,7 +16,7 @@ from groundtruth import create_mask, create_groundtruth, create_dataset
 def calculate_padding(image_shape, block, scale):
     """
     Spfeas removes a few block for padding on the edge of the image when
-    using scales larger than the block size. This function calculates the 
+    using scales larger than the block size. This function calculates the
     number of blocks that were removed for padding. This is based on the
     scale, image size and block size.
 

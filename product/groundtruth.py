@@ -53,7 +53,6 @@ def create_mask(shapefile, imagefile, maskname=None):
     if maskname:
         with rasterio.open(maskname + ".tif", "w", **out_meta) as dest:
             dest.write(out_image)
-    
 
     THRESHOLD = 1000000
     out_image[out_image > THRESHOLD] = 0

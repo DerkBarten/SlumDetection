@@ -1,0 +1,98 @@
+
+########################### HoG ######################################3
+how HoG changes between scales?
+HoG too coarse?
+deltas are useless?
+only second mean interesting?
+variance of histogam, high -> slums, low ->formal
+how to get shapefiles to work in grass?
+beta only gives noise?
+hog difficult differntiate small buildings from large buildings
+hog only usefull large scale?
+check if beta is OK
+
+
+
+hog only used for differentiate between buildings and fields
+weird lines in HoG
+
+######################### General ########################################
+
+LFD not implemented spfeas
+
+hoe uitgebreid uitleg LSR, HoG, LFD
+
+omranding van sloppenwijken shapefiles
+
+
+Explain data
+explain composition of slums
+
+
+calculate surface area of slum in both files
+
+detailed implementation of new feature 
+
+show 3 sections in challenges section
+
+termonology of subfeatures of feature
+
+show positions of sections on whole map
+new images of sections
+
+
+feature evaluation: more detailed analysis of the distributions??
+like properties of the distribution (mean, variance etc)
+
+conclusion in feature evaluation
+
+
+redo all features
+fix 3 scales stuff 
+
+
+not sure about 4 Hog features when 5 in shape
+
+why increased scale works?
+
+PUSH IT TO THE LIMIT, try very high scales, see where it plateau's.
+can still let the other results be, just say they are for illustration.
+
+under challenges: in our case, highly distributed slums
+
+do correct error handling
+fix other ugly scripts
+
+move challenges sections somewhere else
+
+############### roads ###############
+
+try different widths
+try different shapes
+
+longer length of roads to capture intersections better
+convolution changes location of peaks by a contant number
+
+width of road in pixels in kernel should roughly match width of road in image
+
+method for determining the best parameters or best method?
+metrics??
+
+say which file intersection extraction tested on
+make road intersection density separate section
+
+inspired by footprints in different paper
+
+add section explaining what the thesis does (proposed method)
+and put this with previous work under introduction
+
+#################
+
+kl-divergence
+hellinger
+
+50 blocksize
+
+jackard index
+
+
