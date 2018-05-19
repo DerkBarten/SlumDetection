@@ -1,4 +1,4 @@
-\subsection{Road Intersection Density}
+\section{Road Intersection Density}
 
 % how density could indicate formal
 % the estimated accuracy?
@@ -24,7 +24,7 @@ detection uses the sharp contrast between a road and the roadside to identify
 the road.
 
 
-\subsubsection{Intersection extraction methods}
+\subsection{Intersection extraction methods}
 
 Besides tradional image processing methods, another promising approach in the
 detection of road networks from satellite images are Neural Networks
@@ -53,7 +53,7 @@ of a lower resolution than the images of Bangalore which could have hindered
 the neural network in the correct classification of the roads, although this is
 ungrounded speculation.
 
-\subsubsection{Hough Transform}
+\subsection{Hough Transform}
 % TODO: cite Otsu
 %
 As a alternative to neural network, conventional image processes were used. The
@@ -87,7 +87,7 @@ to follow a different method of intersection extraction.
 
 % Use opencv canny stuff with hough lines
 
-\subsubsection{Intersection Convolution}
+\subsection{Intersection Convolution}
 We designed an new approach to detect intersections using a convolution of
 a kernel with its content in the shape of an intersection. Because the kernel
 matches the shape of the intersection, the output of the convolution has peaks
@@ -149,10 +149,36 @@ Left: Heatmap of output of the convolution; Right: Located peaks overlayed on in
 \end{figure}
 
 Figure \ref{fig:roads_conv} shows the peaks of the results of the convolution
-and the corresponding location of the peaks. A larger set of images is provided
-in the appendix.  For the evaluation of this intersection detection, we used
-the 
+and the corresponding location of the peaks. The image used was a small section
+of the image displayed in Figure \ref{fig:west-bangalore}. It was chosen
+because of the regularity of the road network and with 90 degree angles between
+the toes of the intersection. Furthermore, the horizontal and vertical roads
+run parallel to the edges of the image. Besides, the road network is quite distinct from
+the background eventhough it is quite vegetated.
+
+The peaks in the output of the convolution are located using local maxima
+detection. This detects, as the name suggests, local maxima in an image. These
+are regions that stand out from surrounding area. The location of these maxima
+are the red dots displayed over the convolution and the corresponding input
+image in Figure \ref{fig:roads_conv}.
+
+A problem to this approach is the orientation of the intersection and roads.
+The described kernel only works for intersections which toes are parallel to
+the sides of the image. When the intersection are rotated, the kernel does not
+match the intersection anymore and will therefore fail to detect it as an
+intersection.
+
+Another problem is the need to adjust the parameters to the scale and
+resolution of the image. Increasing the scale or resolution of an image will
+change the dimensions of the intersection. Because the content of the kernel
+must match the intersections in the image pixelwise, the dimensions of the
+kernel should change along with change in the image.
 
 
-% How peaks are detected
+
+
+%A larger set of images is provided in the appendix.  For the evaluation of this
+%intersection detection, we used the 
+
+
 % what other things also get matched? what goes wrong

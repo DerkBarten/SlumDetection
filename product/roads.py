@@ -92,21 +92,21 @@ def read_image(image_path):
     return cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
 
 
-def visualize_convolution(convolution, image, peaks=None):
-    if peaks is not None:
-        original, relocated = peaks
-        
-        plt.imshow(convolution)
-        plt.scatter(original[:, 1], original[:, 0], c='r', alpha=0.5)
-        plt.axis('off')
-        plt.savefig('1.png',bbox_inches='tight')
-        plt.show()
+def visualize_convolution(convolution, image, peaks, save=False):
+    original, relocated = peaks
+    plt.imshow(convolution)
+    plt.scatter(original[:, 1], original[:, 0], c='r', alpha=0.5)
+    plt.axis('off')
+    if save:
+        plt.savefig('1.png', bbox_inches='tight')
+    plt.show()
 
-        plt.imshow(image)
-        plt.scatter(relocated[:, 1], relocated[:, 0], c='r', alpha=0.5)
-        plt.axis('off')
-        plt.savefig('2.png',bbox_inches='tight')
-        plt.show()
+    plt.imshow(image)
+    plt.scatter(relocated[:, 1], relocated[:, 0], c='r', alpha=0.5)
+    plt.axis('off')
+    if save:
+        plt.savefig('2.png', bbox_inches='tight')
+    plt.show()
 
 def relocate_peaks(peaks, kernel_width):
     return peaks + kernel_width / 2
