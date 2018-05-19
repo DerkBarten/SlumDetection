@@ -1,30 +1,29 @@
 
 \section{Feature Evaluation}
 
-In order produce a functioning classifier, the predictive value of the features
-must be evaluated. This assesses wether a certain feature is useful in the
-discrimination between formal and informal. The evaluation requires the
-knowledge of what parts in a satellite image are formal and informal to create
-a distinction between the two classes. This knowledge is represented in
-a ground truth, this is a mask covering the satellite image indicating the
-informal regions.
+The success on classification depends on the predictive value of the features
+posses. Therefore, it is necessary asses whether a feature is useful in the
+discrimination between formal and informal housing. The evaluation requires the
+satellite image to be divided into the formal and informal classes. This division
+is represented using a ground truth; this is a mask covering the satellite image
+indicating where the informal areas are located.
 
-The mask is used to divide each block of pixels into the two classes, formal
-and informal. Each block has a vector of values, also called features,
-characterizing that particular block. Because the blocks are grouped together,
-the features associated with the same class are grouped together as well. This
-allows for the analysis of the distribution of the features in both classes. If
-the distribution of a certain feature varies quite distinctly between the two
-classes, this indicates as a suitable candidate for classification of informal
-regions.
+The mask is used to divide each block of pixels into the two classes: formal or
+informal. Each block has a vector of features, characterizing that particular
+block. Because blocks of the same class are grouped together, the features
+associated with the same class are grouped together as well. This allows for
+the analysis of the distribution of the features in both classes. If the
+distribution of a certain feature varies substantially between the two classes,
+this indicates as a suitable candidate for classification of informal regions.
 
 The groundtruth mask is constructed using a vector file containing the
 boundaries of informal areas. The boundary file is rasterized and applied on
-top of the satellite image, creating a mask of the informal settlements.
-Because classification and feature calculation is performed on blocks instead
-of pixels, the pixel based mask transformed into a block based mask. In this
-mask, every pixel represents a block where the zero represents formal and one
-represents informal. This effectively creates a ground truth.  
+top of the satellite image, creating a mask of the location of the informal
+housing areas.  Because classification and feature calculation is performed on
+blocks instead of pixels, the pixel based mask transformed into a block based
+mask. In this block based mask, every pixel represents a block where zero
+represents formal and one represents informal. This effectively creates
+a ground truth of informal areas in the satellite image.  
 
 The predictive value of a feature can be visualized using a boxplot of the two
 classes. When a feature is distinctive on its own, the distribution of the
@@ -33,12 +32,13 @@ comes from three small sections of the image. As priorly mentioned, this
 creates a more even division of classes which should provide a more accurate
 evaluation of the selected feature.
 
+% TODO: make sure numbers here are valid
 The features will be calculated for all combinations of image sections, color
 bands, block sizes, and scales. This resulted in large amounts of data, of
 which only a selection will be shown in the following sections. For both HoG
 and LSR, the features are extracted from the three sections presented in Figure
 \ref{fig:sections} on all the three color bands. To analyze the impact of the
-blocksize and scale parameters, block sizes 20, 40 and 60 will be used in
+block size and scale parameters, block sizes 20, 40 and 60 will be used in
 combination with scales 50, 100, 150 and 200. The block sizes will be combined
 together with the scales, resulting in a large number of combinations of
 parameters.  Some combinations, however, are not valid, e.g when the scale is
@@ -52,7 +52,9 @@ Because every combination of image section, block size and scale will have
 three different results due to the RGB color bands, we refrain from visualizing
 all bands and pick the first band, which is red. The results do actually vary
 a bit between the red, green, and blue band, but it is not significant enough
-to explicitly visualize all three versions of the results.
+to explicitly visualize all three versions of the results. Furthermore, only
+a single feature for each extraction method is shown to reduce the number of
+plots.
 
 \subsection{Histogram of Oriented Gradients}
 
@@ -63,30 +65,32 @@ to explicitly visualize all three versions of the results.
   \subfloat{\includegraphics[width=4cm]{images/HoG/inc_bk/section_1_kde_hog_BK20_SC100_F2}}&
   \subfloat{\includegraphics[width=4cm]{images/HoG/inc_bk/section_1_kde_hog_BK60_SC100_F2}}
 \end{tabular}
-\caption{The effect of increased block size on a HoG feature. From left to
+\caption{The effect of increased block size on the HoG features. From left to
 right: a block size of 20 and 60 respectively.}
 \label{hog_inc_bk}
 \end{figure}
 
-Figure \ref{hog_inc_bk} shows the effect of an increased block size on
-the distribution of values in both classes. This example uses a constant scale
-of 100 pixels and a variable block size of 20 and 60 pixels. The experiment
-with a block size of 40 is performed as well, but is ommited from the figure to
-keep the results brief. A more comprehensive visualization of the evaluation
-can be found in the appendix. It seems that the block size, in this case, does
-not influence the both distrutions significantly. As a result an increase in
-the size of a block should have little to no influence on the predictive value of the
-feature.
+For the HoG, the third feature is selected for visualization in this section.
+This feature best illustrated the difference in distribution. Figure
+\ref{hog_inc_bk} shows the effect of an increased block size on the
+distribution of values in both classes. This example uses a constant scale of
+100 pixels and a variable block size of 20 and 60 pixels. The experiment with
+a block size of 40 is performed as well, but is ommited from the figure to keep
+the results brief. A more comprehensive visualization of the evaluation can be
+found in the appendix. It seems that the block size, in this case, does not
+influence the both distrutions significantly. As a result an increase in the
+size of a block should have little to no influence on the predictive value of
+the feature.
 
 \begin{figure}
 \begin{tabular}{cc}
   \subfloat{\includegraphics[width=4cm]{images/HoG/inc_sc/section_1_boxplot_hog_BK20_SC50_F2}}&
-  \subfloat{\includegraphics[width=4cm]{images/HoG/inc_sc/section_1_boxplot_hog_BK20_SC200_F2}}\\
+  \subfloat{\includegraphics[width=4cm]{images/HoG/inc_sc/section_1_boxplot_hog_BK20_SC150_F2}}\\
   \subfloat{\includegraphics[width=4cm]{images/HoG/inc_sc/section_1_kde_hog_BK20_SC50_F2}}&
-  \subfloat{\includegraphics[width=4cm]{images/HoG/inc_sc/section_1_kde_hog_BK20_SC200_F2}}\\
+  \subfloat{\includegraphics[width=4cm]{images/HoG/inc_sc/section_1_kde_hog_BK20_SC150_F2}}\\
 \end{tabular}
-\caption{The effect of increased scale on a HoG feature. From left to
-right: a scale of 50 and 200 respectively}
+\caption{The effect of increased scale on the HoG features. From left to
+right: a scale of 50 and 150 respectively}
 \label{hog_inc_sc}
 \end{figure}
 
@@ -144,9 +148,24 @@ vegetation, which section 2 and 3 both posess. The difference in vegetation can
 be seen in Figure \ref{fig:sections} where the image sections are displayed.
 
 
+\subsection{Road Intersection Density}
+
 \subsection{Conclusion}
 
+% TODO: make sure numbers are valid
+It seems that, in general, an increase in scale improves the distinctness of
+the two classes. However, increasing the scale is computationally very
+expensive. Just on these smaller subsections, the time to compute features at
+a high scale is measured in hours rather than minutes. Using features with high
+scales on large images would therefore not be feasable. Besides, increasing the
+scale gives diminishing returns while taking significantly more time to
+compute. For the smaller sections, higher scales, such as 200 or 250 is
+used, but on large scale images this is brought down to a managable 150.
+
+With the right parameters, there is a clear distinction between the two classes
+for both the HoG and LSR features. Therefore, we conclude that these features
+can be used classification. 
+
 % Conclude the usefullness of the features
-% One paragraph per feature?
 
 

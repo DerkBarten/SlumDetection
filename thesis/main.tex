@@ -12,9 +12,11 @@
 
 \renewcommand{\thesection}{\Roman{section}}
 \renewcommand{\thesubsection}{\Alph{subsection}}
+\renewcommand{\thesubsubsection}{\roman{subsubsection}}
 
-\titleformat{\subsection}{\small\it}{\thesubsection.}{0.9em}{}
 \titleformat{\section}{\large\sc\filcenter}{\thesection.}{1em}{}
+\titleformat{\subsection}{\normalsize\it}{\thesubsection.}{0.9em}{}
+\titleformat{\subsubsection}{\small\it}{\thesubsection.\thesubsubsection.}{0.9em}{}
 
 \begin{document}
 
@@ -30,6 +32,8 @@
 \input{roads}
 
 \input{evaluation}
+
+\section{Classification Methods}
 
 % classification methods
 %

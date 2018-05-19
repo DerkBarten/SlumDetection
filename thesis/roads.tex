@@ -8,11 +8,12 @@
 %
 
 As a novel approach for the distinction between formal and informal regions, we
-propose the density of intersections as a metric. This is on the belief that
-area's with a dense road network, resulting in many intersections, are well
-developed, thus indicating a formal region. Informal regions, on the other
+propose the density of intersections as a metric. This is based on the belief that
+areas with a dense road network, thus many intersections, are well
+developed, therefore indicating a formal region. Informal regions, on the other
 hand, would be characterized by a dip in the density of intersections.  
 
+% TODO: source ???
 This metric is constructed using road extraction techniques. The area of road
 extraction has developed over the years, starting from 1970. A straightforward
 method for road extraction is the use of edge detection. Because roads have
@@ -54,25 +55,26 @@ the neural network in the correct classification of the roads, although this is
 ungrounded speculation.
 
 \subsection{Hough Transform}
-% TODO: cite Otsu
-%
-As a alternative to neural network, conventional image processes were used. The
-image is subjected to a number of operations that will extract the road network
-from the image. The first operation is the transformation of the RGB satellite
-image to grayscale values. This is done in preparation for Otsu's method for 
-threshold, which effectively separates buildings from roads. The resulting
-image, although quite crude, is a mask of the road network in the satellite image.
-Because are roads are straight lines on satellite image data, these straight
-lines can be captured using a Hough transform. Hough transform is able to
-detect straight lines in images. Once we have the mathematical definition of
-the lines, the location of the intersection can be located.
+As a alterative, we used conventional image processes. The image is subjected
+to a number of operations that extract the road network from the image. The
+first operation is the transformation of the RGB image to grayscale values.
+This is done in preparation for Otsu's method for threshold, which is able to
+separate buildings from roads \cite{otsu1979threshold}. The resulting image,
+displayed in Figure \ref{fig:roads_hough} is a mask of the road network in the
+satellite image. From an aerial point of view, roads are straight lines of
+constant width. The lines can be captured the using a Hough transform. The
+Hough transform is able to detect straight lines in images and create
+a mathematical definition of the lines \cite{duda1972use}.  Once the roads are
+mathematically defined, determining the location of the intersection is
+straightforward.
 
 \begin{figure}
 \begin{tabular}{cc}
   \subfloat{\includegraphics[width=4cm]{images/hough_road_section_8}}&
   \subfloat{\includegraphics[width=4cm]{images/hough_road_section_8_mask}}
 \end{tabular}
-\caption{Detected roads using Otsu's thresholding method combined with Hough Transform}
+\caption{Detected roads using Otsu's thresholding method (left) combined with
+Hough Transform (right)}
 \label{fig:roads_hough}
 \end{figure}
 
@@ -162,19 +164,23 @@ are regions that stand out from surrounding area. The location of these maxima
 are the red dots displayed over the convolution and the corresponding input
 image in Figure \ref{fig:roads_conv}.
 
-A problem to this approach is the orientation of the intersection and roads.
-The described kernel only works for intersections which toes are parallel to
-the sides of the image. When the intersection are rotated, the kernel does not
-match the intersection anymore and will therefore fail to detect it as an
-intersection.
+\subsubsection{Difficulties}
+
+This approach seems works well, although it is very prone to change in
+orientation. The road system displayed in Figure \ref{fig:roads_conv} has
+a constant orientation, which the large majority of roads parallel or in 90
+degrees to the other roads. Because all intersections have the same
+orientation, a single kernel is able to detect them all. When the roads and
+intersections do not share this property, a lot of intersections will not be
+detection. To conclude, this approach needs rotational invariance to detect all
+intersections in an image.
+
 
 Another problem is the need to adjust the parameters to the scale and
 resolution of the image. Increasing the scale or resolution of an image will
-change the dimensions of the intersection. Because the content of the kernel
-must match the intersections in the image pixelwise, the dimensions of the
-kernel should change along with change in the image.
-
-
+change the dimensions of the intersections. Because the content of the kernel
+is required to match the intersections in the image in terms of pixels, the
+dimensions of the kernel should change along with change in the image.
 
 
 %A larger set of images is provided in the appendix.  For the evaluation of this
