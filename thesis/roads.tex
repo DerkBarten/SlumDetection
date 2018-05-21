@@ -84,11 +84,6 @@ many correct lines, although there were a lot of duplicates and noise. Although
 the noise and duplicates could likely be removed for a large part, we decided
 to follow a different method of intersection extraction. 
 
-% TODO: hough transform
-% perhaps expand otsu more
-
-% Use opencv canny stuff with hough lines
-
 \subsection{Intersection Convolution}
 We designed an new approach to detect intersections using a convolution of
 a kernel with its content in the shape of an intersection. Because the kernel
@@ -159,22 +154,48 @@ run parallel to the edges of the image. Besides, the road network is quite disti
 the background eventhough it is quite vegetated.
 
 The peaks in the output of the convolution are located using local maxima
-detection. This detects, as the name suggests, local maxima in an image. These
+detection from the python scikit-image package \cite{scikit-image}. This detects, as the name suggests, local maxima in an image. These
 are regions that stand out from surrounding area. The location of these maxima
 are the red dots displayed over the convolution and the corresponding input
 image in Figure \ref{fig:roads_conv}.
 
 \subsubsection{Difficulties}
 
-This approach seems works well, although it is very prone to change in
-orientation. The road system displayed in Figure \ref{fig:roads_conv} has
-a constant orientation, which the large majority of roads parallel or in 90
-degrees to the other roads. Because all intersections have the same
-orientation, a single kernel is able to detect them all. When the roads and
-intersections do not share this property, a lot of intersections will not be
-detection. To conclude, this approach needs rotational invariance to detect all
-intersections in an image.
+\begin{figure}
+\begin{tabular}{cc}
+  \subfloat{\includegraphics[width=4cm]{images/rot10}}&
+  \subfloat{\includegraphics[width=4cm]{images/rot45}}
+\end{tabular}
+\caption{Performance of intersection detection in rotated intersections, from
+  left to right with 10 and 45 degrees respectively}
+\label{fig:roads_rot}
+\end{figure}
 
+Because of the fixed orientation of the cross in the kernel, this approach
+should inherently be prone to differences in orientation. Therefore, in the
+proof of concept, we used a road system with a constant orientation, such as
+displayed in Figure \ref{fig:roads_conv}. Because all intersections have the
+same orientation, the kernel is able to detect a large number of intersections.
+However, in many other areas, the road system is not nearly as consistent.
+Intersections that are rotated relative to the orientation of the kernel should
+therefore be more difficult to detect.
+
+To evaluate how well this approach performs with different orientations, we
+applied a rotation of 10 degrees to the image displayed in Figure
+\ref{fig:roads_conv}. In the resulting image, the fast majority of
+intersections were still detected, as displayed in Figure \ref{fig:roads_rot}.
+The increase of the rotation to the maximum of 45 degrees results in a loss of
+detections, which is as expected. Surprisingly enough, there is almost no
+increase in false positives.
+
+After analysis of the output of the convolution, we believe this seemingly
+invariance to rotation is caused by the method of peaks detection.  When using
+the rotated image, the resulting convoluted image is more smooth with less
+peaks than the unrotated image. The local maxima detection is able to
+correctly detect these faint peaks in the convoluted image.
+
+In conclusion, this approach works best with images with little rotation,
+although it still performs reasonably well under a lot of rotation.
 
 Another problem is the need to adjust the parameters to the scale and
 resolution of the image. Increasing the scale or resolution of an image will
@@ -182,9 +203,28 @@ change the dimensions of the intersections. Because the content of the kernel
 is required to match the intersections in the image in terms of pixels, the
 dimensions of the kernel should change along with change in the image.
 
+To account for different widths of roads in an image, we created the kernel
+using gaussian distributions in contrast to the kernel displayed in Figure
+\ref{fig:conv_kernel}. The kernel created using gaussian distributions is
+displayed in Figure \ref{fig:gauss_kernel}.  Furthermore, this should smooth
+the contrast between roads and roadside and could remove noise. As a result of
+this kernel, the center of the road is the part that counts the most. The edges
+of the road are less count for less, which should help make the kernel scalable
+to multiple types and sizes of roads, such as alleys or main streets.  Although
+the usage of the Gaussian distribution creates a more versatile kernel, it is
+still required to adjust parameters according to the resolution of the image.
 
-%A larger set of images is provided in the appendix.  For the evaluation of this
-%intersection detection, we used the 
+\begin{figure}
+  \centering
+  \subfloat{\includegraphics[width=4cm]{images/gauss_kernel}}
+\caption{Kernel created using a Gaussian Distribution}
+\label{fig:gauss_kernel}
+\end{figure}
 
+\subsection{Feature extraction}
 
-% what other things also get matched? what goes wrong
+Now we got an estimation of the positions of intersections in an area, we can
+start feature extraction. Since our objective is not to precicely track all
+intersections of a region, a bit of noise or missed intersections are not of
+high concern. 
+

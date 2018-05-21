@@ -97,7 +97,10 @@ right: a scale of 50 and 150 respectively}
 Figure \ref{hog_inc_sc} illustrates the effect of increased scale on a constant
 block size. It seems to indicate that an increased scale leads to an increased
 separatation of the two distribution, thus increasing the predictiveness of the
-feature.
+feature. Scales larger than 150 do not seem to improve the performance. In
+contrast, the performance actually seems to decrease with scales larger than
+150. Therefore, for the HoG features, the scale of 150 is used in all further
+experiments 
 
 % TODO: explain why this happens?
 
@@ -149,6 +152,9 @@ be seen in Figure \ref{fig:sections} where the image sections are displayed.
 
 
 \subsection{Road Intersection Density}
+
+% The evaluation of the road density features is different than the HoG and LSR
+% features. 
 
 \subsection{Conclusion}
 
