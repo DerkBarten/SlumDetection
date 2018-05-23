@@ -1,38 +1,36 @@
+import math
 import fiona
 import rasterio
 import argparse
+import numpy as np
+import pandas as pd
+
 from rasterio import mask
 from rasterio.features import shapes
-import matplotlib.pyplot as plt
-import numpy as np
-import math
-import pandas as pd
+from matplotlib import pyplot as plt
 
 
 def create_groundtruth(mask, block_size=25, threshold=0.1):
+    """
+    This functions creates a block based groundtruth map from the mask produced
+    by the create_mask function. When a block of pixels has a certain amount of
+    pixels that of the informal class, the pixel block will be assigned as
+    informal.
+
+
+    """
     minum_pixels = pow(block_size, 2) * threshold
-    slum_cnt = 0
-    nonslum_cnt = 0
     height = mask.shape[0]
     width = mask.shape[1]
-    groundtruth = np.zeros((int(math.ceil(height / block_size)),
-                            int(math.ceil(width / block_size))))
+    groundtruth = np.zeros((int(math.ceil(float(height) / block_size)),
+                            int(math.ceil(float(width) / block_size))))
 
-    i = 0
-    j = 0
-    while i < groundtruth.shape[0]:
-        j = 0
-        while j < groundtruth.shape[1]:
+    for i in range(0, groundtruth.shape[0]):
+        for j in range(groundtruth.shape[1]):
             chunck = mask[i * block_size:i * block_size + block_size,
                           j * block_size:j * block_size + block_size]
             if np.count_nonzero(chunck) > minum_pixels:
-                slum_cnt += 1
                 groundtruth[i, j] = 1
-            else:
-                nonslum_cnt += 1
-                groundtruth[i, j] = 0
-            j += 1
-        i += 1
 
     return groundtruth
 
@@ -73,6 +71,7 @@ def create_dataset(feature, groundtruth):
 
     return pd.DataFrame.from_dict(dataset)
 
+
 def create_dict(feature, groundtruth):
     height, width = groundtruth.shape
     dataset = {'formal': [], 'informal': []}
@@ -97,10 +96,8 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    # use the red band
-    mask = create_mask(args.shapefile, args.imagefile, args.maskname)[0]
+    mask = create_mask(args.shapefile, args.imagefile, args.maskname)
     groundtruth = create_groundtruth(mask)
-    print(groundtruth.shape)
 
     plt.imshow(groundtruth, cmap='gray')
     plt.title('Binary mask')    

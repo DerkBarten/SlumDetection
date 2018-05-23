@@ -21,7 +21,8 @@ def calculate_padding(image, block, scale):
 def reshape_image(image, block, scale):
     dimensions = image.shape
     padding = calculate_padding(image, block, scale)
-    px = math.ceil((scale - block) / 2.0)
+    print(padding)
+    # px = math.ceil((scale - block) / 2.0)
 
     # x_start = math.ceil(px / block)
     # x_end = padding[0] - x_start
@@ -58,15 +59,16 @@ def print_dimensions(imagefile, featurefile, block, scale):
 
     reshape_image(image[0], block, scale)
     
+    
     print("")
     
     # for band in image:
     #     plt.imshow(band)
     #     plt.show()
     
-    for band in feature:
-        plt.imshow(band)
-        plt.show()
+    # for band in feature:
+    #     plt.imshow(band)
+    #     plt.show()
 
 # De feature file is de samenvoeging van alle losse files die spfeas geeft
 # Dit bestand is gemaakt door het commando'gdalwarp * merged.tif' in de folder
@@ -100,8 +102,8 @@ def print_dimensions(imagefile, featurefile, block, scale):
 
 imagefile = 'data/section_1.tif'
 #featurefile = '/home/derk/projects/dynaslum/thesis/product/features/section_1__BD1-2-3_BK20_SC30_TRhog.vrt'
-featurefile = '/home/derk/projects/dynaslum/thesis/product/features/features/section_1__BD1-2-3_BK20_SC30_TRhog/section_1__BD1-2-3_BK20_SC30__ST1-015__TL000001.tif'
-print_dimensions(imagefile, featurefile, 20, 30)
+featurefile = '/home/derk/projects/dynaslum/thesis/product/features/features/section_1__BD1-2-3_BK20_SC150_TRhog/section_1__BD1-2-3_BK20_SC150__ST1-015__TL000001.tif'
+print_dimensions(imagefile, featurefile, 20, 150)
 
 # feature = read_geotiff(featurefile)
 # plt.imshow(feature[2])

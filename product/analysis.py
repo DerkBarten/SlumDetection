@@ -33,6 +33,7 @@ def calculate_padding(image_shape, block, scale):
         math.ceil(float(image_shape[0] - (scale - block)) / block)
     padding_y = math.ceil(image_shape[1] / float(block)) -\
         math.ceil(float(image_shape[1] - (scale - block)) / block)
+
     return (padding_x, padding_y)
 
 
@@ -180,7 +181,9 @@ def analyze_feature(image_path, block, scale, bands, feature_name):
     features_ = np.array(read_geotiff(feature_path))
     groundtruth = create_groundtruth(mask, block_size=block,
                                      threshold=0)
-    groundtruth = reshape_image(groundtruth, image.shape, block, scale)
+
+    image_shape = image[0].shape
+    groundtruth = reshape_image(groundtruth, image_shape, block, scale)
 
     for i, feature_ in enumerate(features_):
         foldername = "analysis/{}_{}_BK{}_SC{}"
@@ -228,7 +231,7 @@ def analysis(image_path, blocks, scales, bands, feature_names):
                 print("Processing {},\tfeature: {}\tblock: {}\tscale: {}\t".
                       format(os.path.basename(image_path), feature_name, block,
                              scale))
-                create_feature(image_path, block, scale, bands, feature_name)
+                #create_feature(image_path, block, scale, bands, feature_name)
                 analyze_feature(image_path, block, scale, bands, feature_name)
 
 
@@ -254,6 +257,6 @@ def spatial_distribution(feature, folder, name):
     plt.clf()
 
 if __name__ == "__main__":
-    #analysis('data/section_3.tif', [20], [150, 200, 250], [1, 2, 3], ['lsr'])
-    #analysis('data/section_2.tif', [20], [150, 200, 250], [1, 2, 3], ['lsr'])
-    analysis('data/section_1.tif', [20], [200, 250, 300], [1, 2, 3], ['lsr'])
+    analysis('data/section_1.tif', [20], [200], [1, 2, 3], ['lsr'])
+    #analysis('data/section_2.tif', [20, 40, 60], [50, 100, 150], [1, 2, 3], ['lsr', 'hog'])
+    #analysis('data/section_3.tif', [20, 40, 60], [50, 100, 150], [1, 2, 3], ['lsr', 'hog'])
