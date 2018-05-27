@@ -1,10 +1,15 @@
 import sys
 import cv2
 import numpy as np
+import math
 
 from enum import Enum
 from util import read_geotiff
+from scipy.ndimage import zoom
+from analysis import reshape_image
 from skimage.feature import peak_local_max
+from pysal.esda.getisord import G_Local
+from pysal.weights.Distance import DistanceBand
 
 from scipy import signal as sg
 from scipy import ndimage as nd
@@ -28,11 +33,13 @@ class convolution_parameters():
 
     """
     def __init__(self, road_width=35, road_length=200, peak_min_distance=100,
-                 kernel_type=ktype.GAUSSIAN):
+                 kernel_type=ktype.GAUSSIAN, block_size=20, scale=150):
         self.road_width = road_width
         self.road_length = road_length
         self.peak_min_distance = peak_min_distance
         self.kernel_type = kernel_type
+        self.block_size = block_size
+        self.scale = scale
 
 
 def hough_method(image_path):
@@ -120,10 +127,13 @@ def convolution_method(image_path, params):
     road_length = params.road_length
     peak_min_distance = params.peak_min_distance
     kernel_type = params.kernel_type
+    block_size = params.block_size
+    scale = params.scale
     kernel = create_kernel(road_width, road_length, kernel_type)
 
     print("Reading image...")
     image = read_image(image_path)
+    print(image.shape)
     gray_image = convert_to_grayscale(image)
     gray_image = cv2.threshold(gray_image, 0, 255, cv2.THRESH_BINARY |
                                cv2.THRESH_OTSU)[1]
@@ -131,12 +141,35 @@ def convolution_method(image_path, params):
     print("Performing Convolution...")
     convolution = sg.convolve(gray_image, kernel, "valid")
 
-    print("Finding peaks..")
+    print("Finding peaks...")
     peaks = peak_local_max(convolution, min_distance=peak_min_distance)
     relocated = relocate_peaks(peaks, kernel.shape[0])
 
     print("Visualizing...")
-    visualize_convolution(convolution, image, (peaks, relocated))
+    #visualize_convolution(convolution, image, (peaks, relocated))
+
+    print("Creating Density Map...")
+    block_size_multiplier = 3
+    density_map = create_density_map(relocated, block_size *
+                                     block_size_multiplier,
+                                     image.shape)
+    print(density_map.shape)
+
+    print("Creating Feature...")
+    radius = int(scale / block_size)
+    feature = create_feature(density_map, radius)
+
+    print("Interpolating Feature...")
+    feature = interpolate_feature(feature, image.shape, feature.shape,
+                                  block_size)
+
+    print("Reshaping image...")
+    feature = reshape_image(feature, (image.shape[0], image.shape[1]),
+                            block_size, scale)
+    print(feature.shape)
+    
+    plt.imshow(feature)
+    plt.show()
 
 
 def create_kernel(road_width, road_length, kernel_type):
@@ -337,6 +370,50 @@ def visualize_convolution(convolution, image, peaks, save=False):
         plt.show()
 
 
+def create_feature(density_map, radius):
+    grid = np.indices((density_map.shape[0], density_map.shape[1]))
+    grid = np.stack((grid[0], grid[1]), axis=-1)
+    grid = np.reshape(grid, (grid.shape[0]*grid.shape[1], 2))
+
+    w = DistanceBand(grid, threshold=radius)
+    y = np.ravel(density_map)
+
+    g = G_Local(y, w).Zs
+    g = np.reshape(g, (density_map.shape[0], density_map.shape[1]))
+    return g
+
+
+def create_density_map(points, block_size, image_shape):
+    height = image_shape[0]
+    width = image_shape[1]
+    density_map = np.zeros((int(math.floor(float(height) / block_size)),
+                            int(math.floor(float(width) / block_size))))
+
+    for point in points:
+        h = int(point[0] / block_size)
+        w = int(point[1] / block_size)
+
+        if point[0] < image_shape[0] and point[1] < image_shape[1]:
+            density_map[h, w] += 1
+    return density_map
+
+
+def interpolate_feature(feature, image_shape, feature_shape, block_size):
+
+    zoom_level = [float(image_shape[0]) / (block_size * feature_shape[0]),
+                  float(image_shape[1]) / (block_size * feature_shape[1])]
+
+    # To compensate for the round of the zoom when we want to use a ceil
+    if (zoom_level[0] * feature_shape[0]) % 1 < 0.5:
+        zoom_level[0] = math.ceil(zoom_level[0] * feature_shape[0]) /\
+                        float(feature_shape[0])
+    if (zoom_level[1] * feature_shape[1]) % 1 < 0.5:
+        zoom_level[1] = math.ceil(zoom_level[1] * feature_shape[1]) /\
+                        float(feature_shape[1])
+    
+    return zoom(feature, zoom_level, order=3)
+
+
 if __name__ == '__main__':
     if len(sys.argv) < 2:
         print("Please supply an image")
@@ -345,13 +422,20 @@ if __name__ == '__main__':
     image_path = sys.argv[1]
 
     # These parameters work well for large scale images
-    params = convolution_parameters(road_width=35, road_length=200,
-                                    peak_min_distance=100,
-                                    kernel_type=ktype.GAUSSIAN)
+    # params = convolution_parameters(road_width=35, road_length=200,
+    #                                 peak_min_distance=100,
+    #                                 kernel_type=ktype.GAUSSIAN)
 
     # These parameters work well for smaller images
-    # params = convolution_parameters(road_width=15, road_length=35,
-    #                                 peak_min_distance=35,
-    #                                 kernel_type=ktype.GAUSSIAN)
+    # params = convolution_parameters(road_width=30, road_length=70,
+    #                                 peak_min_distance=150,
+    #                                 kernel_type=ktype.NEGATIVE)
+
+    # Params for section 3
+    params = convolution_parameters(road_width=30, road_length=70,
+                                    peak_min_distance=150,
+                                    kernel_type=ktype.NEGATIVE,
+                                    scale=150,
+                                    block_size=20)
 
     convolution_method(image_path, params)

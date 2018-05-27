@@ -112,12 +112,9 @@ def plot_confusion_matrix(cm, classes,
     plt.ylabel('True label')
     plt.xlabel('Predicted label')
 
+
 def classify_Forrest():
     X, y = create_dataset('data/section_1.tif', 20, 150, ['lsr'])
-    print(X.shape)
-    X = np.matrix(X)
-    X = X[:,[1,4]]
-    print(X.shape)
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.33, random_state=0)
     clf = RandomForestClassifier(max_depth=2, random_state=0)
     X_train, y_train = balance_dataset(X_train, y_train)
@@ -145,5 +142,5 @@ def classify_TSNE():
     plt.scatter(X0[y == 1], X1[y == 1], c='b')
     plt.show()
 
-classify_TSNE()
-#classify_Forrest()
+#classify_TSNE()
+classify_Forrest()
