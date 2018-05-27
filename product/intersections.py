@@ -9,6 +9,7 @@ from scipy.ndimage import zoom
 from analysis import reshape_image
 from skimage.feature import peak_local_max
 from pysal.esda.getisord import G_Local
+from pysal.esda.moran import Moran_Local
 from pysal.weights.Distance import DistanceBand
 
 from scipy import signal as sg
@@ -25,6 +26,15 @@ class ktype(Enum):
     GAUSSIAN = 2
     INCREASE = 3
     NEGATIVE = 4
+
+
+class htype(Enum):
+    """
+    Types of hotspot analysis
+
+    """
+    G_LOCAL = 1
+    MORAN_LOCAL = 2
 
 
 class convolution_parameters():
@@ -146,21 +156,20 @@ def convolution_method(image_path, params):
     relocated = relocate_peaks(peaks, kernel.shape[0])
 
     print("Visualizing...")
-    #visualize_convolution(convolution, image, (peaks, relocated))
+    visualize_convolution(convolution, image, (peaks, relocated))
 
     print("Creating Density Map...")
-    block_size_multiplier = 3
+    block_size_multiplier = 4
     density_map = create_density_map(relocated, block_size *
                                      block_size_multiplier,
                                      image.shape)
-    print(density_map.shape)
 
     print("Creating Feature...")
     radius = int(scale / block_size)
-    feature = create_feature(density_map, radius)
+    feature = create_hotspot_map(density_map, radius, htype.MORAN_LOCAL)
 
     print("Interpolating Feature...")
-    feature = interpolate_feature(feature, image.shape, feature.shape,
+    feature = interpolate_feature(feature, image.shape,
                                   block_size)
 
     print("Reshaping image...")
@@ -370,7 +379,10 @@ def visualize_convolution(convolution, image, peaks, save=False):
         plt.show()
 
 
-def create_feature(density_map, radius):
+def create_hotspot_map(density_map, radius, hotspot_type=htype.G_LOCAL):
+    """
+    Create a hotspot map from the intersection density map.
+    """
     grid = np.indices((density_map.shape[0], density_map.shape[1]))
     grid = np.stack((grid[0], grid[1]), axis=-1)
     grid = np.reshape(grid, (grid.shape[0]*grid.shape[1], 2))
@@ -378,12 +390,32 @@ def create_feature(density_map, radius):
     w = DistanceBand(grid, threshold=radius)
     y = np.ravel(density_map)
 
-    g = G_Local(y, w).Zs
+    if hotspot_type == htype.G_LOCAL:
+        g = G_Local(y, w).Zs
+    else:
+        g = Moran_Local(y, w).Is
+
     g = np.reshape(g, (density_map.shape[0], density_map.shape[1]))
     return g
 
 
 def create_density_map(points, block_size, image_shape):
+    """
+    This function rasterizes the intersection points to a grid built from
+    blocks of size block_size and in the shape of the image. This is required
+    in the creation of a hotspot map from the intersection points.
+
+    Args:
+        points:         nx2 numpy array of integers containing the points of
+                        road intersection.
+        block_size:     The dimension of a single block that makes up the grid;
+                        integer
+        image_shape:    The shape of image where the intersections are
+                        extracted from; tuple of integers
+    Returns:
+        A rasterized version of the intersection points; nxm numpy matrix
+
+    """
     height = image_shape[0]
     width = image_shape[1]
     density_map = np.zeros((int(math.floor(float(height) / block_size)),
@@ -398,19 +430,39 @@ def create_density_map(points, block_size, image_shape):
     return density_map
 
 
-def interpolate_feature(feature, image_shape, feature_shape, block_size):
+def interpolate_feature(feature, image_shape, block_size):
+    """
+    This function resizes and interpolates the feature matrix to the dimensions
+    corresponding to the image with the correct block size. A larger blocksize
+    was used to create the feature matrix to reduce the computational load.
 
+    Args:
+        feature:        The hotspot map of reduced dimensions; nxm numpy matrix
+                        of floats
+        image_shape:    The shape of image where the intersections are
+                        extracted from; tuple of integers
+        block_size:     The dimension of a single block that makes up the grid;
+                        integer
+    Returns:
+        A resized and interpolated version of the feature matrix in the correct
+        dimensions corresponding to the shape of the image and blocksize.
+
+    """
+    feature_shape = feature.shape
     zoom_level = [float(image_shape[0]) / (block_size * feature_shape[0]),
                   float(image_shape[1]) / (block_size * feature_shape[1])]
 
-    # To compensate for the round of the zoom when we want to use a ceil
+    # To compensate for the round() used in the zoom() when we want to use a
+    # ceil() instead. The round() will give one off errors when the computed
+    # dimensions of the interpolated feature matrix has the first decimal lower
+    # than 0.5.
     if (zoom_level[0] * feature_shape[0]) % 1 < 0.5:
         zoom_level[0] = math.ceil(zoom_level[0] * feature_shape[0]) /\
                         float(feature_shape[0])
     if (zoom_level[1] * feature_shape[1]) % 1 < 0.5:
         zoom_level[1] = math.ceil(zoom_level[1] * feature_shape[1]) /\
                         float(feature_shape[1])
-    
+
     return zoom(feature, zoom_level, order=3)
 
 
