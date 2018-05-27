@@ -10,7 +10,7 @@ from rasterio.features import shapes
 from matplotlib import pyplot as plt
 
 
-def create_groundtruth(mask, block_size=25, threshold=0.1):
+def create_groundtruth(mask, block_size=20, threshold=0.1):
     """
     This functions creates a block based groundtruth map from the mask produced
     by the create_mask function. When a block of pixels has a certain amount of
@@ -40,7 +40,8 @@ def create_mask(shapefile, imagefile, maskname=None):
         geoms = [feature["geometry"] for feature in sf]
 
     with rasterio.open(imagefile) as src:
-        out_image, out_transform = mask.mask(src, geoms, crop=False, invert=False)
+        out_image, out_transform = mask.mask(src, geoms, crop=False,
+                                             invert=False)
         out_meta = src.meta.copy()
 
     out_meta.update({"driver": "GTiff",
@@ -84,6 +85,65 @@ def create_dict(feature, groundtruth):
                 dataset['informal'].append(feature[i, j])
             
     return dataset
+
+
+def calculate_padding(image_shape, block, scale):
+    """
+    Spfeas removes a few block for padding on the edge of the image when
+    using scales larger than the block size. This function calculates the
+    number of blocks that were removed for padding. This is based on the
+    scale, image size and block size.
+
+    Args:
+        image_shape:    A tuple containing the shape of the image; integers.
+        block:          The block size; integer.
+        scale:          The scale; integer.
+
+    Returns:
+        The padding of the image in width and length; tuple of floats.
+
+    """
+    padding_x = math.ceil(image_shape[0] / float(block)) -\
+        math.ceil(float(image_shape[0] - (scale - block)) / block)
+    padding_y = math.ceil(image_shape[1] / float(block)) -\
+        math.ceil(float(image_shape[1] - (scale - block)) / block)
+
+    return (padding_x, padding_y)
+
+
+def reshape_image(groundtruth, image_shape, block, scale):
+    """
+    This function resizes the groundtruth to the dimensions of the feature
+    vector created by spfeas. The groundtruth needs to account for the padding
+    introduced by the creation of the feature vector by spfeas.
+
+    Args:
+        groundtruth:    A zero filled nxm numpy matrix with ones on the
+                        location of informal areas.
+        image_shape:     A tuple containing the shape of the image, integers.
+        block:          The block size; integer.
+        scale:          The scale; integer.
+
+    Returns:
+        The groundtruth without padding in the same shape as the feature
+        vector; nxm numpy matrix.
+
+    """
+    padding = calculate_padding(image_shape, block, scale)
+
+    x_start = int(math.ceil(padding[0] / 2.0))
+    x_end = int(math.floor(padding[0] / 2.0))
+    y_start = int(math.ceil(padding[1] / 2.0))
+    y_end = int(math.floor(padding[1] / 2.0))
+
+    if x_end <= 0 and y_end <= 0:
+        return groundtruth[x_start:, y_start:]
+    if x_end <= 0:
+        return groundtruth[x_start:, y_start:-y_end]
+    if y_end <= 0:
+        return groundtruth[x_start:-x_end, y_start:]
+    return groundtruth[x_start:-x_end, y_start:-y_end]
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Create mask from shape file")

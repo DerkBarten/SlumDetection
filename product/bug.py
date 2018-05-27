@@ -2,7 +2,7 @@ import numpy as np
 import math
 import gdal
 from matplotlib import pyplot as plt
-
+from groundtruth import reshape_image
 
 def read_geotiff(filename):
     dataset = gdal.Open(filename)
@@ -18,24 +18,24 @@ def calculate_padding(image, block, scale):
     #             math.ceil(float(image.shape[1] - (scale - block)) / block)
     return (padding_x, padding_y)
 
-def reshape_image(image, block, scale):
-    dimensions = image.shape
-    padding = calculate_padding(image, block, scale)
-    print(padding)
-    # px = math.ceil((scale - block) / 2.0)
+# def reshape_image(image, block, scale):
+#     dimensions = image.shape
+#     padding = calculate_padding(image, block, scale)
+#     print(padding)
+#     # px = math.ceil((scale - block) / 2.0)
 
-    # x_start = math.ceil(px / block)
-    # x_end = padding[0] - x_start
+#     # x_start = math.ceil(px / block)
+#     # x_end = padding[0] - x_start
 
-    # y_start = math.ceil(px / block)
-    # y_end = padding[1] - y_start
+#     # y_start = math.ceil(px / block)
+#     # y_end = padding[1] - y_start
 
-    x_start = math.ceil(padding[0] / 2.0)
-    x_end = math.floor(padding[0] / 2.0)
-    y_start = math.ceil(padding[1] / 2.0)
-    y_end = math.floor(padding[1] / 2.0)
+#     x_start = math.ceil(padding[0] / 2.0)
+#     x_end = math.floor(padding[0] / 2.0)
+#     y_start = math.ceil(padding[1] / 2.0)
+#     y_end = math.floor(padding[1] / 2.0)
 
-    print(x_start, x_end, y_start, y_end)
+#     print(x_start, x_end, y_start, y_end)
 
     #return image[x_start:-x_end, y_start:-y_end]
 
@@ -57,8 +57,9 @@ def print_dimensions(imagefile, featurefile, block, scale):
     print("Actual feature vector dimension:\t{}x{}".format(
         feature.shape[1], feature.shape[2]))
 
-    reshape_image(image[0], block, scale)
     
+    new = reshape_image(np.zeros((154, 154)), image[0].shape, block, scale)
+    print(new.shape)
     
     print("")
     

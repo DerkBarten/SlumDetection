@@ -10,65 +10,8 @@ import matplotlib.pyplot as plt
 
 from groundtruth import create_dict
 from util import read_geotiff, concat_tiff
-from groundtruth import create_mask, create_groundtruth, create_dataset
-
-
-def calculate_padding(image_shape, block, scale):
-    """
-    Spfeas removes a few block for padding on the edge of the image when
-    using scales larger than the block size. This function calculates the
-    number of blocks that were removed for padding. This is based on the
-    scale, image size and block size.
-
-    Args:
-        image_shape:    A tuple containing the shape of the image; integers.
-        block:          The block size; integer.
-        scale:          The scale; integer.
-
-    Returns:
-        The padding of the image in width and length; tuple of floats.
-
-    """
-    padding_x = math.ceil(image_shape[0] / float(block)) -\
-        math.ceil(float(image_shape[0] - (scale - block)) / block)
-    padding_y = math.ceil(image_shape[1] / float(block)) -\
-        math.ceil(float(image_shape[1] - (scale - block)) / block)
-
-    return (padding_x, padding_y)
-
-
-def reshape_image(groundtruth, image_shape, block, scale):
-    """
-    This function resizes the groundtruth to the dimensions of the feature
-    vector created by spfeas. The groundtruth needs to account for the padding
-    introduced by the creation of the feature vector by spfeas.
-
-    Args:
-        groundtruth:    A zero filled nxm numpy matrix with ones on the
-                        location of informal areas.
-        image_shape:     A tuple containing the shape of the image, integers.
-        block:          The block size; integer.
-        scale:          The scale; integer.
-
-    Returns:
-        The groundtruth without padding in the same shape as the feature
-        vector; nxm numpy matrix.
-
-    """
-    padding = calculate_padding(image_shape, block, scale)
-
-    x_start = int(math.ceil(padding[0] / 2.0))
-    x_end = int(math.floor(padding[0] / 2.0))
-    y_start = int(math.ceil(padding[1] / 2.0))
-    y_end = int(math.floor(padding[1] / 2.0))
-
-    if x_end <= 0 and y_end <= 0:
-        return groundtruth[x_start:, y_start:]
-    if x_end <= 0:
-        return groundtruth[x_start:, y_start:-y_end]
-    if y_end <= 0:
-        return groundtruth[x_start:-x_end, y_start:]
-    return groundtruth[x_start:-x_end, y_start:-y_end]
+from groundtruth import create_mask, create_groundtruth
+from groundtruth import reshape_image, create_dataset
 
 
 def parse_filename(filename):
@@ -180,7 +123,7 @@ def analyze_feature(image_path, block, scale, bands, feature_name):
 
     features_ = np.array(read_geotiff(feature_path))
     groundtruth = create_groundtruth(mask, block_size=block,
-                                     threshold=0)
+                                     threshold=0.5)
 
     image_shape = image[0].shape
     groundtruth = reshape_image(groundtruth, image_shape, block, scale)
@@ -196,14 +139,17 @@ def analyze_feature(image_path, block, scale, bands, feature_name):
             os.mkdir(featurefolder)
 
         dataset = create_dataset(feature_, groundtruth)
-        name = featurename.format(base, 'boxplot', feature_name, block, scale, i)
+        name = featurename.format(base, 'boxplot', feature_name,
+                                  block, scale, i)
         boxplot(dataset, featurefolder, name)
 
         dataset = create_dict(feature_, groundtruth)
-        name = featurename.format(base, 'kde', feature_name, block, scale, i)
+        name = featurename.format(base, 'kde', feature_name,
+                                  block, scale, i)
         kde(dataset, featurefolder, name)
 
-        name = featurename.format(base, 'spatial', feature_name, block, scale, i)
+        name = featurename.format(base, 'spatial', feature_name,
+                                  block, scale, i)
         spatial_distribution(feature_, featurefolder, name)
 
 
@@ -231,7 +177,7 @@ def analysis(image_path, blocks, scales, bands, feature_names):
                 print("Processing {},\tfeature: {}\tblock: {}\tscale: {}\t".
                       format(os.path.basename(image_path), feature_name, block,
                              scale))
-                #create_feature(image_path, block, scale, bands, feature_name)
+                # create_feature(image_path, block, scale, bands, feature_name)
                 analyze_feature(image_path, block, scale, bands, feature_name)
 
 
@@ -257,6 +203,8 @@ def spatial_distribution(feature, folder, name):
     plt.clf()
 
 if __name__ == "__main__":
-    analysis('data/section_1.tif', [20], [200], [1, 2, 3], ['lsr'])
-    #analysis('data/section_2.tif', [20, 40, 60], [50, 100, 150], [1, 2, 3], ['lsr', 'hog'])
-    #analysis('data/section_3.tif', [20, 40, 60], [50, 100, 150], [1, 2, 3], ['lsr', 'hog'])
+    analysis('data/section_1.tif', [20], [150], [1, 2, 3], ['lsr'])
+    # analysis('data/section_2.tif', [20, 40, 60], [50, 100, 150], [1, 2, 3],
+    #          ['lsr', 'hog'])
+    # analysis('data/section_3.tif', [20, 40, 60], [50, 100, 150], [1, 2, 3],
+    #          ['lsr', 'hog'])

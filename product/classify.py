@@ -7,8 +7,8 @@ import numpy as np
 
 from matplotlib import pyplot as plt
 from util import read_geotiff
-from groundtruth import create_mask, create_groundtruth
-from analysis import get_feature_path, reshape_image
+from groundtruth import create_mask, create_groundtruth, reshape_image
+from analysis import get_feature_path
 
 from sklearn.manifold import TSNE
 
