@@ -6,7 +6,6 @@ import numpy as np
 import pandas as pd
 
 from rasterio import mask
-from rasterio.features import shapes
 from matplotlib import pyplot as plt
 
 

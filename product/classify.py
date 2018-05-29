@@ -8,23 +8,24 @@ import numpy as np
 from matplotlib import pyplot as plt
 from util import read_geotiff
 from groundtruth import create_mask, create_groundtruth, reshape_image
-from analysis import get_feature_path
+from analysis import get_features
 
 from sklearn.manifold import TSNE
 
 import itertools
 
-def create_dataset(image_path, block, scale, feature_names):
+
+def create_dataset(image_path, block, scale, bands, feature_names):
     shapefile = 'data/slums_approved.shp'
     image = np.array(read_geotiff(image_path))
     mask = create_mask(shapefile, image_path)
-    groundtruth = create_groundtruth(mask, block_size=block, threshold=0)
+    groundtruth = create_groundtruth(mask, block_size=block, threshold=0.5)
     image_shape = (image.shape[1], image.shape[2])
     groundtruth = reshape_image(groundtruth, image_shape, block, scale)
 
     features = None
     for feature_name in feature_names:
-        f = get_feature(image_path, block, scale, feature_name)
+        f = get_features(image_path, block, scale, bands, feature_name)
         if features is None:
             features = f
         else:
@@ -41,16 +42,6 @@ def create_dataset(image_path, block, scale, feature_names):
                                  np.ones((true.shape[0], 1)))))
     return (X, y)
 
-
-def get_feature(image_path, block, scale, feature_name):
-    feature_path = get_feature_path(image_path, block, scale, [1, 2, 3],
-                                    feature_name)
-
-    if feature_path is None:
-        print("Error: cannot find feature file")
-        return
-
-    return np.array(read_geotiff(feature_path))
 
 def balance_dataset(X, y, class_ratio=1.3):
     """
@@ -114,9 +105,9 @@ def plot_confusion_matrix(cm, classes,
 
 
 def classify_Forrest():
-    X, y = create_dataset('data/section_1.tif', 20, 150, ['lsr'])
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.33, random_state=0)
-    clf = RandomForestClassifier(max_depth=2, random_state=0)
+    X, y = create_dataset('data/section_1.tif', 20, 100, [1, 2, 3], ['lsr', 'rid'])
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.33)
+    clf = RandomForestClassifier(max_depth=4)
     X_train, y_train = balance_dataset(X_train, y_train)
     clf.fit(X_train, y_train)
 
@@ -128,7 +119,7 @@ def classify_Forrest():
 
 
 def classify_TSNE():
-    X, y = create_dataset('data/section_1.tif', 20, 150, ['lsr'])
+    X, y = create_dataset('data/section_1.tif', 20, 100, [1,2,3], ['lsr', 'rid'])
     # X = np.matrix(X)
     # X = X[:, [1,4]]
     
@@ -142,5 +133,5 @@ def classify_TSNE():
     plt.scatter(X0[y == 1], X1[y == 1], c='b')
     plt.show()
 
-#classify_TSNE()
-classify_Forrest()
+classify_TSNE()
+#classify_Forrest()
