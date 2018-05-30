@@ -60,10 +60,10 @@ plots.
 
 \begin{figure}
 \begin{tabular}{cc}
-  \subfloat{\includegraphics[width=4cm]{images/HoG/inc_bk/section_1_boxplot_hog_BK20_SC100_F2}}&
-  \subfloat{\includegraphics[width=4cm]{images/HoG/inc_bk/section_1_boxplot_hog_BK60_SC100_F2}}\\ 
-  \subfloat{\includegraphics[width=4cm]{images/HoG/inc_bk/section_1_kde_hog_BK20_SC100_F2}}&
-  \subfloat{\includegraphics[width=4cm]{images/HoG/inc_bk/section_1_kde_hog_BK60_SC100_F2}}
+  \subfloat{\includegraphics[width=3.5cm]{images/HoG/inc_bk/section_1_boxplot_hog_BK20_SC100_F2}}&
+  \subfloat{\includegraphics[width=3.5cm]{images/HoG/inc_bk/section_1_boxplot_hog_BK60_SC100_F2}}\\ 
+  \subfloat{\includegraphics[width=3.5cm]{images/HoG/inc_bk/section_1_kde_hog_BK20_SC100_F2}}&
+  \subfloat{\includegraphics[width=3.5cm]{images/HoG/inc_bk/section_1_kde_hog_BK60_SC100_F2}}
 \end{tabular}
 \caption{The effect of increased block size on the HoG features. From left to
 right: a block size of 20 and 60 respectively.}
@@ -75,19 +75,19 @@ This feature best illustrated the difference in distribution. Figure
 \ref{hog_inc_bk} shows the effect of an increased block size on the
 distribution of values in both classes. This example uses a constant scale of
 100 pixels and a variable block size of 20 and 60 pixels. The experiment with
-a block size of 40 is performed as well, but is ommited from the figure to keep
+a block size of 40 is performed as well, but is omitted from the figure to keep
 the results brief. A more comprehensive visualization of the evaluation can be
 found in the appendix. It seems that the block size, in this case, does not
-influence the both distrutions significantly. As a result an increase in the
+influence the both distributions significantly. As a result an increase in the
 size of a block should have little to no influence on the predictive value of
 the feature.
 
 \begin{figure}
 \begin{tabular}{cc}
-  \subfloat{\includegraphics[width=4cm]{images/HoG/inc_sc/section_1_boxplot_hog_BK20_SC50_F2}}&
-  \subfloat{\includegraphics[width=4cm]{images/HoG/inc_sc/section_1_boxplot_hog_BK20_SC150_F2}}\\
-  \subfloat{\includegraphics[width=4cm]{images/HoG/inc_sc/section_1_kde_hog_BK20_SC50_F2}}&
-  \subfloat{\includegraphics[width=4cm]{images/HoG/inc_sc/section_1_kde_hog_BK20_SC150_F2}}\\
+  \subfloat{\includegraphics[width=3.5cm]{images/HoG/inc_sc/section_1_boxplot_hog_BK20_SC50_F2}}&
+  \subfloat{\includegraphics[width=3.5cm]{images/HoG/inc_sc/section_1_boxplot_hog_BK20_SC150_F2}}\\
+  \subfloat{\includegraphics[width=3.5cm]{images/HoG/inc_sc/section_1_kde_hog_BK20_SC50_F2}}&
+  \subfloat{\includegraphics[width=3.5cm]{images/HoG/inc_sc/section_1_kde_hog_BK20_SC150_F2}}\\
 \end{tabular}
 \caption{The effect of increased scale on the HoG features. From left to
 right: a scale of 50 and 150 respectively}
@@ -96,7 +96,7 @@ right: a scale of 50 and 150 respectively}
 
 Figure \ref{hog_inc_sc} illustrates the effect of increased scale on a constant
 block size. It seems to indicate that an increased scale leads to an increased
-separatation of the two distribution, thus increasing the predictiveness of the
+separation of the two distribution, thus increasing the predictiveness of the
 feature. Scales larger than 150 do not seem to improve the performance. In
 contrast, the performance actually seems to decrease with scales larger than
 150. Therefore, for the HoG features, the scale of 150 is used in all further
@@ -111,7 +111,7 @@ it was the second feature. The second feature is the mean, which seems to work
 quite well. The mean of the first section is visualized in since this section
 produced the most distinct results from the three sections. Similar to the
 analysis of HoG, the increase of the block size does not influence the
-distribution of the two classes. The difference is as neglible as displayed in
+distribution of the two classes. The difference is as negligible as displayed in
 the comparison of the HoG in Figure \ref{hog_inc_bk}
 
 %\begin{figure}
@@ -128,10 +128,10 @@ the comparison of the HoG in Figure \ref{hog_inc_bk}
 
 \begin{figure}
 \begin{tabular}{cc}
-  \subfloat{\includegraphics[width=4cm]{images/LSR/inc_sc/s1/section_1_boxplot_lsr_BK20_SC50_F1}}&
-  \subfloat{\includegraphics[width=4cm]{images/LSR/inc_sc/s1/section_1_boxplot_lsr_BK20_SC150_F1}}\\
-  \subfloat{\includegraphics[width=4cm]{images/LSR/inc_sc/s1/section_1_kde_lsr_BK20_SC50_F1}}&
-  \subfloat{\includegraphics[width=4cm]{images/LSR/inc_sc/s1/section_1_kde_lsr_BK20_SC150_F1}}
+  \subfloat{\includegraphics[width=3.5cm]{images/LSR/inc_sc/s1/section_1_boxplot_lsr_BK20_SC50_F1}}&
+  \subfloat{\includegraphics[width=3.5cm]{images/LSR/inc_sc/s1/section_1_boxplot_lsr_BK20_SC150_F1}}\\
+  \subfloat{\includegraphics[width=3.5cm]{images/LSR/inc_sc/s1/section_1_kde_lsr_BK20_SC50_F1}}&
+  \subfloat{\includegraphics[width=3.5cm]{images/LSR/inc_sc/s1/section_1_kde_lsr_BK20_SC150_F1}}
 \end{tabular}
 \caption{The effect of increased scale on the second SLR feature. From left to
 right: a scale of 50 and 150 respectively.}
@@ -147,14 +147,24 @@ section 2 the distributions are somewhat distinct. Section 3 has barely any
 distinction between the two distributions. The use of the other LSR features
 together with the two different color bands does not seem to help.  It might be
 that the features of LSR fail to produce correct results in areas with
-vegetation, which section 2 and 3 both posess. The difference in vegetation can
+vegetation, which section 2 and 3 both posses. The difference in vegetation can
 be seen in Figure \ref{fig:sections} where the image sections are displayed.
 
 
 \subsection{Road Intersection Density}
 
-% The evaluation of the road density features is different than the HoG and LSR
-% features. 
+The road intersection density method only generates a single feature. This feature, as discussed earlier, is the result of the Gettis and Ord G function. Like HoG and LSR, this method can use different block sizes and scales as well. However, in this case, the meaning of the scale and block size is a bit different. In the calculation of the G function, in order to map the hotspot to the same dimension of the two other features, the points returned by the intersection detection need to be rasterized on a grid. This grid is in the same dimensions as the two other features and each block in the grid represents a block in the image, just like the blocksize. Every block in the grid has a counter of the number of intersections that fall in that specific block. Over this grid, the G function is calculated, resulting in a feature of the correct dimensions. The scale is used in the determination of the radius of each block. The G function is calculated using the block in combination with its surrounding neighbors. The scale, in this case, determines the radius around each block in which blocks are identified as a neighbor.
+
+
+Due to the diversity in the landscape between the three sections, it is difficult
+to select parameters that generate correct intersection for all three sections.
+
+There is no groundtruth for the intersections, therefore, we cannot calculate various
+measures for the performance of the intersection detection
+
+
+The evaluation of the road intersection density is harder than the other features
+due to the complexity 
 
 \subsection{Conclusion}
 
@@ -166,7 +176,7 @@ a high scale is measured in hours rather than minutes. Using features with high
 scales on large images would therefore not be feasable. Besides, increasing the
 scale gives diminishing returns while taking significantly more time to
 compute. For the smaller sections, higher scales, such as 200 or 250 is
-used, but on large scale images this is brought down to a managable 150.
+used, but on large scale images this is brought down to a manageable 150.
 
 With the right parameters, there is a clear distinction between the two classes
 for both the HoG and LSR features. Therefore, we conclude that these features

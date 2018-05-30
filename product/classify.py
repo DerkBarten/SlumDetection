@@ -2,6 +2,8 @@ from sklearn.manifold import Isomap
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import confusion_matrix
+from sklearn import preprocessing
+from sklearn.cluster import KMeans
 
 import numpy as np
 
@@ -9,67 +11,100 @@ from matplotlib import pyplot as plt
 from util import read_geotiff
 from groundtruth import create_mask, create_groundtruth, reshape_image
 from analysis import get_features
+from sklearn.svm import SVC
 
 from sklearn.manifold import TSNE
+from sklearn.utils import shuffle
 
 import itertools
+import os
+import enum
+import pickle
+
+basedir = "data"
+imagefiles = { 0 : 'section_1.tif',
+               1 : 'section_2.tif',
+               2 : 'section_3.tif'}
 
 
-def create_dataset(image_path, block, scale, bands, feature_names):
+class ClassifierType:
+    FORREST, KNN, SVM = range(3)
+
+
+def get_classifier(class_type):
+    if class_type == ClassifierType.FORREST:
+        return RandomForestClassifier(max_depth=6)
+    if class_type == ClassifierType.KNN:
+        return KNeighborsClassifier()
+    if class_type == ClassifierType.SVM:
+        return SVC()
+    print("Error: Invalid Classifier type")
+    exit()
+
+
+def load_features(block, scales, bands, feature_names):
+    features = {}
+    for index in imagefiles:
+        path = os.path.join(basedir, imagefiles[index])
+        if os.path.exists(path):
+            features[index] = get_features(path, block, scales, bands,
+                                           feature_names)
+            features[index][features[index] == np.inf] = 0
+        else:
+            print("Feature does not exist")
+    return features
+
+
+def create_dataset(path, block, scales, bands, feature):
     shapefile = 'data/slums_approved.shp'
-    image = np.array(read_geotiff(image_path))
-    mask = create_mask(shapefile, image_path)
+    
+    image = np.array(read_geotiff(path))
+    mask = create_mask(shapefile, path)
     groundtruth = create_groundtruth(mask, block_size=block, threshold=0.5)
     image_shape = (image.shape[1], image.shape[2])
-    groundtruth = reshape_image(groundtruth, image_shape, block, scale)
+    groundtruth = reshape_image(groundtruth, image_shape, block, max(scales))
 
-    features = None
-    for feature_name in feature_names:
-        f = get_features(image_path, block, scale, bands, feature_name)
-        if features is None:
-            features = f
-        else:
-            features = np.concatenate((features, f), axis=0)
+    # shape = feature.shape
+    # print(shape)
+    # plt.imshow(feature[0])
+    # plt.show()
+    X = np.reshape(feature, (feature.shape[1] * feature.shape[2],
+                             feature.shape[0]))
+    
+    for i, feature in enumerate(X):
+        X[i] = preprocessing.scale(feature)
 
-    features = np.reshape(features, (features.shape[1],  features.shape[2], features.shape[0]))
-    features[features == np.inf] = 0
+    # image = image[0:-1]
 
-    true = features[groundtruth > 0]
-    false = features[groundtruth < 1]
+    # plt.imshow(image[0])
+    # plt.show()
+    # plt.imshow(np.array(groundtruth > 0, dtype=int))
+    # plt.show()
+   
+    # print(groundtruth.shape)
+    # plt.imshow(np.array(groundtruth > 0, dtype=int))
+    # plt.show()
 
-    X = np.concatenate((false, true), axis=0)
-    y = np.ravel(np.concatenate((np.zeros((false.shape[0], 1)),
-                                 np.ones((true.shape[0], 1)))))
-    return (X, y)
+    y = np.ravel(np.array(groundtruth > 0, dtype=int))
 
-
-def balance_dataset(X, y, class_ratio=1.3):
-    """
-    Balances the dataset over the classes
-    Class ratio 1.5 means that there are 50% more non-slum examples compared to slum examples
-
-    Zero and one reference the class
-    filters part of the X matrix out, where y = 0
-    :param X:
-    :param y:
-    :param class_ratio:
-    """
-    to_take = round(len(y[y == 1]) * class_ratio)
-
-    X_zeros = X[y == 0, :]
-    y_zeros = y[y == 0]
-
-    row_indices = np.random.choice(X_zeros.shape[0], int(to_take), replace=False)
-    X_zeros = X_zeros[row_indices, :]
-    y_zeros = y_zeros[row_indices]
-
-    X_ones = X[y == 1, :]
-    y_ones = y[y == 1]
-
-    X = np.append(X_zeros, X_ones, axis=0)
-    y = np.append(y_zeros, y_ones)
-
+    # print(X.shape)
+    
+    # print(y.shape)
+    # print(np.bincount(y))
     return X, y
+
+def create_train_test(d0, d1, d2):
+    Xtest, ytest = d0
+
+    X1, y1 = d1
+    X2, y2 = d2
+
+    Xtrain = np.concatenate((X1, X2), axis=0)
+    ytrain = np.concatenate((y1, y2), axis=0)
+    Xtrain, ytrain = shuffle(Xtrain, ytrain)
+
+    return Xtrain, ytrain, Xtest, ytest
+
 
 def plot_confusion_matrix(cm, classes,
                           normalize=False,
@@ -103,35 +138,103 @@ def plot_confusion_matrix(cm, classes,
     plt.ylabel('True label')
     plt.xlabel('Predicted label')
 
+def classify_Gaussian(Xtrain, ytrain, Xtest, ytest):
+    from sklearn.gaussian_process import GaussianProcessClassifier
+    from sklearn.gaussian_process.kernels import RBF
+    clf = GaussianProcessClassifier(1.0 * RBF(1.0))
 
-def classify_Forrest():
-    X, y = create_dataset('data/section_1.tif', 20, 100, [1, 2, 3], ['lsr', 'rid'])
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.33)
-    clf = RandomForestClassifier(max_depth=4)
-    X_train, y_train = balance_dataset(X_train, y_train)
-    clf.fit(X_train, y_train)
+    clf.fit(Xtrain, ytrain)
 
-    y_pred = clf.predict(X_test)
-    cnf_matrix = confusion_matrix(y_test, y_pred)
+    ypred = clf.predict(Xtest)
+    cnf_matrix = confusion_matrix(ytest, ypred)
     plot_confusion_matrix(cnf_matrix, classes=['formal', 'informal'],
                           title='Confusion matrix')
     plt.show()
+    return ypred
 
 
-def classify_TSNE():
-    X, y = create_dataset('data/section_1.tif', 20, 100, [1,2,3], ['lsr', 'rid'])
-    # X = np.matrix(X)
-    # X = X[:, [1,4]]
-    
-    output = TSNE(n_components=2).fit_transform(X)
-    print(output.shape)
-    print(X.shape)
-    print(y.shape)
-    X0 = np.ravel(output[:, 0])
-    X1 = np.ravel(output[:, 1])
-    plt.scatter(X0[y == 0], X1[y == 0], c='r')
-    plt.scatter(X0[y == 1], X1[y == 1], c='b')
+def classify_Gradient(Xtrain, ytrain, Xtest, ytest):
+    from sklearn.ensemble import GradientBoostingClassifier
+    grad = GradientBoostingClassifier()
+    grad.fit(Xtrain, ytrain)
+
+    ypred = grad.predict(Xtest)
+    cnf_matrix = confusion_matrix(ytest, ypred)
+    plot_confusion_matrix(cnf_matrix, classes=['formal', 'informal'],
+                          title='Confusion matrix')
+    plt.show()
+    return ypred
+
+
+def oversample(Xtrain, ytrain):
+    from imblearn.over_sampling import RandomOverSampler
+    ros = RandomOverSampler()
+    return ros.fit_sample(Xtrain, ytrain)
+
+
+def do_tsne(Xtrain, shape, load=False, save=True):
+    print("performing tsne")
+
+    if load:
+        f = open('cluster.pkl', 'r')
+        points = pickle.load(f)
+    else:
+        tsne = TSNE(n_components=2, init='random', random_state=0)
+        points = tsne.fit_transform(Xtrain)
+
+    if save:
+        f = open('cluster.pkl', 'w')
+        pickle.dump(points, f)
+
+    print(points.shape)
+
+    plt.scatter(points[:, 0], points[:, 1])
     plt.show()
 
-classify_TSNE()
-#classify_Forrest()
+    kmeans = KMeans(n_clusters=2, random_state=0)
+    clusters = kmeans.fit_predict(points)
+    print(clusters.shape)
+
+    plt.imshow(np.reshape(clusters, shape))
+    plt.show()
+
+def classify(Xtrain, ytrain, Xtest, ytest, class_type):
+    classifier = get_classifier(class_type)
+    classifier.fit(Xtrain, ytrain)
+    return classifier.predict(Xtest)
+
+block = 20
+scales = [150]
+bands = [1, 2, 3]
+features = ['lsr', 'hog', 'rid']
+
+features = load_features(block, scales, bands, features)
+
+d0 = create_dataset(os.path.join(basedir, imagefiles[0]), block, scales, bands,
+                    features[0])
+# d1 = create_dataset(os.path.join(basedir, imagefiles[1]), block, scales, bands,
+#                     features[1])
+# d2 = create_dataset(os.path.join(basedir, imagefiles[2]), block, scales, bands,
+#                     features[2])
+
+Xtrain, _ = d0
+print(features[0].shape[1:])
+do_tsne(Xtrain, features[0].shape[1:])
+
+# shape = features[0].shape[1:]
+
+# Xtrain, ytrain, Xtest, ytest = create_train_test(d0, d1, d2)
+
+# Xtrain, ytrain = oversample(Xtrain, ytrain)
+
+# prediction = classify(Xtrain, ytrain, Xtest, ytest, ClassifierType.FORREST)
+
+# plot_confusion_matrix(confusion_matrix(ytest, prediction),
+#                       classes=['formal', 'informal'],
+#                       title='Confusion matrix')
+# plt.show()
+
+# print(shape)
+# print(prediction.shape)
+# plt.imshow(np.reshape(prediction, shape))
+# plt.show()

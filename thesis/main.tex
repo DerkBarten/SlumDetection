@@ -1,28 +1,27 @@
-\documentclass[twocolumn]{article}
+\documentclass[a4paper]{article}
 
-\usepackage[backend=biber]{biblatex}
-\usepackage[margin=0.7in]{geometry}
+\usepackage[backend=biber, sorting=none]{biblatex}
+\usepackage[]{geometry}
 \usepackage[font={normalsize,it}]{caption}
 \usepackage{titlesec}
 \usepackage{graphicx}
 \usepackage{subfig}
 \usepackage{amsmath}
 
+
 \addbibresource{references.bib}
 
-\renewcommand{\thesection}{\Roman{section}}
-\renewcommand{\thesubsection}{\Alph{subsection}}
-\renewcommand{\thesubsubsection}{\roman{subsubsection}}
+\renewcommand{\thesection}{\arabic{section}}
+\renewcommand{\thesubsection}{\arabic{subsection}}
+\renewcommand{\thesubsubsection}{\arabic{subsubsection}}
 
 \titleformat{\section}{\large\sc\filcenter}{\thesection.}{1em}{}
-\titleformat{\subsection}{\normalsize\it}{\thesubsection.}{0.9em}{}
-\titleformat{\subsubsection}{\small\it}{\thesubsection.\thesubsubsection.}{0.9em}{}
+\titleformat{\subsection}{\normalsize\it}{\thesection.\thesubsection}{0.9em}{}
+\titleformat{\subsubsection}{\small\it}{\thesection.\thesubsection.\thesubsubsection}{0.9em}{}
 
 \begin{document}
 
-\twocolumn[
-  \input{title}
-]
+\input{title}
 \clearpage
 
 \input{introduction}

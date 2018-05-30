@@ -205,6 +205,8 @@ def get_features(image_path, block, scales, bands, feature_names):
         exit()
 
     spfeas_features = set(feature_names).intersection(['hog', 'lsr'])
+    rid_feature = set(feature_names).intersection(['rid'])
+
     if spfeas_features:
         folder = get_folder_name(image_path, block, scales, bands,
                                  spfeas_features)
@@ -215,7 +217,8 @@ def get_features(image_path, block, scales, bands, feature_names):
             exit()
 
         spfeas_features = np.array(read_geotiff(feature_path))
-    if 'rid' in feature_names:
+    
+    if rid_feature:
         folder = get_folder_name(image_path, block, scales, bands, ['rid'])
         feature_path = get_feature_from_folder(folder)
 
@@ -223,11 +226,11 @@ def get_features(image_path, block, scales, bands, feature_names):
         rid = RoadIntersectionDensity.load(feature_path)
         rid_feature = rid.get_feature()
 
-    if spfeas_features is not None and rid_feature is not None:
+    if len(spfeas_features) > 0 and len(rid_feature) > 0:
         return np.concatenate((spfeas_features, rid_feature), axis=0)
-    if spfeas_features is not None:
+    if len(spfeas_features) > 0:
         return spfeas_features
-    if rid_feature is not None:
+    if len(rid_feature) > 0:
         return rid_feature
 
 
@@ -281,7 +284,7 @@ def spatial_distribution(feature, folder, name):
     plt.clf()
 
 if __name__ == "__main__":
-    analysis('data/section_1.tif', [20], [[150]], [1, 2, 3], [['hog', 'rid']])
+    analysis('data/section_1.tif', [20], [[100, 150]], [1, 2, 3], [['rid', 'hog', 'lsr']])
     # analysis('data/section_2.tif', [20, 40, 60], [50, 100, 150], [1, 2, 3],
     #          ['lsr', 'hog'])
     # analysis('data/section_3.tif', [20, 40, 60], [50, 100, 150], [1, 2, 3],
