@@ -1,20 +1,6 @@
 \section{Introduction}
 
-The increase in informal housing is a common issue faced by nations globally.
-Although informal regions of housing, such as slums, are commonplace in
-underdeveloped countries, it affects the developed world as well, e.g., refugee
-camps. Informal settlements might be difficult to monitor merely on the usage
-of ground surveys due to scale, distribution or a varity of other difficulties.
-Satellite and aerial images provide a solution to the problems encountered with
-ground based methods.  High resolution images allow for the detection of
-informal housing based exclusively on features extracted from the image.  The
-images could be annotated manually although the feasability diminishes with
-increased scale.  As a solution, the detection of informal settlements can be
-automated using inherent visual characteristics of a certain area. The features
-extracted images provide a distinct difference between formal and informal
-housing. The features that are determined distinctive can used by classification
-algorithms, effectively automizing the detection of areas containing informal
-housing in images.
+Informal housing is a common issue faced by cities in developing countries. Inhabitants of informal regions, commonly named as slums, have less social economic opportunities and a lower quality of life compared to urban residents in formal housing. The monitoring of these the development of slums requires resources which governments in developing countries often cannot spare. Remote sensing methods from satellites or airplanes provide a relatively low cost solution in tracking development of slums in the city. The detection of informal areas from the images provides by satellites and airplanes remains a difficult task despite the effort from the field of study. This is in part caused by the disparate nature of slums, which varies between cities and even between regions of the same city. In our research, we aim to detect a certain type of slum. The slum characteristics of this type of slum are small buildings which are similar to tents, covered with plastic fabric roofs often colored blue. This type of slum indicates a newly developing slum, which has often a lack of basic services, such as infrastructure and sanitation. Over time, the inhabitants of these slums improve the build quality of the slums into permanent housing. Slum upgrading efforts of the government aim to support these slums by providing the lacking basic services to these newly developed neighborhoods. In this thesis, we focus explicitly on this type of developing slum. The automatic detection of developing slums from satellite images enables the government to support the needs of these developing neighborhoods.
 
 \subsection{Global Context}
 % state
@@ -28,7 +14,7 @@ Over the years, there have been multiple governmental policies implemented to ad
 
 \subsection{Related works and contributions}
 % into remote sensing
-In many cities in the developing world, slums are a large part of the urban environment. However, there is often a lack of information about the properties of the slum, such as the location, the scale and the population \cite{kuffer2016slums}. These cities often do not have the resources to obtain this information. Remote sensing is able to provide the often lacking  socialeconomic information. Besides, remote sensing is also able to capture the spatial and temporal dynamics of the informal areas, which supports urban planning and the development of the city.
+In many cities in the developing world, slums are a large part of the urban environment. However, there is often a lack of information about the properties of the slum, such as the location, the scale and the population \cite{kuffer2016slums}. These cities often do not have the resources to obtain this information. Remote sensing is able to provide the often lacking  social economic information. Besides, remote sensing is also able to capture the spatial and temporal dynamics of the informal areas, which supports urban planning and the development of the city.
 
 % methods
 In the last decade, access to satellite images was becoming widespread along side an increase in methods for urban area classification \cite{kuffer2016slums}. This allowed for informal areas to be studied throughout the globe, e.g. Colombo \cite{colombo}, Johannesburg \cite{williams2016automatic}, Accra \cite{accra}, Mumbai \cite{mumbai}, Rio de Janeiro \cite{hofmann2008detecting}, and Hyderabad \cite{hyderabad}. With the increase interest in slum detection, it became apparent that the structural characteristics of slums were quite different from formal areas. This led to a large number of approaches based on the extraction of  image based features from satellite images. These approaches are, among others: the presence of vegetation \cite{niebergall2007object}, the size and shapes of buildings \cite{hofmann2008detecting}, the roofing material \cite{williams2016automatic}, texture features \cite{mattia2007exploiting}, and road accesability \cite{owen2013approach}.
@@ -44,78 +30,27 @@ Currently, the majority of studies uses the pixel image data of informal regions
  
 \subsection{Proposed Method}
 
-Our thesis continues with the work performed by Graesser \textit{et al.} \cite{graesser2012image}.
-The paper characterized formal and informal neighborhoods using a set of different
-features extracted from satellite images. Their approach was able to successfully characterize the
-two types of neighborhoods with high accuracy on certain parts of the urban landscape. We will evaluate two of the feature extraction methods described in the paper from Graesser \textit{et al.} and attempt to reproduce similar results with satellite images from Bangalore. These methods are the Histogram of Oriented Gradients and Line support regions. Beyond the replication and evaluation of previous research, the methods of feature extraction used by Graesser \textit{et al.} will be extended by an additional new method.
-This method creates a feature based on the density of road intersections in an image. The feature created from this method will be compared to the existing features and measured for its performance. The features produced by the three methods will combined and used by a set of different classification methods.
+Our thesis continues with the work performed by Graesser \textit{et al.} \cite{graesser2012image}. The paper characterized formal and informal neighborhoods using a set of different features extracted from satellite images. Their approach was able to successfully characterize the two types of neighborhoods with high accuracy on certain parts of the urban landscape. We will evaluate two of the feature extraction methods described in the paper from Graesser \textit{et al.} and attempt to reproduce similar results with satellite images from Bangalore. These methods are the Histogram of Oriented Gradients and Line support regions. Beyond the replication and evaluation of previous research, the methods of feature extraction used by Graesser \textit{et al.} will be extended with an additional new method. This method creates a feature based on the density of road intersections in an image. The feature created from this method will be compared to the existing features and measured for its performance. The features produced by the three methods will combined and used by a set of different classification methods.
 We will evaluate the different classification methods to discover the most suitable classification method for our image and its features. 
 
-\subsection{Terminology}
-% TODO: Move this somewhere else
-% and rewrite bits
-The paper of Graesser \textit{et al.} \cite{graesser2012image} uses blocks of pixels instead of each
-individual pixel when extracting features from images.  This is to ease the
-computational load because several of the extraction methods used are
-computationally quite expensive. These blocks of pixels are of 20 by
-20 pixels in the paper. The size of these pixel blocks will from this part on
-be refered to as the \textit{block size}. The block size will differ from
-this value to evaluate the affect to the performance of the features.
-In addition to blocks, the paper also uses a set of different scales for the
-calculation of features. A scale specifies the pixels around a block that
-are used for the calculation of that block. This allows blocks to be more
-spatially connected to the surrounding areas, which can increase the
-performance of a feature.
-
 \subsection{Data and Area of Study}
-The image data used for the thesis is displayed in Figure \ref{fig:sections}d. The image has a resolution of 52,322 by 31,789 pixels with a filesize of 6.19GiB.
-The image data is captured in 2012 by the earth observation satellite WorldView3 owned by DigitalGlobe. The WorldView3 satellite produces multiple types of images
-with varying degrees of resolution. The panchromatic images have a resolution
-of 0.31 meter in contrast to  the multiband images have a significantly lower
-resolution of 1.24 meter. The project uses pansharpened images, which combines
-the high resolution panchromatic- and the low resolution multiband images to
-create high resolution RGB images.
+The image data used for the thesis is displayed in Figure \ref{fig:sections}d, a larger version of the image is included in appendix A. The content of this image contain an area on the west of Bangalore, which is the capital city of the Indian state of Karnataka, located in south central India. The city experienced a fast growth population from 8.4 million in 2011 to 12.3 million in 2017, becoming the third largest city in India\cite{popcount2017}. One of the reasons for its sudden growth is the large IT sector together with better living standards and infrastructure. This rapid increase in population has led to a shortage of housing which, in turn, caused an increase in the number slums in the city. At present, the city is estimated to have over two thousand slums. These slums account for 25 to 35 percent of the urban population \cite{roy2018survey}.
 
-The content of the images contain an area on the west of Bangalore, which is the capital city of the Indian state of Karnataka, located in south central India. The city experienced a fast growth population from 8.4 million in 2011 to 12.3 million in 2017, becoming the third largest city in India\cite{popcount2017}. One of the reasons for its sudden growth is the large IT sector together with better living standards and infrastructure. This rapid increase in population has led to a shortage of housing which, in turn, caused an increase in the number slums in the city. At present, the city is estimated to have over two thousand slums. These slums account for 25 to 35 percent of the urban population \cite{roy2018survey}.
+The image in Figure \ref{fig:sections}d has a resolution of 52,322 by 31,789 pixels with a filesize of 6.19GiB. The image data is captured in 2012 by the earth observation satellite WorldView3 owned by DigitalGlobe. The WorldView3 satellite produces multiple types of images with varying degrees of resolution. The panchromatic images have a resolution of 0.31 meter in contrast to  the multiband images have a significantly lower resolution of 1.24 meter. The project uses pansharpened images, which combines the high resolution panchromatic- and the low resolution multiband images to create high resolution RGB images.
 
-% TODO: Nature of slums in bangalore
+% Source of shape files
+Besides image data, we also use vector files with the location and shape of the developing slums we aim to detect. These vector files are overlayed in the images in Figure \ref{fig:sections} and mark the location of the slums. The images a to c show that these slums are relatively small in scale compared to the surrounding neighborhoods. These sections show the the dispersed small blue roofs that characterize this type of informal settlement. 
 
-%\begin{figure}
-%  \includegraphics[width=\linewidth]{images/west-bangalore}
-%  \caption{A part of western Bangalore, the red patches indicate informal
-%  settlements}
-%  \label{fig:west-bangalore}
-%\end{figure}
+\subsection{Difficulties}
 
-\subsection{Challenges}
+The distinction between formal and informal regions is often quite challenging. In some cases, it is hard to differentiate where to draw the border between formal and informal. In this case, formal areas could be visually similar to informal area despite being of a different class. Furthermore, some areas could be annotated incorrectly. All in all, this produces noise in the dataset which presents a problem for correct binary classification of the two classes of regions.
 
-The distinction between formal and informal regions is often quite challenging,
-in part due to the vagueness of borders between the regions. The border between
-formal and informal regions often resembles more of a spectrum than a clear cut line.
-Besides border difficulties, some areas are not designated as informal, while
-still posessing characteristics of an informal region. This results in
-a dataset with noise and inconsistency.  All in all, the binary classification
-of a region encounters difficulties when applied in practice. 
+Another challenge encountered in this field is the scarcity of informal settlements.  Even though a large part of the inhabitants of Banglore reside in informal settlements, the type slums we aim to detect are small and highly distributed thoughout the city. Figure \ref{fig:sections}d illustrates this point quite well. A larger view of the distribution of informal settlements in this area is provided in the appendix. The relative small number of slums causes the dataset of formal and informal regions to become quite skewed.
 
-Another challenge encountered in this field is the scarcity of informal
-settlements.  Eventhough Banglore  has an abundance of informal settlements,
-the fast majority of land is identified as formal area's. Figure
-\ref{fig:sections}d shows a part of western Bangalore where it is clear
-that informal settlements are sparce and distributed throughout the city. A comprehensive view of the distribution of informal settlements in this area is provided in the appendix. As
-a result, the dataset of formal and informal regions becomes quite skewed.
-Furthermore, because everything that is not informal is automatically
-considered formal, the formal regions have a large amount of variance of visual
-properties.  To illustrate: lakes, forrests, and fields fall in the same
-catagory as formal residential and industrial areas while the visual
-characteristics are significantly different. The diverse content of the formal
-set of visual characteristics might hinder the effectiveness of differentiating
-between formal and informal regions. 
+In our case, everything that is not the specific type of slum we are looking for is automatically considered formal. This is actually not in accord with reality since the formal class includes a large range of different types of buildings. Furthermore, fields and lakes in the image are also included in the formal class. Therefore, the formal class should actually be considered as the class that include all things except a specific type of slum. Consequently, the formal regions have a large amount of variance of visual properties in the image. The diverse content of the formal class of visual characteristics might hinder the effectiveness of classification between formal and informal regions. However, this class division is necessary since we do possess the location and shapes of all other neighborhood types.
 
-To reduce the skewedness between informal and formal, only subsections of
-Figure \ref{fig:west-bangalore} are used where the proportion formal to
-informal is less one-sided. The sections together with their position in the whole image, are displayed in Figure \ref{fig:sections}. A smaller difference in formal informal ratio allows for
-a better understanding of the effectiveness of various features. The features
-are assesed using these area's 
+The large satellite image displayed in Figure \ref{fig:sections}d is transformed into the three smaller sections displayed in Figure \ref{fig:sections} a to c in order to reduce the skewness between the two classes. These sections were selected on the relative prevalence of informal settlements in that specific part of the image. The location of these sections together relative to the complete image are displayed in Figure \ref{fig:sections}d as red squares. The use of these sections should provide a less one-sided class balance and consequently increase classification performance. 
+
 
 %\begin{figure}
 %\centering
@@ -124,7 +59,6 @@ are assesed using these area's
 %  settlements}
 %  \label{fig:section_3}
 %\end{figure}
-
 
 \begin{figure}
 \centering

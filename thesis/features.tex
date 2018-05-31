@@ -1,18 +1,17 @@
 \section{Conventional Feature Extraction Methods}
+Studies often use a combination of features in the detection of informal settlements. Our research will use methods for feature extraction that performed well in previous research \cite{graesser2012image}. The methods we use are the Histogram of Oriented Gradients (HoG) and Line Support Region (LSR) features. Both HoG and LSR are already implemented in a Python library. This library, called spfeas, that is based on the research Graesser \textit{et al.} conducted on the classification of formal and informal neighborhoods \cite{graesser2012image}. Besides these two features we design a new method that measures the difference 
+in prevalence and distribution of road intersections between formal and informal areas. This is based on the belief that there is a difference in this aspect between formal and informal areas.
 
-In the classification of areas in satellite images, it is common for studies to use
-a combination of features on which classification can be performed.
-Our research will use methods for feature extraction that performed well in
-previous research \cite{graesser2012image}. The methods that are used, are: the Histogram
-of Oriented Gradients, Line Support Region features and Linear Feature
-Distribution. Both the Histogram of Oriented Gradients and Line Support Regions
-are already implemented in a framework created by Jordan Graesser. This
-framework is a Python library, called spfeas, that is based on the
-research Graesser et al conducted on the classification of formal and informal
-settlements \cite{graesser2012image}. In addition to the features provided by
-spfeas, this research will implement a new feature that measures the density of
-road intersections in a given area, with the belief that area's with many
-intersections are less likely to be informal.
+\subsection{Terminology}
+The paper of Graesser \textit{et al.} \cite{graesser2012image} uses blocks of pixels instead of each individual pixel when extracting features from images.  This is to ease the computational load because the extraction methods used are
+computationally quite expensive, especially LSR. These blocks of pixels are of 20 by
+20 pixels in the paper. The size of these pixel blocks is referred to as the \textit{block size}. In our research, the block size will differ from
+this value to evaluate the affect to the performance of the features.
+In addition to blocks, the paper also uses a set of different scales for the
+calculation of features. A scale specifies the pixels around a block that
+are used for the calculation of that block. This allows blocks to be
+spatially connected to the surrounding areas, which can increase the
+performance of features.
 
 \subsection{Histogram of Oriented Gradients}
 % designed for only settlement detection
@@ -22,7 +21,7 @@ intersections are less likely to be informal.
 % picture for explaination?
 
 
-The Histogram of Oriented Gradients (HoG) was originally used for the detection of
+The Histogram of Oriented Gradients was originally used for the detection of
 man-made structures in images. The features retrieved from the histogram were
 able to differentiate between natural and man-made sections in an image. This
 approach of man-made structure detection relies on the difference in the
@@ -64,7 +63,7 @@ describe the histogram and differentiate between formal and informal regions.
 These 5 features will be calculated for every color band of the image,
 resulting in a grand total of 15 features for the Histogram of Gradients.
 According to the results presented in the paper, these 15 features alone could
-result in an accuracy of 65 to 75 \%.
+result in an accuracy of 65 to 75 percent. It must be noted, however, that this feature was applied to specific regions where the visual difference between formal and informal was substantial, which is often not the case.
 
 \subsection{Line Support Region Features}
 
@@ -72,17 +71,16 @@ The formality of regions can be for a part be determined by observing the
 spatial distribution of neighborhoods. In the same manner as HoG characterized
 areas by the orientation their buildings, neighborhoods, alternatively, can be
 characterized by the size of their buildings. Informal settlements generally
-lack the precence of large buildings in contrast with formal regions. The size
-of constructions can be characterised using the Line Support Region (LSR)
+lack the presence of large buildings in contrast with formal regions. The size
+of constructions can be characterized using the Line Support Region (LSR)
 features \cite{unsalan2004classifying}. Likewise to HoG, LSR utilizes gradients
-calulated from remote sensing imagery. LSR uses the fact that straight lines
+calculated from remote sensing imagery. LSR uses the fact that straight lines
 have uniform gradients. In practice, natural photographs hardly contain
 perfectly straight lines, which results in similar but non uniform gradients of
 lines. Therefore, LSR uses groups similar gradients to represent a line in
 images to detect semi straight lines in images \cite{burns1986extracting}.
 
-The LSR is implemented in spfeas in accordance to the paper of Graesser et al
-\cite{graesser2012image}. The paper uses three statistical features extracted
-from the LSR, these are line length entropy, mean, and entropy of line
+The LSR is implemented in spfeas in accordance to the paper of Graesser \textit{et al.} \cite{graesser2012image}. The paper uses three statistical features extracted
+from the LSR, these are: line length entropy, mean, and entropy of line
 contrasts. Together with three color bands, this brings the total to nine
-features for a single scale.
+features for a single scale. Using only LSR features and scales 50, 100, and 200, the paper achieved an accuracy of 60 to 75 percent.
