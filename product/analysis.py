@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 from groundtruth import create_dict
 from util import read_geotiff
 from groundtruth import create_mask, create_groundtruth
-from groundtruth import reshape_image, create_dataset
+from groundtruth import reshape_image, create_dataset, overlay_groundtruth
 
 from rid import RoadIntersectionDensity
 
@@ -53,19 +53,9 @@ def get_folder_name(image_name, block=20, scales=[50], bands=[1, 2, 3],
         The path to the feature file if it exists, else it returns None.
 
     """
-    scale_string = 'SC'
-    for i, scale in enumerate(scales):
-        if i == len(scales) - 1:
-            scale_string += str(scale)
-        else:
-            scale_string += '{}-'.format(scale) 
     
-    feature_string = 'TR'
-    for i, name in enumerate(feature_names):
-        if i == len(feature_names) - 1:
-            feature_string += str(name)
-        else:
-            feature_string += '{}-'.format(name) 
+    scale_string = get_scale_string(scales)
+    feature_string = get_feature_string(feature_names, 'TR')
 
     folder = "features/features/{}__BD{}-{}-{}_BK{}_{}_{}/".format(
                 os.path.basename(os.path.splitext(image_name)[0]), bands[0],
@@ -132,6 +122,26 @@ def create_feature(image_path, block, scales, bands, feature_names):
         RoadIntersectionDensity.save(rid, path)
 
 
+def get_scale_string(scales):
+    scale_string = 'SC'
+    for i, scale in enumerate(scales):
+        if i == len(scales) - 1:
+            scale_string += str(scale)
+        else:
+            scale_string += '{}-'.format(scale)
+    return scale_string
+
+
+def get_feature_string(names, prefix=''):
+    feature_string = prefix
+    for i, name in enumerate(names):
+        if i == len(names) - 1:
+            feature_string += str(name)
+        else:
+            feature_string += '{}-'.format(name)
+    return feature_string
+
+
 def analyze_feature(image_path, block, scales, bands, feature_names):
     """
     This function performs and analysis of a single feature using a boxplot,
@@ -154,30 +164,25 @@ def analyze_feature(image_path, block, scales, bands, feature_names):
     mask = create_mask(shapefile, image_path)
     
     groundtruth = create_groundtruth(mask, block_size=block,
-                                     threshold=0.5)
+                                     threshold=0.6)
+
+    # print(image.shape)
+    # image = np.dstack((image[0], image[1], image[2]))
+    # print(image.shape)
+    # overlay_groundtruth(groundtruth, image, block)
+    # exit()
     features_ = get_features(image_path, block, scales, bands, feature_names)
     image_shape = image[0].shape
     groundtruth = reshape_image(groundtruth, image_shape, block, max(scales))
 
-    scale_string = 'SC'
-    for i, scale in enumerate(scales):
-        if i == len(scales) - 1:
-            scale_string += str(scale)
-        else:
-            scale_string += '{}-'.format(scale)
+    scale_string = get_scale_string(scales)
+    feature_string = get_feature_string(feature_names)
 
-    feature_string = ''
-    for i, name in enumerate(feature_names):
-        if i == len(feature_names) - 1:
-            feature_string += str(name)
-        else:
-            feature_string += '{}-'.format(name)
+    base = os.path.basename(os.path.splitext(image_path)[0])
+    foldername = "analysis/{}_{}_BK{}_{}"
 
     for i, feature_ in enumerate(features_):
-        foldername = "analysis/{}_{}_BK{}_{}"
         featurename = "{}_{}_{}_BK{}_{}_F{}.png"
-        base = os.path.basename(os.path.splitext(image_path)[0])
-
         featurefolder = foldername.format(base, feature_string, block,
                                           scale_string)
 
@@ -199,9 +204,24 @@ def analyze_feature(image_path, block, scales, bands, feature_names):
         spatial_distribution(feature_, featurefolder, name)
 
 
+def get_divergence(features):
+    for feature in features:
+        foldername = "analysis/{}_{}_BK{}_{}"
+        featurename = "{}_{}_{}_BK{}_{}_F{}.txt"
+        
+        featurefolder = foldername.format(base, feature_string, block,
+                                          scale_string)
+
+        if not os.path.exists(featurefolder):
+            os.mkdir(featurefolder)
+    name = featurename.format(base, 'entropy', feature_string,
+                              block, scale_string, 0)
+    entropy(dataset)
+
+
 def get_features(image_path, block, scales, bands, feature_names):
     if not set(feature_names).intersection(['hog', 'lsr', 'rid']):
-        print("Error: cannot find specified feature")
+        print("Error: cannot find specified feature, invalid feature name")
         exit()
 
     spfeas_features = set(feature_names).intersection(['hog', 'lsr'])
@@ -213,16 +233,23 @@ def get_features(image_path, block, scales, bands, feature_names):
         feature_path = get_feature_from_folder(folder)
         print(feature_path)
         if feature_path is None:
-            print("Error: cannot find feature file")
+            print("Error: cannot find SPFEAS feature file: {}".format(folder))
             exit()
-
+        print("Found feature: {}".format(folder))
         spfeas_features = np.array(read_geotiff(feature_path))
-    
+
+        for f in spfeas_features:
+            plt.imshow(f)
+            plt.show()
+
     if rid_feature:
-        folder = get_folder_name(image_path, block, scales, bands, ['rid'])
+        folder = get_folder_name(image_path, block, [max(scales)], bands, ['rid'])
         feature_path = get_feature_from_folder(folder)
 
-        print(feature_path)
+        if feature_path is None:
+            print("Error: cannot find RID feature file: {}".format(folder))
+            exit()
+        print("Found feature: {} ".format(folder))
         rid = RoadIntersectionDensity.load(feature_path)
         rid_feature = rid.get_feature()
 
@@ -258,7 +285,7 @@ def analysis(image_path, blocks, scales_list, bands, feature_names_list):
                 print("Processing {},\tfeature_list: {}\tblock: {}\tscale_list: {}\t".
                       format(os.path.basename(image_path), feature_names, block,
                              scales_list))
-                create_feature(image_path, block, scales, bands, feature_names)
+                # create_feature(image_path, block, scales, bands, feature_names)
                 analyze_feature(image_path, block, scales, bands, feature_names)
 
 
@@ -284,7 +311,7 @@ def spatial_distribution(feature, folder, name):
     plt.clf()
 
 if __name__ == "__main__":
-    analysis('data/section_1.tif', [20], [[100, 150]], [1, 2, 3], [['rid', 'hog', 'lsr']])
+    analysis('data/section_5.tif', [20], [[50, 100, 150]], [1, 2, 3], [['hog', 'lsr', 'rid']])
     # analysis('data/section_2.tif', [20, 40, 60], [50, 100, 150], [1, 2, 3],
     #          ['lsr', 'hog'])
     # analysis('data/section_3.tif', [20, 40, 60], [50, 100, 150], [1, 2, 3],
