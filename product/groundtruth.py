@@ -7,7 +7,13 @@ import pandas as pd
 
 from rasterio import mask
 from matplotlib import pyplot as plt
+from scipy.ndimage import zoom
 
+def overlay_groundtruth(groundtruth, image, block_size):
+    groundtruth = zoom(groundtruth, block_size, order=0)
+    plt.imshow(image)
+    plt.imshow(groundtruth, alpha=0.5)
+    plt.show() 
 
 def create_groundtruth(mask, block_size=20, threshold=0.1):
     """
@@ -63,10 +69,11 @@ def create_dataset(feature, groundtruth):
 
     for i in range(height):
         for j in range(width):
-            if (groundtruth[i, j] != 0):
-                dataset['formality'].append('informal')
-            else:
+            if (groundtruth[i, j] == 0):
                 dataset['formality'].append('formal')
+            else:
+                dataset['formality'].append('informal')
+            
             dataset['feature'].append(feature[i, j])
 
     return pd.DataFrame.from_dict(dataset)
