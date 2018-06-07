@@ -76,18 +76,6 @@ def create_dataset(path, block, scales, bands, feature):
     groundtruth = reshape_image(groundtruth, (image.shape[1], image.shape[2]),
                                 block, max(scales))
 
-    #for f in feature:
-        # tr = f[groundtruth > 0]
-        # fa = f[groundtruth < 1]
-        # print(tr.shape)
-        # print(fa.shape)
-        # sns.kdeplot(tr)
-        # sns.kdeplot(fa)
-        # plt.imshow(f)
-        # plt.show()
-        # break
-    # exit()
-
     X = []
     for i in range(feature.shape[1]):
         for j in range(feature.shape[2]):
@@ -100,31 +88,6 @@ def create_dataset(path, block, scales, bands, feature):
 
     X = np.array(X)
     y = np.array(y)
-    # print(X.shape)
-    # print(y.shape)
-
-    # X = np.reshape(X, feature.shape)
-    # y = np.reshape(y, feature[0].shape)
-    
-    # for x in X:
-    #     tr = x[y > 0]
-    #     fa = x[y < 1]
-        
-    #     sns.kdeplot(tr)
-    #     sns.kdeplot(fa)
-    #     plt.show()
-    # exit()
-
-    # for i in range(10):
-    #     x = X[:, i]
-    #     tr = x[y > 0]
-    #     fa = x[y < 1]
-    #     sns.kdeplot(tr)
-    #     sns.kdeplot(fa)
-    #     plt.show()
-    # exit()
-
-
     return X, y
 
 
@@ -236,58 +199,73 @@ def create_train_test(train_images_paths, test_image_path, feature_names,
     #Xtrain, ytrain = undersample(Xtrain, ytrain)
     return Xtrain, ytrain, Xtest, ytest, test_features.shape
 
+def get_metrics(prediction, ytest):
+    precision = metrics.precision_score(ytest, prediction)
+    f1_score = metrics.f1_score(ytest, prediction)
+    keepers = np.where(np.logical_not((np.vstack((ytest,
+                       prediction)) == 0).all(axis=0)))
+    jaccard = metrics.jaccard_similarity_score(ytest[keepers],
+                                               prediction[keepers])
+    return precision, f1_score, jaccard
+
+
+def table_entry(dataset, classifier, experiments=5):
+    Xtrain, ytrain, Xtest, ytest = dataset
+
+    tmp = np.empty((0, 3))
+    for i in range(experiments):
+        prediction = classify(Xtrain, ytrain, Xtest, classifier)
+        precision, f1_score, jaccard = get_metrics(prediction, ytest)
+
+        entry = np.array([[precision, f1_score, jaccard]])
+        tmp = np.concatenate((tmp, entry))
+
+    mean = np.mean(tmp, axis=0)
+    name = str(classifier).split("(")[0]
+    return [np.append([name], mean)]
+
+
 def run_results():
     block = 20
     scales = [50, 100, 150]
     bands = [1, 2, 3]
     feature_name_list = [['hog', 'lsr', 'rid'], ['hog'], ['lsr'], ['rid']]
-    images = [ [imagefiles[0], imagefiles[1], imagefiles[2]],
-               [imagefiles[1], imagefiles[2], imagefiles[0]],
-               [imagefiles[2], imagefiles[0], imagefiles[1]] ]
+    images = [[imagefiles[0], imagefiles[1], imagefiles[2]],
+              [imagefiles[1], imagefiles[2], imagefiles[0]],
+              [imagefiles[2], imagefiles[0], imagefiles[1]]]
 
     for traintest in images:
         test_image = traintest[0]
         train_images = traintest[1:]
+
         for feature_names in feature_name_list:
-            Xtrain, ytrain, Xtest, ytest, shape =\
-                create_train_test(train_images, test_image, feature_names,
-                                  scales, block, bands)
+            Xtrain, ytrain, Xtest, ytest, _ = create_train_test(train_images,
+                                                                test_image,
+                                                                feature_names,
+                                                                scales, block,
+                                                                bands)
+
             print("Table: {} {} {} {}".format(feature_names, scales,
                                               test_image, train_images))
+
+            dataset = (Xtrain, ytrain, Xtest, ytest)
             table = np.empty((0, 4))
+            # All classifiers
             for i in classifiers:
-                prediction = classify(Xtrain, ytrain, Xtest, classifiers[i])
-                precison = metrics.precision_score(ytest, prediction)
-                f1_score = metrics.f1_score(ytest, prediction)
-                keepers = np.where(np.logical_not((np.vstack((ytest,
-                                   prediction)) == 0).all(axis=0)))
-                jaccard = metrics.jaccard_similarity_score(ytest[keepers],
-                                                           prediction[keepers])
-                name = str(classifiers[i]).split("(")[0]
-                entry = np.array([[name, precison, f1_score, jaccard]])
+                entry = table_entry(dataset, classifiers[i])
                 table = np.concatenate((table, entry))
-            
+
             # 50% slum
             prediction = np.random.randint(2, size=ytest.shape[0])
-            precison = metrics.precision_score(ytest, prediction)
-            f1_score = metrics.f1_score(ytest, prediction)
-            keepers = np.where(np.logical_not((np.vstack((ytest,
-                               prediction)) == 0).all(axis=0)))
-            jaccard = metrics.jaccard_similarity_score(ytest[keepers],
-                                                       prediction[keepers])
-            entry = np.array([["50% Random Noise as slum", precison, f1_score,
+            precision, f1_score, jaccard = get_metrics(prediction, ytest)
+            entry = np.array([["50% Random Noise as slum", precision, f1_score,
                                jaccard]])
             table = np.concatenate((table, entry))
 
             # 100% slum
             prediction = np.ones(ytest.shape[0])
-            precison = metrics.precision_score(ytest, prediction)
-            f1_score = metrics.f1_score(ytest, prediction)
-            keepers = np.where(np.logical_not((np.vstack((ytest,
-                               prediction)) == 0).all(axis=0)))
-            jaccard = metrics.jaccard_similarity_score(ytest[keepers],
-                                                       prediction[keepers])
-            entry = np.array([["100% as slum", precison, f1_score,
+            precision, f1_score, jaccard = get_metrics(prediction, ytest)
+            entry = np.array([["100% as slum", precision, f1_score,
                                jaccard]])
             table = np.concatenate((table, entry))
 
@@ -295,7 +273,6 @@ def run_results():
             entry = np.array([["Max", np.max(table[:, 1].astype(float)),
                                np.max(table[:, 2].astype(float)),
                                np.max(table[:, 3].astype(float))]])
-
             table = np.concatenate((table, entry))
 
             print(tabulate(table, headers=["Classifier", "Precision",
@@ -308,7 +285,7 @@ def test():
     scales = [50, 100, 150]
     bands = [1, 2, 3]
     feature_names = ['lsr', 'hog', 'rid']
-    classifier = classifiers[3]
+    classifier = None #classifiers[3]
     train_images = [imagefiles[2], imagefiles[3]]
     test_image = imagefiles[0]
 
@@ -317,15 +294,6 @@ def test():
                 create_train_test(train_images, test_image, feature_names,
                                   scales, block, bands)
 
-    
-
-    # for i in range(10):
-    #     print(i)
-    #     f = Xtrain[:, i]
-    #     sns.kdeplot(f[ytrain > 0])
-    #     sns.kdeplot(f[ytrain < 1])
-    #     plt.show()
-    # exit()
     prediction = classify(Xtrain, ytrain, Xtest, classifier)
 
     plot_confusion_matrix(confusion_matrix(ytest, prediction),
@@ -339,6 +307,6 @@ def test():
 
 
 if __name__ == "__main__":
-    # run_results()
-    test()
+    run_results()
+    # test()
    
