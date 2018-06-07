@@ -55,7 +55,7 @@ def get_folder_name(image_name, block=20, scales=[50], bands=[1, 2, 3],
     """
     
     scale_string = get_scale_string(scales)
-    feature_string = get_feature_string(feature_names, 'TR')
+    feature_string = get_feature_string(sorted(feature_names), 'TR')
 
     folder = "features/features/{}__BD{}-{}-{}_BK{}_{}_{}/".format(
                 os.path.basename(os.path.splitext(image_name)[0]), bands[0],
@@ -90,8 +90,8 @@ def create_feature(image_path, block, scales, bands, feature_names):
                         'hog' or 'lsr'; string.
 
     """
-    spfeas_features = set(feature_names).intersection(['hog', 'lsr'])
-    rid_feature = set(feature_names).intersection(['rid'])
+    spfeas_features = sorted(set(feature_names).intersection(['hog', 'lsr']))
+    rid_feature = sorted(set(feature_names).intersection(['rid']))
     
     if spfeas_features:
         cmd = 'spfeas -i {} -o features --sect-size 100000 --block {} \
@@ -224,32 +224,27 @@ def get_features(image_path, block, scales, bands, feature_names):
         print("Error: cannot find specified feature, invalid feature name")
         exit()
 
-    spfeas_features = set(feature_names).intersection(['hog', 'lsr'])
-    rid_feature = set(feature_names).intersection(['rid'])
+    spfeas_features = sorted(set(feature_names).intersection(['hog', 'lsr']))
+    rid_feature = sorted(set(feature_names).intersection(['rid']))
 
     if spfeas_features:
         folder = get_folder_name(image_path, block, scales, bands,
                                  spfeas_features)
         feature_path = get_feature_from_folder(folder)
-        print(feature_path)
         if feature_path is None:
-            print("Error: cannot find SPFEAS feature file: {}".format(folder))
+            print("Error: cannot find feature: {}".format(folder))
             exit()
-        print("Found feature: {}".format(folder))
-        spfeas_features = np.array(read_geotiff(feature_path))
 
-        for f in spfeas_features:
-            plt.imshow(f)
-            plt.show()
+        spfeas_features = np.array(read_geotiff(feature_path))
 
     if rid_feature:
         folder = get_folder_name(image_path, block, [max(scales)], bands, ['rid'])
         feature_path = get_feature_from_folder(folder)
 
         if feature_path is None:
-            print("Error: cannot find RID feature file: {}".format(folder))
+            print("Error: cannot find feature: {}".format(folder))
             exit()
-        print("Found feature: {} ".format(folder))
+        
         rid = RoadIntersectionDensity.load(feature_path)
         rid_feature = rid.get_feature()
 
@@ -297,8 +292,8 @@ def boxplot(dataset, folder, name):
 
 
 def kde(dataset, folder, name):
-    seaborn.kdeplot(dataset['formal'], label="formal")
-    seaborn.kdeplot(dataset['informal'], label="informal")
+    seaborn.kdeplot(dataset['formal'], label="Formal")
+    seaborn.kdeplot(dataset['informal'], label="Informal")
     plt.title(name)
     plt.savefig(os.path.join(folder, name))
     plt.clf()
@@ -311,8 +306,9 @@ def spatial_distribution(feature, folder, name):
     plt.clf()
 
 if __name__ == "__main__":
-    analysis('data/section_5.tif', [20], [[50, 100, 150]], [1, 2, 3], [['hog', 'lsr', 'rid']])
-    # analysis('data/section_2.tif', [20, 40, 60], [50, 100, 150], [1, 2, 3],
-    #          ['lsr', 'hog'])
-    # analysis('data/section_3.tif', [20, 40, 60], [50, 100, 150], [1, 2, 3],
-    #          ['lsr', 'hog'])
+    analysis('data/section_5.tif', [20], [[50, 100, 150]], [1, 2, 3], [['hog'], ['lsr'], ['rid']])
+    analysis('data/section_4.tif', [20], [[50, 100, 150]], [1, 2, 3], [['hog'], ['lsr'], ['rid']])
+    analysis('data/section_3.tif', [20], [[50, 100, 150]], [1, 2, 3], [['hog'], ['lsr'], ['rid']])
+    analysis('data/section_2.tif', [20], [[50, 100, 150]], [1, 2, 3], [['hog'], ['lsr'], ['rid']])
+    analysis('data/section_1.tif', [20], [[50, 100, 150]], [1, 2, 3], [['hog'], ['lsr'], ['rid']])
+    
