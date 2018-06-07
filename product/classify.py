@@ -1,109 +1,131 @@
-from sklearn.manifold import Isomap
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.model_selection import train_test_split
-from sklearn.metrics import confusion_matrix
-from sklearn import preprocessing
-from sklearn.cluster import KMeans
-
-import numpy as np
-
-from matplotlib import pyplot as plt
-from util import read_geotiff
-from groundtruth import create_mask, create_groundtruth, reshape_image
-from analysis import get_features
-from sklearn.svm import SVC
-
-from sklearn.manifold import TSNE
-from sklearn.utils import shuffle
-
 import itertools
 import os
 import enum
 import pickle
+import numpy as np
 
-basedir = "data"
-imagefiles = { 0 : 'section_1.tif',
-               1 : 'section_2.tif',
-               2 : 'section_3.tif'}
+from util import read_geotiff
+from analysis import get_features
+from groundtruth import create_mask, create_groundtruth, reshape_image
+from groundtruth import overlay_groundtruth, create_dict
+
+from matplotlib import pyplot as plt
+from sklearn.manifold import TSNE
+from sklearn.utils import shuffle
+from sklearn.metrics import confusion_matrix
+from sklearn.model_selection import train_test_split
+from sklearn import preprocessing
+from sklearn.preprocessing import StandardScaler
+from sklearn.datasets import make_moons, make_circles, make_classification
+from sklearn.cluster import KMeans
+from sklearn.neural_network import MLPClassifier
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.svm import SVC
+from sklearn.gaussian_process import GaussianProcessClassifier
+from sklearn.gaussian_process.kernels import RBF
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier
+from sklearn.ensemble import GradientBoostingClassifier
+from sklearn.naive_bayes import GaussianNB
+from sklearn.discriminant_analysis import QuadraticDiscriminantAnalysis
+
+import sklearn.metrics as metrics
+from sklearn.preprocessing import StandardScaler
 
 
-class ClassifierType:
-    FORREST, KNN, SVM = range(3)
+from imblearn.over_sampling import RandomOverSampler
+from imblearn.under_sampling import RandomUnderSampler
+from imblearn.over_sampling import SMOTE, ADASYN
+
+import seaborn as sns
+from tabulate import tabulate
+
+imagefiles = {
+    0: 'data/section_1.tif',
+    1: 'data/section_2.tif',
+    2: 'data/section_3.tif',
+    3: 'data/section_4.tif',
+    4: 'data/section_5.tif'
+}
+shapefile = 'data/slums_approved.shp'
+
+classifiers = {
+    # 1: SVC(),
+    2: DecisionTreeClassifier(),
+    3: RandomForestClassifier(),
+    4: MLPClassifier(),
+    5: AdaBoostClassifier(),
+    6: GradientBoostingClassifier()
+}
 
 
-def get_classifier(class_type):
-    if class_type == ClassifierType.FORREST:
-        return RandomForestClassifier(max_depth=6)
-    if class_type == ClassifierType.KNN:
-        return KNeighborsClassifier()
-    if class_type == ClassifierType.SVM:
-        return SVC()
-    print("Error: Invalid Classifier type")
+def load_features(block, scales, bands, feature_names, image_path):
+    if os.path.exists(image_path):
+        features = get_features(image_path, block, scales, bands,
+                                feature_names)
+        features[features == np.inf] = 0
+        return features
+    print("Feature does not exist")
     exit()
 
 
-def load_features(block, scales, bands, feature_names):
-    features = {}
-    for index in imagefiles:
-        path = os.path.join(basedir, imagefiles[index])
-        if os.path.exists(path):
-            features[index] = get_features(path, block, scales, bands,
-                                           feature_names)
-            features[index][features[index] == np.inf] = 0
-        else:
-            print("Feature does not exist")
-    return features
-
-
 def create_dataset(path, block, scales, bands, feature):
-    shapefile = 'data/slums_approved.shp'
-    
     image = np.array(read_geotiff(path))
     mask = create_mask(shapefile, path)
-    groundtruth = create_groundtruth(mask, block_size=block, threshold=0.5)
-    image_shape = (image.shape[1], image.shape[2])
-    groundtruth = reshape_image(groundtruth, image_shape, block, max(scales))
+    groundtruth = create_groundtruth(mask, block_size=block, threshold=0.6)
+    groundtruth = reshape_image(groundtruth, (image.shape[1], image.shape[2]),
+                                block, max(scales))
 
-    # shape = feature.shape
-    # print(shape)
-    # plt.imshow(feature[0])
-    # plt.show()
-    X = np.reshape(feature, (feature.shape[1] * feature.shape[2],
-                             feature.shape[0]))
-    
-    for i, feature in enumerate(X):
-        X[i] = preprocessing.scale(feature)
+    #for f in feature:
+        # tr = f[groundtruth > 0]
+        # fa = f[groundtruth < 1]
+        # print(tr.shape)
+        # print(fa.shape)
+        # sns.kdeplot(tr)
+        # sns.kdeplot(fa)
+        # plt.imshow(f)
+        # plt.show()
+        # break
+    # exit()
 
-    # image = image[0:-1]
+    X = []
+    for i in range(feature.shape[1]):
+        for j in range(feature.shape[2]):
+            X.append(feature[:, i, j])
 
-    # plt.imshow(image[0])
-    # plt.show()
-    # plt.imshow(np.array(groundtruth > 0, dtype=int))
-    # plt.show()
-   
-    # print(groundtruth.shape)
-    # plt.imshow(np.array(groundtruth > 0, dtype=int))
-    # plt.show()
+    y = []
+    for i in range(groundtruth.shape[0]):
+        for j in range(groundtruth.shape[1]):
+            y.append(groundtruth[i, j])
 
-    y = np.ravel(np.array(groundtruth > 0, dtype=int))
-
+    X = np.array(X)
+    y = np.array(y)
     # print(X.shape)
-    
     # print(y.shape)
-    # print(np.bincount(y))
+
+    # X = np.reshape(X, feature.shape)
+    # y = np.reshape(y, feature[0].shape)
+    
+    # for x in X:
+    #     tr = x[y > 0]
+    #     fa = x[y < 1]
+        
+    #     sns.kdeplot(tr)
+    #     sns.kdeplot(fa)
+    #     plt.show()
+    # exit()
+
+    # for i in range(10):
+    #     x = X[:, i]
+    #     tr = x[y > 0]
+    #     fa = x[y < 1]
+    #     sns.kdeplot(tr)
+    #     sns.kdeplot(fa)
+    #     plt.show()
+    # exit()
+
+
     return X, y
-
-def create_train_test(d0, d1, d2):
-    Xtest, ytest = d0
-
-    X1, y1 = d1
-    X2, y2 = d2
-
-    Xtrain = np.concatenate((X1, X2), axis=0)
-    ytrain = np.concatenate((y1, y2), axis=0)
-    Xtrain, ytrain = shuffle(Xtrain, ytrain)
-
-    return Xtrain, ytrain, Xtest, ytest
 
 
 def plot_confusion_matrix(cm, classes,
@@ -114,12 +136,6 @@ def plot_confusion_matrix(cm, classes,
     This function prints and plots the confusion matrix.
     Normalization can be applied by setting `normalize=True`.
     """
-    if normalize:
-        cm = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
-        print("Normalized confusion matrix")
-    else:
-        print('Confusion matrix, without normalization')
-
     plt.imshow(cm, interpolation='nearest', cmap=cmap)
     plt.title(title)
     plt.colorbar()
@@ -138,38 +154,15 @@ def plot_confusion_matrix(cm, classes,
     plt.ylabel('True label')
     plt.xlabel('Predicted label')
 
-def classify_Gaussian(Xtrain, ytrain, Xtest, ytest):
-    from sklearn.gaussian_process import GaussianProcessClassifier
-    from sklearn.gaussian_process.kernels import RBF
-    clf = GaussianProcessClassifier(1.0 * RBF(1.0))
-
-    clf.fit(Xtrain, ytrain)
-
-    ypred = clf.predict(Xtest)
-    cnf_matrix = confusion_matrix(ytest, ypred)
-    plot_confusion_matrix(cnf_matrix, classes=['formal', 'informal'],
-                          title='Confusion matrix')
-    plt.show()
-    return ypred
-
-
-def classify_Gradient(Xtrain, ytrain, Xtest, ytest):
-    from sklearn.ensemble import GradientBoostingClassifier
-    grad = GradientBoostingClassifier()
-    grad.fit(Xtrain, ytrain)
-
-    ypred = grad.predict(Xtest)
-    cnf_matrix = confusion_matrix(ytest, ypred)
-    plot_confusion_matrix(cnf_matrix, classes=['formal', 'informal'],
-                          title='Confusion matrix')
-    plt.show()
-    return ypred
-
 
 def oversample(Xtrain, ytrain):
-    from imblearn.over_sampling import RandomOverSampler
-    ros = RandomOverSampler()
-    return ros.fit_sample(Xtrain, ytrain)
+    # return RandomOverSampler().fit_sample(Xtrain, ytrain)
+    return SMOTE().fit_sample(Xtrain, ytrain)
+    #return ADASYN().fit_sample(Xtrain, ytrain)
+
+
+def undersample(Xtrain, ytrain):
+    return RandomUnderSampler(ratio='majority').fit_sample(Xtrain, ytrain)
 
 
 def do_tsne(Xtrain, shape, load=False, save=True):
@@ -195,46 +188,157 @@ def do_tsne(Xtrain, shape, load=False, save=True):
     clusters = kmeans.fit_predict(points)
     print(clusters.shape)
 
-    plt.imshow(np.reshape(clusters, shape))
+    plt.imshow(np.reshape(clusters, shape[1:]))
     plt.show()
 
-def classify(Xtrain, ytrain, Xtest, ytest, class_type):
-    classifier = get_classifier(class_type)
-    classifier.fit(Xtrain, ytrain)
-    return classifier.predict(Xtest)
 
-block = 20
-scales = [150]
-bands = [1, 2, 3]
-features = ['lsr', 'hog', 'rid']
+def classify(Xtrain, ytrain, Xtest, sklearn_classifier):
+    sklearn_classifier.fit(Xtrain, ytrain)
+    return sklearn_classifier.predict(Xtest)
 
-features = load_features(block, scales, bands, features)
 
-d0 = create_dataset(os.path.join(basedir, imagefiles[0]), block, scales, bands,
-                    features[0])
-# d1 = create_dataset(os.path.join(basedir, imagefiles[1]), block, scales, bands,
-#                     features[1])
-# d2 = create_dataset(os.path.join(basedir, imagefiles[2]), block, scales, bands,
-#                     features[2])
+def plot_dataset_distribution(Xtrain, Xtest):
+    Xtrain = np.transpose(Xtrain)
+    Xtest = np.transpose(Xtest)
 
-Xtrain, _ = d0
-print(features[0].shape[1:])
-do_tsne(Xtrain, features[0].shape[1:])
+    for i in range(Xtrain.shape[0]):
+        train_feature = Xtrain[i]
+        test_feature = Xtest[i]
+        sns.kdeplot(train_feature)
+        sns.kdeplot(test_feature)
+        plt.show()
 
-# shape = features[0].shape[1:]
 
-# Xtrain, ytrain, Xtest, ytest = create_train_test(d0, d1, d2)
+def create_train_test(train_images_paths, test_image_path, feature_names,
+                      scales, block, bands):
+    test_features = load_features(block, scales, bands, feature_names,
+                                  test_image_path)
+    Xtest, ytest = create_dataset(test_image_path, block, scales, bands,
+                                  test_features)
 
-# Xtrain, ytrain = oversample(Xtrain, ytrain)
+    Xtrain = np.empty((0, Xtest.shape[1]))
+    ytrain = np.ravel(np.empty((0, 1)))
 
-# prediction = classify(Xtrain, ytrain, Xtest, ytest, ClassifierType.FORREST)
+    for path in train_images_paths:
+        features = load_features(block, scales, bands, feature_names, path)
+        X, y = create_dataset(path, block, scales, bands, features)
 
-# plot_confusion_matrix(confusion_matrix(ytest, prediction),
-#                       classes=['formal', 'informal'],
-#                       title='Confusion matrix')
-# plt.show()
+        Xtrain = np.concatenate((Xtrain, X), axis=0)
+        ytrain = np.concatenate((ytrain, y), axis=0)
 
-# print(shape)
-# print(prediction.shape)
-# plt.imshow(np.reshape(prediction, shape))
-# plt.show()
+    scaler = StandardScaler().fit(Xtrain)
+    Xtrain = scaler.transform(Xtrain)
+    Xtest = scaler.transform(Xtest)
+
+    Xtrain, ytrain = shuffle(Xtrain, ytrain)
+    Xtrain, ytrain = oversample(Xtrain, ytrain)
+
+    #Xtrain, ytrain = undersample(Xtrain, ytrain)
+    return Xtrain, ytrain, Xtest, ytest, test_features.shape
+
+def run_results():
+    block = 20
+    scales = [50, 100, 150]
+    bands = [1, 2, 3]
+    feature_name_list = [['hog', 'lsr', 'rid'], ['hog'], ['lsr'], ['rid']]
+    images = [ [imagefiles[0], imagefiles[1], imagefiles[2]],
+               [imagefiles[1], imagefiles[2], imagefiles[0]],
+               [imagefiles[2], imagefiles[0], imagefiles[1]] ]
+
+    for traintest in images:
+        test_image = traintest[0]
+        train_images = traintest[1:]
+        for feature_names in feature_name_list:
+            Xtrain, ytrain, Xtest, ytest, shape =\
+                create_train_test(train_images, test_image, feature_names,
+                                  scales, block, bands)
+            print("Table: {} {} {} {}".format(feature_names, scales,
+                                              test_image, train_images))
+            table = np.empty((0, 4))
+            for i in classifiers:
+                prediction = classify(Xtrain, ytrain, Xtest, classifiers[i])
+                precison = metrics.precision_score(ytest, prediction)
+                f1_score = metrics.f1_score(ytest, prediction)
+                keepers = np.where(np.logical_not((np.vstack((ytest,
+                                   prediction)) == 0).all(axis=0)))
+                jaccard = metrics.jaccard_similarity_score(ytest[keepers],
+                                                           prediction[keepers])
+                name = str(classifiers[i]).split("(")[0]
+                entry = np.array([[name, precison, f1_score, jaccard]])
+                table = np.concatenate((table, entry))
+            
+            # 50% slum
+            prediction = np.random.randint(2, size=ytest.shape[0])
+            precison = metrics.precision_score(ytest, prediction)
+            f1_score = metrics.f1_score(ytest, prediction)
+            keepers = np.where(np.logical_not((np.vstack((ytest,
+                               prediction)) == 0).all(axis=0)))
+            jaccard = metrics.jaccard_similarity_score(ytest[keepers],
+                                                       prediction[keepers])
+            entry = np.array([["50% Random Noise as slum", precison, f1_score,
+                               jaccard]])
+            table = np.concatenate((table, entry))
+
+            # 100% slum
+            prediction = np.ones(ytest.shape[0])
+            precison = metrics.precision_score(ytest, prediction)
+            f1_score = metrics.f1_score(ytest, prediction)
+            keepers = np.where(np.logical_not((np.vstack((ytest,
+                               prediction)) == 0).all(axis=0)))
+            jaccard = metrics.jaccard_similarity_score(ytest[keepers],
+                                                       prediction[keepers])
+            entry = np.array([["100% as slum", precison, f1_score,
+                               jaccard]])
+            table = np.concatenate((table, entry))
+
+            # Max performance
+            entry = np.array([["Max", np.max(table[:, 1].astype(float)),
+                               np.max(table[:, 2].astype(float)),
+                               np.max(table[:, 3].astype(float))]])
+
+            table = np.concatenate((table, entry))
+
+            print(tabulate(table, headers=["Classifier", "Precision",
+                           "F1-Score", "Jaccard's Index"], tablefmt='orgtbl'))
+            print("")
+
+
+def test():
+    block = 20
+    scales = [50, 100, 150]
+    bands = [1, 2, 3]
+    feature_names = ['lsr', 'hog', 'rid']
+    classifier = classifiers[3]
+    train_images = [imagefiles[2], imagefiles[3]]
+    test_image = imagefiles[0]
+
+
+    Xtrain, ytrain, Xtest, ytest, shape =\
+                create_train_test(train_images, test_image, feature_names,
+                                  scales, block, bands)
+
+    
+
+    # for i in range(10):
+    #     print(i)
+    #     f = Xtrain[:, i]
+    #     sns.kdeplot(f[ytrain > 0])
+    #     sns.kdeplot(f[ytrain < 1])
+    #     plt.show()
+    # exit()
+    prediction = classify(Xtrain, ytrain, Xtest, classifier)
+
+    plot_confusion_matrix(confusion_matrix(ytest, prediction),
+                          classes=['Non Slum', 'Slum'],
+                          title='Confusion matrix')
+    plt.show()
+
+    image = np.array(read_geotiff(test_image))
+    image = np.dstack((image[0], image[1], image[2]))
+    overlay_groundtruth(np.reshape(prediction, shape[1:]), image, block)
+
+
+if __name__ == "__main__":
+    # run_results()
+    test()
+   
