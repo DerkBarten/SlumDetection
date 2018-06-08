@@ -8,6 +8,8 @@
 \usepackage{subfig}
 \usepackage{amsmath}
 \usepackage[toc,page]{appendix}
+\usepackage{pgfplots}
+\usepackage{tikz}
 
 \addbibresource{references.bib}
 
@@ -18,6 +20,9 @@
 \titleformat{\section}{\LARGE\sc}{\thesection.}{1em}{}
 \titleformat{\subsection}{\normalsize\it}{\thesection.\thesubsection}{0.9em}{}
 \titleformat{\subsubsection}{\small\it}{\thesection.\thesubsection.\thesubsubsection}{0.9em}{}
+
+
+
 
 \begin{document}
 
@@ -32,8 +37,11 @@
 
 \input{evaluation}
 
-\section{Classification Methods}
+\input{classification}
 
+\input{results}
+
+\input{discussion}
 
 
 % classification methods

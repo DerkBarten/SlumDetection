@@ -1,0 +1,45 @@
+\section{Classification}
+
+For classification, we use a set of different classification algorithms. We will evaluate the individual performance of the three features along with all features combined.
+
+preparing data (oversampling)
+
+\subsection{Classification Algorithms}
+In order to discover the optimal method for classification of our features, we use a set of different supervised learning algorithms. These algorithms are Decision Tree, Random Forrest, AdaBoosting, GradientBoosting and MLP classifier. We use Decision Trees because this would produce a model which would be easy to interpret. However, the disadvantage of Decision Trees is the general inaccuracy and instability to small changes in data. To compensate for the disadvantages of the Decision Tree classifier, we use a Random Forrest as wel. A Random Forrest is a form of ensamble learning, which combines multiple learning algorithms to improve predictive performance. The Random Forrest constructs and uses multiple Decision Trees for classification. This generally reduces the tendency of single Decision Trees to overfit. Similar to Random Forrest, AdaBoosting and GradientBoosting are both ensemble leraning techniques. Both use a set of weak learning algorithms to create a single strong learner. AdaBoost, especially, is known to perform well without the need to adjust many parameters. The MLP  or Multi Layer Perceptron classifier is a class of feedforward artificial neural network. The MLP is a fairlt uncomplex neural network that is used for training and classification of data. The hidden layer allows the MLP to classify data that cannot linearly be separated. We used scikit-learn package for the implementation of these classification algorithms \cite{scikit-learn}.
+
+\subsection{Performance Measures}
+We require a objective measure of performance to compare the results between different features, parameters and images. Measuring classification performance on highly imbalanced datasets is difficult. Common measures, like accuracy, often failt to capture the actual performance. For instance, on highly imbalanced data, classifying everything as the most common class could result in high accuracy, although the classification is completely trivial and useless. The create a more usefull vision of the results, we use three metrics to measure the performance. These are the precision, F1-Score and Jaccards Index. Precision is the ratio between true positives and all positives. In our case, true positives are slum areas that are detected as slums. False positives are areas that are falsely classified as slum. 
+A high precision alone does not immediately indicate high performance. For instance, the high precision could be caused by a very low recall. We can solve this by using the F1 score. The F1 gives a measure of performance based on the balance between precision and recall.
+Because the classification we use is dependent on spatial positions, we need a method to measure the similarity between detected reagions and the ground truth.
+For this, we use Jaccards index or coefficient, which is a way to measure the overlap between two datasets. In our case, it divides the area of overlap betwen the detection and groundtruth with the union of the two areas. This results in a coefficient which indicates the overlap.
+
+
+\subsection{Data Preparation}
+% TODO: oversampling
+% Ratio of 100 to one
+
+
+For the classification, we used the three sections displayed in Figure \ref{fig:sections}. These sections of the image contain the most largest concentration of slums in the image. We divided the the three sections as two sections for training and one section for testing. Although these regions contain the highest concentrations of slums, there is still a significant class imbalance between the two classes. The ratio of formal to informal surface area is often 100 to 1 or more larger. Classification algorithms usually do not perform well on imbalanced data, since they are likely to classify everything as the most common class. There are multiple approaches to balance the dataset, such as undersampling, oversampling and synthethic oversampling. Undersampling removes occurences of the most common class, oversampling duplicates existing data points of the minority class. Synthethic oversampling adds new data points based on existing data points of the minority class. We will evaluate the effect of these different methods on the performance of the classifiers in the next sections.
+Besides imbalanced data, classification algorithms may encounter difficulties when the ranges of values within the features are not balanced. Therefore, we scale the values of the features to a range of negative one to positive one.
+
+\subsection{Experimental Setup}
+
+In this section we discuss the experimental setup for feature classification in the next section. As mentioned in the previous subsection, we use combinations of the three sections in the creation of the test and training sets. The division of the test and training sets is 1 to 2, one section is the test image, the other two are the training images. Since every section a test image a single time, this results in three combinations.  We used a whole image as test set because we can overlay of the predicted slums over the original image. This could help to identify which parts of the image are difficult to classify correctly.
+
+Besides the three combinations of training and test images, we use different sets of features as well. These feature sets are LSR, HoG, RID combined in a single set, together with the three features in separate sets, resulting in four different feature sets. For these feature sets, the scales are 50, 100 and 150. We did not create different scale combinations to reduce the number of variables in the experiment. Instead, we will observe the effects of different scales in a separate experiment. Lastly, to reduce the impact of randomness from the classifiers, we run the experiment 5 times and use the mean of the experiments. Figure \ref{fig:params} summarizes the most important parameters of the experiments.
+
+\begin{figure}
+	\centering
+	\begin{tabular}{|ll|}
+		\hline
+		Test Images: & Section 1, 2, and 3 \\
+		Features: & (HoG, LSR, RID), HoG, LSR, RID\\
+		Scales: & 50, 100 and 150 \\
+		Classifiers: & Decision Tree, Random Forrest, AdaBoost, GradientBoost, MLP \\
+		Performance Metrics: & Precision, F1-Score, Jaccard's Index\\
+		\hline
+	\end{tabular}
+	\caption{The parameters of the classification evaluation}
+	\label{fig:params}
+\end{figure}
+

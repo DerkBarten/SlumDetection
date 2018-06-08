@@ -1,0 +1,132 @@
+\section{Results}
+
+
+We performed an experiment to evaluate the performance of the feature classification. The experimental setup described in the previous section shows that we have many parameters that could influence the classification performance. We will therefore first show results for a certain set of parameters that performed well. In the further sections, we explore the effects of different parameters, such as different images, classification algorithms of feature parameters.
+
+% TODO: deprecated numbers, pls update
+\begin{figure}[h]
+	\centering
+	\begin{tabular}{| l | l | l | l | l |}
+		\hline
+		Features & Precision & F1-Score & Jaccard's Index & Best Classifier\\ \hline
+		HoG, LSR, RID &  0.1881 & 0.1538 & 0.0833 & RandomForrest\\ \hline
+		HoG & 0.0440 & 0.0573 &  0.0295 & RandomForrest\\ \hline
+		LSR & 0.0192 & 0.0374 & 0.0191 & AdaBoosting\\ \hline
+		RID & 0.0109 & 0.0216 & 0.0109 & GradientBoosting\\ \hline
+		Random 50\% Slum & 0.0058 & 0.0115 &  0.0058 & N/A\\
+		100\% Slum  & 0.0067 & 0.0133 & 0.0067 & N/A\\
+		\hline
+	\end{tabular}
+	\caption{Classification performance tested on section 1 trained on section 2 and 3}
+	\label{fig:res_tab_1}
+\end{figure}
+% TODO: Feature evaluation allready suggested this --v
+
+Figure \ref{fig:res_tab_1} show the classification performance for the different features. In this table, we have shown the separate feature performance together with the performance oft the combination of the three features. We displayed the highest performance for each feature and added the classifier that produced that result. Furthermore, we added what the performance would be if the predictions were totally random with 50\% chance on a slum and 100\% slum. This serves as baseline to put the performance of the features in perspective. In this case, the classifiers were trained on section two and three and tested on section one. Furthermore, these results were obtained using synthetic oversampling using the SMOTE method.
+
+% The results of the different classifiers, section combinations and oversampling methods will be further shown in the next subsections.
+
+% It seems that neither feature or classification method is able to differentiate slums. The performance metrics are similar to the performance when using random predictions.
+
+\subsection{Classifier Performance}
+In this section we evaluate the relative performance of the different classification algorithms. As shown in Figure \ref{fig:res_tab_1}, the performance of the classification depends on the features it uses. In this figure, we show the maximum performance of each classifier performed. The maximum is selected on the F1-score. We refrain from showing the mean performance of the classifiers because for certain parameter combinations, the performance would be very low. This distorts the mean performance and does not illustrate the actual performance well. The experimental setup is identical to the one described in the previous section.
+
+\pgfplotstableread[row sep=\\,col sep=&]{
+	Name			& Precision & F1-Score	& Jaccard \\
+	DecisionTree	& 0.11197	& 0.0929458 & 0.0487384  \\
+	RandomForrest	& 0.151823	& 0.135963	& 0.0730602 \\ 
+	AdaBoost		& 0.0919488 & 0.145928  & 0.0787067 \\
+	GradientBoost   & 0.145256  & 0.192465  & 0.106479 \\
+	MLP				& 0.101808  & 0.154975  & 0.084058 \\
+}\dataone
+
+\begin{figure}
+	\begin{tikzpicture}
+		\begin{axis}[
+			ybar,
+			bar width=.5cm,
+			width=\textwidth,
+			height=.5\textwidth,
+			symbolic x coords={DecisionTree, RandomForrest,AdaBoost,GradientBoost,MLP},
+			xtick=data,
+			yticklabel style={
+				/pgf/number format/fixed,
+				/pgf/number format/precision=2,
+				/pgf/number format/fixed zerofill
+			},
+			scaled y ticks=false,
+		]
+		\addplot table[x=Name,y=Precision]{\dataone};
+		\addplot table[x=Name,y=F1-Score]{\dataone};
+		\addplot table[x=Name,y=Jaccard]{\dataone};
+		\legend{Precision, F1-Score, Jaccard's Index}
+		\end{axis}
+		
+	\end{tikzpicture}
+	\caption{Maximum Performance of Classification Methods}
+	\label{fig:res_bar_1}
+\end{figure}
+
+GradientBoosting seems to produce the best results, although this is only the maximum. It does not entail that this performance generalizes to all sections and parameters.
+
+\subsection{Different Sections}
+
+In the general results, we showed the results of the first section as a test set and the second and third section as a training set. In this section, we observe the difference in performance with different sections. Furthermore, we split section 1 into two parts and use these two parts for separate classification as well.
+
+\pgfplotstableread[row sep=\\,col sep=&]{
+	Name	 & Precision & F1-Score	& Jaccard \\
+	Section 1 & 0.151823  & 0.135963 & 0.0730602\\
+	Section 2 & 0.237315  & 0.181185 & 0.0996169\\
+	Section 3 & 0.124122  & 0.101628 & 0.0535974\\
+}\datatwo
+
+\begin{figure}
+	\begin{tikzpicture}
+	\begin{axis}[
+	ybar,
+	bar width=.5cm,
+	width=\textwidth,
+	height=.5\textwidth,
+	symbolic x coords={Section 1, Section 2, Section 3},
+	xtick=data,
+	yticklabel style={
+		/pgf/number format/fixed,
+		/pgf/number format/precision=2,
+		/pgf/number format/fixed zerofill
+	},
+	scaled y ticks=false,
+	]
+	\addplot table[x=Name,y=Precision]{\datatwo};
+	\addplot table[x=Name,y=F1-Score]{\datatwo};
+	\addplot table[x=Name,y=Jaccard]{\datatwo};
+	\legend{Precision, F1-Score, Jaccard's Index}
+	\end{axis}
+	
+	\end{tikzpicture}
+	\caption{Section performance}
+	\label{fig:res_bar_2}
+\end{figure}
+
+The performance displayed in Figure \ref{fig:res_bar_2} displays the difference in performance between the different sections. In the bar plot, sections displayed are the results from the testset. For example, the results labeled section 2 are trained on section 1 and 3 and tested on section 2. The performance measures were the maximum values produced by the classification algorithms. In this case, the classifier that performed best for the first and third section was the Random Forrest. The second section performed best with the GradientBoosting classifier. Because performance depends on the feature set used, as displayed in \ref{fig:res_tab_1}, we displayed the results of the full feature set with HoG, LSR and RID for every section. The only variable in the performance comparison is the different section used, this enables us to make conclusions about the effect of using different image sections.
+
+
+\subsection{Effect of different Scales}
+
+
+
+\subsection{Effects of oversampling}
+As hinted earlier, oversampling is an important part in classification. Without oversampling, the classifiers are likely to produce trivial results. Oversampling is a common method to balance a dataset. In this section, we evaluate three different oversampling methods. These are random oversampling, SMOTE and ADASYN. The first method randomly picks entries of the minority class and copies these. The last two methods create new synthetic examples that suit the data well.
+
+
+
+
+
+%First, we show the general results, the maximum performance of the three section for each feature seperate and combined. Afterwards, we discuss the effect of the different sections on performance
+
+
+%In this section, we show the results of the first sections as test data and the second and third section as training data. The datagram in .. shows the maximum
+
+%We will show the measured performance produced by the methods discussed in the previous section. Furthermore, we will show an overlay of the detected slums with the groundtruth and the original image to visually show the results.
+
+
+% Since we use multiple algorithms, we will show the results of the maximum of the predictions. In the next section, we will discuss the difference in performance between the different algorithms.
