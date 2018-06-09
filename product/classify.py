@@ -3,43 +3,25 @@ import os
 import enum
 import pickle
 import numpy as np
+import pandas as pd
 
 from util import read_geotiff
 from analysis import get_features
 from groundtruth import create_mask, create_groundtruth, reshape_image
-from groundtruth import overlay_groundtruth, create_dict
 
 from matplotlib import pyplot as plt
-from sklearn.manifold import TSNE
 from sklearn.utils import shuffle
-from sklearn.metrics import confusion_matrix
-from sklearn.model_selection import train_test_split
-from sklearn import preprocessing
 from sklearn.preprocessing import StandardScaler
-from sklearn.datasets import make_moons, make_circles, make_classification
-
-from sklearn.neural_network import MLPClassifier
-
-from sklearn.svm import SVC
-
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier
 from sklearn.ensemble import GradientBoostingClassifier
-
-
-import sklearn.metrics as metrics
-from sklearn.preprocessing import StandardScaler
-
-
+from sklearn.neural_network import MLPClassifier
 from imblearn.over_sampling import RandomOverSampler
 from imblearn.under_sampling import RandomUnderSampler
 from imblearn.over_sampling import SMOTE, ADASYN
-
-import seaborn as sns
-from tabulate import tabulate
 from scipy.ndimage import zoom
 from scipy.ndimage.interpolation import shift
-import pandas as pd
+
 
 imagefiles = {
     0: 'data/section_1.tif',
@@ -72,8 +54,6 @@ def plot_confusion_matrix(cm, classes,
         plt.text(j, i, format(cm[i, j], fmt),
                  horizontalalignment="center",
                  color="white" if cm[i, j] > thresh else "black")
-
-    plt.tight_layout()
     plt.ylabel('True label')
     plt.xlabel('Predicted label')
 
@@ -161,10 +141,10 @@ class Dataset:
 
     def get_dataset(self):
         return self.dataset
-    
+
     def get_feature_shape(self):
         return self.feature_shape
-    
+
     def get_train_images(self):
         return self.train_images
 
@@ -173,10 +153,10 @@ class Dataset:
 
     def get_feature_names(self):
         return self.feature_names
-    
+
     def get_scales(self):
         return self.scales
-    
+
     def get_block_size(self):
         return self.block_size
 
@@ -212,9 +192,9 @@ class Classify:
         name = "confusion_" + basename + "_" + classifier_name + ".png"
         path = os.path.join(folder, name)
 
-        plot_confusion_matrix(confusion_matrix(ytest, prediction),
+        plot_confusion_matrix(metrics.confusion_matrix(ytest, prediction),
                               classes=['Informal', 'Formal'],
-                              title='Confusion ')
+                              title='Confusion Matrix')
 
         print("Saving confusion at: {}".format(path))
         plt.savefig(path, format='png', dpi=1200)
@@ -286,7 +266,7 @@ class Classify:
 
         return "TR{}_TE_{}_SC{}_F{}".format(tr_string, te_string, sc_string,
                                             f_string)
-    
+
     def classify(self):
         folder = os.path.join("results", self._get_basename())
         if not os.path.exists(folder):
@@ -302,10 +282,12 @@ class Classify:
             self._create_confusion(prediction, ytest, folder, index)
             self._create_overlay(prediction, ytest, folder, index)
         self._create_metrics(folder)
-            
 
 if __name__ == "__main__":
-    dataset = Dataset([imagefiles[0], imagefiles[2]], imagefiles[1], shapefile,
-                      ['hog', 'lsr', 'rid'])
-    classify = Classify(dataset)
-    classify.classify()
+    scales_list = [[50], [100], [150], [50, 100, 150]]
+
+    for scales in scales_list:
+        dataset = Dataset([imagefiles[0], imagefiles[2]], imagefiles[1],
+                          shapefile, ['hog', 'lsr', 'rid'], scales=scales)
+        classify = Classify(dataset)
+        classify.classify()
