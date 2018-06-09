@@ -4,6 +4,7 @@ import enum
 import pickle
 import numpy as np
 import pandas as pd
+import sklearn.metrics as metrics
 
 from util import read_geotiff
 from analysis import get_features
@@ -207,9 +208,9 @@ class Classify:
         path = os.path.join(folder, name)
 
         prediction = np.reshape(prediction, self.dataset.get_feature_shape())
+        prediction = shift(prediction, 3, cval=0)
         prediction = zoom(prediction, self.block_size, order=0)
         # Compensate for the padding
-        prediction = shift(prediction, 3, cval=0)
         plt.axis('off')
         image = np.array(read_geotiff(self.test_image))
         image = np.dstack((image[0], image[1], image[2]))
