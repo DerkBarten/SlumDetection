@@ -11,9 +11,11 @@ from scipy.ndimage import zoom
 
 def overlay_groundtruth(groundtruth, image, block_size):
     groundtruth = zoom(groundtruth, block_size, order=0)
+    plt.axis('off')
     plt.imshow(image)
     plt.imshow(groundtruth, alpha=0.5)
-    plt.show() 
+    plt.savefig('image.png', format='png', dpi=1000)
+    plt.show()
 
 def create_groundtruth(mask, block_size=20, threshold=0.1):
     """
@@ -86,9 +88,9 @@ def create_dict(feature, groundtruth):
     for i in range(height):
         for j in range(width):
             if (groundtruth[i, j] != 0):
-                dataset['formal'].append(feature[i, j])
-            else:
                 dataset['informal'].append(feature[i, j])
+            else:
+                dataset['formal'].append(feature[i, j])
             
     return dataset
 
