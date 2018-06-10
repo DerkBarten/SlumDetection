@@ -60,13 +60,9 @@ def plot_confusion_matrix(cm, classes,
 
 
 def get_metrics(prediction, ytest):
-    precision = metrics.precision_score(ytest, prediction)
     f1_score = metrics.f1_score(ytest, prediction)
-    keepers = np.where(np.logical_not((np.vstack((ytest,
-                       prediction)) == 0).all(axis=0)))
-    jaccard = metrics.jaccard_similarity_score(ytest[keepers],
-                                               prediction[keepers])
-    return precision, f1_score, jaccard
+    matthews = metrics.matthews_corrcoef(ytest, prediction)
+    return f1_score, matthews
 
 
 class Dataset:
@@ -221,27 +217,26 @@ class Classify:
         plt.clf()
 
     def _create_metrics(self, folder):
-        columns = ["Precision", "F1 score", "Jaccard"]
+        columns = ["F1 score", "Matthews"]
         indices = [self._get_classifier_name(index)
                    for index in self.classifier_indices]
         metrics = pd.DataFrame(columns=columns)
 
         for index in self.classifier_indices:
-            tmp = np.empty((0, 3))
+            tmp = np.empty((0, 2))
             classifier = self.classifiers[index]
             Xtrain, ytrain, Xtest, ytest = self.dataset.get_dataset()
             for i in range(self.experiments):
-
                 classifier.fit(Xtrain, ytrain)
                 prediction = classifier.predict(Xtest)
 
-                precision, f1_score, jaccard = get_metrics(prediction, ytest)
+                f1_score, matthews = get_metrics(prediction, ytest)
 
-                entry = np.array([[precision, f1_score, jaccard]])
+                entry = np.array([[f1_score, matthews]])
                 tmp = np.concatenate((tmp, entry))
 
             mean = np.mean(tmp, axis=0)
-            metrics = metrics.append(pd.DataFrame(np.reshape(mean, (1, 3)),
+            metrics = metrics.append(pd.DataFrame(np.reshape(mean, (1, 4)),
                                      index=[self._get_classifier_name(index)],
                                      columns=columns))
 
@@ -275,17 +270,17 @@ class Classify:
 
         Xtrain, ytrain, Xtest, ytest = self.dataset.get_dataset()
 
-        for index in self.classifier_indices:
-            classifier = self.classifiers[index]
-            classifier.fit(Xtrain, ytrain)
-            prediction = classifier.predict(Xtest)
+        # for index in self.classifier_indices:
+        #     classifier = self.classifiers[index]
+        #     classifier.fit(Xtrain, ytrain)
+        #     prediction = classifier.predict(Xtest)
 
-            self._create_confusion(prediction, ytest, folder, index)
-            self._create_overlay(prediction, ytest, folder, index)
+        #     self._create_confusion(prediction, ytest, folder, index)
+        #     self._create_overlay(prediction, ytest, folder, index)
         self._create_metrics(folder)
 
 if __name__ == "__main__":
-    scales_list = [[50], [100], [150], [50, 100, 150]]
+    scales_list = [[50, 100, 150]]
 
     for scales in scales_list:
         dataset = Dataset([imagefiles[0], imagefiles[2]], imagefiles[1],
