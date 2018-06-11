@@ -236,7 +236,7 @@ class Classify:
                 tmp = np.concatenate((tmp, entry))
 
             mean = np.mean(tmp, axis=0)
-            metrics = metrics.append(pd.DataFrame(np.reshape(mean, (1, 4)),
+            metrics = metrics.append(pd.DataFrame(np.reshape(mean, (1, 2)),
                                      index=[self._get_classifier_name(index)],
                                      columns=columns))
 

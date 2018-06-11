@@ -92,10 +92,7 @@ To account for different widths of roads in an image, we created a kernel using 
 the contrast between roads and roadside and might remove noise. As a result of
 this kernel, the center of the road is the part that counts the most. The edges
 of the road are less count for less, which should help make the kernel to a certain extend scalable
-to multiple types and sizes of roads, such as alleys or main streets.
-
-% TODO: conclusion of kernels
-%The creation of a kernel that works well for an image is 
+to multiple types and sizes of roads, such as alleys or main streets. We will therefore use this kernel by default.
 
 \subsubsection{Intersection Detection Evaluation}
 

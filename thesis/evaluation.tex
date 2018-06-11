@@ -138,18 +138,7 @@ be seen in Figure \ref{fig:sections} where the image sections are displayed. How
 
 The road intersection density method only generates a single feature. This feature, as discussed earlier, is the result of the Gettis and Ord local G function. Like HoG and LSR, this method can use different block sizes and scales as well. However, in this case, the meaning of the scale and block size is a bit different. In the calculation of the G function, in order to map the hotspot to the same dimension of the two other features, the points returned by the intersection detection need to be rasterized on a grid. This grid is in the same dimensions as the two other features and each block in the grid represents a block in the image, just like the blocksize. Every block in the grid has a counter of the number of intersections that fall in that specific block. The G function is calculated over this grid, resulting in a feature of the correct dimensions. The scale is used in the determination of the radius of each block. The G function is calculated using the block in combination with its surrounding neighbors. The scale, in this case, determines the radius around each block in the grid which blocks are identified as a neighbor.
 
-Because we use three sections in the evaluation of the features, the road intersection density method is complicated to use. The parameters RID uses for the correct detection of intersections is different for the three sections. For instance, parameters that detect intersections well in the first section do not necessarily translate to the second and third section. As mentioned in the section about the design of the RID method, the parameters are very specific to the content of the image. Furthermore, it is hard to evaluate if this whole approach for slum detection is flawed or if the intersection extraction is not working correctly. This is why it is important to have a ground truth of the intersections in the image because this allows to conclude with certainty if this slum detection method is valid.
-% TODO: reread and continue -^
-
-Due to the diversity in the landscape between the three sections, it is difficult
-to select parameters that generate correct intersection for all three sections.
-
-There is no groundtruth for the intersections, therefore, we cannot calculate various
-measures for the performance of the intersection detection
-
-
-The evaluation of the road intersection density is harder than the other features
-due to the complexity 
+Because we use three sections in the evaluation of the features, the road intersection density method is complicated to use. The parameters RID uses for the correct detection of intersections is different for the three sections. For instance, parameters that detect intersections well in the first section do not necessarily translate to the second and third section. As mentioned in the section about the design of the RID method, the parameters are very specific to the content of the image. Furthermore, it is hard to evaluate if the hypothesis for slum detection is false or if the intersection extraction does not produce correct intersections. This is why it is important to have a ground truth of the intersections in the image because this allows to conclude with certainty if this method for slum detection is valid.
 
 \subsection{Conclusion}
 
@@ -160,8 +149,7 @@ expensive. Just on these smaller subsections, the time to compute features at
 a high scale is measured in hours rather than minutes. Using features with high
 scales on large images would therefore not be feasable. Besides, increasing the
 scale gives diminishing returns while taking significantly more time to
-compute. For the smaller sections, higher scales, such as 200 or 250 is
-used, but on large scale images this is brought down to a manageable 150.
+compute. We will therefore use 150 as the maximum scale. We will further discuss the observed effects in performance of different scales in the results section.
 
 With the right parameters, there is a clear distinction between the two classes
 for both the HoG and LSR features. Therefore, we conclude that these features
