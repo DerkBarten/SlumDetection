@@ -16,8 +16,7 @@ blocks instead of pixels. Therefore, the pixel based mask is transformed into a 
 mask. In this new block based mask, every pixel represents a block of pixels. In this mask pixels with the value zero represent formal blocks of pixels. Ones represent informal blocks of pixels. This effectively creates a ground truth of the informal areas in the satellite image.  
 
 We visualize the predictive value of a feature can be visualized using a boxplot of the two
-classes. When a feature is distinctive on its own, the distribution of the values in the two classes will be different. The data used for the evaluation comes from three small sections of the image. As priorly mentioned, this creates a more even division of classes which should provide a more accurate
-evaluation of the selected feature.
+classes. When a feature is distinctive on its own, the distribution of the values in the two classes will be different. The data used for the evaluation comes from three small sections of the image. As priorly mentioned, this creates a more even division of classes which should provide a more accurate evaluation of the selected feature. We attempted to use KL divergence as an objective measurement as an alternative for the visual inclined box plot and kernel density estimation. However, we were not able to extract reasonable KL divergence values from our data, since for many outcomes would point to a divergence of infinite value. We will therefore visually evaluate the differences between the formal and informal value distributions.
 
 % TODO: make sure numbers here are valid
 The features will be calculated for all combinations of image sections, color
@@ -136,25 +135,30 @@ be seen in Figure \ref{fig:sections} where the image sections are displayed. How
 
 \subsection{Road Intersection Density}
 
-The road intersection density method only generates a single feature. This feature, as discussed earlier, is the result of the Gettis and Ord local G function. Like HoG and LSR, this method can use different block sizes and scales as well. However, in this case, the meaning of the scale and block size is a bit different. In the calculation of the G function, in order to map the hotspot to the same dimension of the two other features, the points returned by the intersection detection need to be rasterized on a grid. This grid is in the same dimensions as the two other features and each block in the grid represents a block in the image, just like the blocksize. Every block in the grid has a counter of the number of intersections that fall in that specific block. The G function is calculated over this grid, resulting in a feature of the correct dimensions. The scale is used in the determination of the radius of each block. The G function is calculated using the block in combination with its surrounding neighbors. The scale, in this case, determines the radius around each block in the grid which blocks are identified as a neighbor.
+\begin{figure}
+	\centering
+	\begin{tabular}{ccc}
+		\subfloat{\includegraphics[width=5cm]{images/RID/1}}&
+		\subfloat{\includegraphics[width=5cm]{images/RID/2}}&
+		\subfloat{\includegraphics[width=5cm]{images/RID/3}}\\
+		\subfloat{\includegraphics[width=5cm]{images/RID/4}}&
+		\subfloat{\includegraphics[width=5cm]{images/RID/5}}&
+		\subfloat{\includegraphics[width=5cm]{images/RID/6}}\\
+	\end{tabular}
+	\caption{The distribution of values for the Road Intersection Density feature. Top: Scale 150; Bottom: Scale 50}
+	\label{rid}
+\end{figure}
 
-Because we use three sections in the evaluation of the features, the road intersection density method is complicated to use. The parameters RID uses for the correct detection of intersections is different for the three sections. For instance, parameters that detect intersections well in the first section do not necessarily translate to the second and third section. As mentioned in the section about the design of the RID method, the parameters are very specific to the content of the image. Furthermore, it is hard to evaluate if the hypothesis for slum detection is false or if the intersection extraction does not produce correct intersections. This is why it is important to have a ground truth of the intersections in the image because this allows to conclude with certainty if this method for slum detection is valid.
+
+The road intersection density method only generates a single feature. This feature, as discussed earlier, is the result of the Gettis and Ord local G function. Like HoG and LSR, this method can use different block sizes and scales as well. However, in this case, the meaning of the scale and block size is a bit different. In the calculation of the G function, in order to map the hotspot to the same dimension of the two other features, the points returned by the intersection detection need to be rasterized on a grid. This grid is in the same dimensions as the two other features and each block in the grid represents a block in the image, just like the blocksize. Every block in the grid has a counter of the number of intersections that fall in that specific block. The G function is calculated over this grid, resulting in a feature of the correct dimensions. The scale is used in the determination of the radius of each block. The G function is calculated using the block in combination with its surrounding neighbors. The scale, in this case, determines the radius around each block in the grid which blocks are identified as a neighbor.\newline\newline
+\noindent
+Figure \ref{rid} shows the differences in distribution for the RID feature for scales 150 and 50. The low scale seems to create artifacts and does not have a distinctly different distribution. The higher scale, on the other hand, does seem to have a difference in distribution, although not quite significant. For the other sections, even at scale 150, the results are similar to the bottom right image in the figure. Because we use three sections in the evaluation of the features, the road intersection density method is complicated to use. In this evaluation, we have only used the parameters that work well with the first section and applied this to the second and third section. As mentioned in the section about the design of the RID method, the parameters are very specific to the content of the image. This parameter tweaking makes it difficult to scale to different images.
 
 \subsection{Conclusion}
 
 % TODO: make sure numbers are valid
-It seems that, in general, an increase in scale improves the distinctness of
-the two classes. However, increasing the scale is computationally very
-expensive. Just on these smaller subsections, the time to compute features at
-a high scale is measured in hours rather than minutes. Using features with high
-scales on large images would therefore not be feasable. Besides, increasing the
-scale gives diminishing returns while taking significantly more time to
-compute. We will therefore use 150 as the maximum scale. We will further discuss the observed effects in performance of different scales in the results section.
-
-With the right parameters, there is a clear distinction between the two classes
-for both the HoG and LSR features. Therefore, we conclude that these features
-can be used classification. 
-
-% Conclude the usefullness of the features
+With the right parameters, there is a clear distinction between the two classes for both the HoG and LSR features. RID, in contrast, does not seem to have a clear distinction. It seems that, in general, an increase in scale improves the distinctness of the two classes. However, increasing the scale is computationally expensive. On these smaller subsections alone, the time to compute features at a high scale is measured in hours rather than minutes. Using features with high scales on large images would therefore not be feasable. Besides, increasing the scale gives diminishing returns while taking significantly more time to compute. We will therefore use 150 as the maximum scale.
+Since increasing the block size did not seem to improve performance, we keep the blocksize at 20 pixels as in the paper by Graesser \textit{et al}. We will test our hypothesis of the effect of block size and scale during the feature classification experiments.
+% TODO: dot in et al?? -^
 
 
