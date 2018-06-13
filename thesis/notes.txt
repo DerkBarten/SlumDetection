@@ -1,69 +1,72 @@
+*	hoe uitgebreid uitleg LSR, HoG
+*	omranding van sloppenwijken shapefiles
 
-########################### HoG ######################################3
-how HoG changes between scales?
-HoG too coarse?
-deltas are useless?
-only second mean interesting?
-variance of histogam, high -> slums, low ->formal
-how to get shapefiles to work in grass?
-beta only gives noise?
-hog difficult differntiate small buildings from large buildings
-hog only usefull large scale?
-check if beta is OK
+*	Explain data
+*	explain composition of slums
 
+*	calculate surface area of slum in both files
 
+*	detailed implementation of new feature 
 
-hog only used for differentiate between buildings and fields
-weird lines in HoG
-
-######################### General ########################################
-
-LFD not implemented spfeas
-
-hoe uitgebreid uitleg LSR, HoG, LFD
-
-omranding van sloppenwijken shapefiles
-
-
-Explain data
-explain composition of slums
-
-
-calculate surface area of slum in both files
-
-detailed implementation of new feature 
-
-show 3 sections in challenges section
-
-termonology of subfeatures of feature
+*	show 3 sections in challenges section
 
 show positions of sections on whole map
 new images of sections
-
-
-feature evaluation: more detailed analysis of the distributions??
-like properties of the distribution (mean, variance etc)
-
-conclusion in feature evaluation
-
-
-redo all features
-fix 3 scales stuff 
-
 
 not sure about 4 Hog features when 5 in shape
 
 why increased scale works?
 
-PUSH IT TO THE LIMIT, try very high scales, see where it plateau's.
-can still let the other results be, just say they are for illustration.
-
-under challenges: in our case, highly distributed slums
+*	under challenges: in our case, highly distributed slums
 
 do correct error handling
-fix other ugly scripts
 
-move challenges sections somewhere else
+*	CREATE MORE ELABORTE LITERATURE STUDY IN PREVIOUS WORK
+
+*	test hog and slr for block size of 10
+
+create parameter selection section for every feature and classification thing
+
+
+objective measure for difference in distribution, feature evaluation
+
+*	meer info bangalore
+
+problem, the 3 sections all need different road parameters
+
+*	check actually west bangalore and not east
+
+*	waarom slum detection zo moeilijk is
+
+more results of previous work!!! how did those researches go??
+
+road segment detection
+
+*	create new sections, 2 and 3 don't work well
+
+*	perhaps my features only work on large scale?
+
+distribution KDE plots are not correctly labeled, should be the other way around
+
+Originally goal unsupervised, but supervised isnt even working
+
+say something about threshold slum parameter?
+
+more precise experiment setup
+
+add numbers to whole bangalore map
+
+should use mean with lower and upper bound indicators?
+
+show getis ords hotspots
+
+finish feature evaluation for RID
+
+fix confusion plots
+
+hog performs better than lsr for section 2!!!????
+
+
 
 ############### roads ###############
 
@@ -73,26 +76,38 @@ try different shapes
 longer length of roads to capture intersections better
 convolution changes location of peaks by a contant number
 
-width of road in pixels in kernel should roughly match width of road in image
-
 method for determining the best parameters or best method?
 metrics??
 
-say which file intersection extraction tested on
-make road intersection density separate section
 
-inspired by footprints in different paper
+needs to be large contrast between roads and surroundings
 
-add section explaining what the thesis does (proposed method)
-and put this with previous work under introduction
+create section about the kernels
+
+problem: not enough contrast between roads and surroundings -> solution: otsu
+
+expand on gaussian kernel: std-dev enzo
+
+add disclaimer that no ground truth
+
+---------------------------------
+
+G_local is scale invariant
+use G, G_local, and morian as 3 features?
+create block size and scale in creature of matrix
 
 #################
+
+classification
+
+gradient boosting
+combine all features
+
+##############################3
 
 kl-divergence
 hellinger
 
-50 blocksize
+ #### Questions ####
 
-jackard index
-
-
+ethical questions???

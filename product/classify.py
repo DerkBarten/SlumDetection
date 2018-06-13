@@ -287,6 +287,6 @@ if __name__ == "__main__":
         for scales in scales_list:
             dataset = Dataset([imagefiles[0], imagefiles[2]], imagefiles[1],
                               shapefile, ['hog', 'lsr', 'rid'], scales=scales,
-                              block_size=block)
+                              block_size=block_size)
             classify = Classify(dataset)
             classify.classify()
