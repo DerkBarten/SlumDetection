@@ -43,30 +43,30 @@ class Analysis:
         base = os.path.basename(os.path.splitext(image_path)[0])
         foldername = "analysis/{}_{}_BK{}_{}"
 
-        for i, feature in enumerate(features):
+        for i, f in enumerate(features):
             featurename = "{}_{}_{}_BK{}_{}_F{}.png"
             featurefolder = foldername.format(base, feature_string, block_size,
                                               scale_string)
 
             # Remove infinite values
-            feature[feature == np.inf] = 0
+            f[f == np.inf] = 0
 
             if not os.path.exists(featurefolder):
                 os.mkdir(featurefolder)
 
-            dataset = create_dataset(feature, groundtruth)
+            dataset = create_dataset(f, groundtruth)
             name = featurename.format(base, 'boxplot', feature_string,
                                       block_size, scale_string, i)
             Analysis.boxplot(dataset, featurefolder, name)
 
-            dataset = create_dict(feature, groundtruth)
+            dataset = create_dict(f, groundtruth)
             name = featurename.format(base, 'kde', feature_string,
                                       block_size, scale_string, i)
             Analysis.kde(dataset, featurefolder, name)
 
             name = featurename.format(base, 'spatial', feature_string,
                                       block_size, scale_string, i)
-            Analysis.spatial_distribution(feature, featurefolder, name)
+            Analysis.spatial_distribution(f, featurefolder, name)
 
     @staticmethod
     def boxplot(dataset, folder, name):
@@ -95,7 +95,7 @@ class Analysis:
 
 if __name__ == "__main__":
     shapefile = 'data/slums_approved.shp'
-    feature_names_list = [['hog'], ['lsr'], ['rid'], ['hog', 'lsr', 'rid']]
+    feature_names_list = [['rid']]
     block_size_list = [20]
     scales_list = [[50, 100, 150]]
 

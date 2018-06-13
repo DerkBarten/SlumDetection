@@ -290,9 +290,9 @@ class RoadIntersectionDensity:
         self._intersections = intersections
         self._block_size = block_size
         self._scale = scale
-        self._feature = self.__calculate()
+        self._feature = None
 
-    def get_feature(self):
+    def get(self):
         """
         This function can be used to get the feature after the creation of the
         object
@@ -303,22 +303,7 @@ class RoadIntersectionDensity:
 
         return self._feature
 
-    def visualize(self):
-        plt.imshow(self._feature[0])
-        plt.show()
-
-    @staticmethod
-    def save(rid_object, path):
-        f = open(path, 'w')
-        pickle.dump(rid_object, f)
-
-    @staticmethod
-    def load(path):
-        f = open(path, 'r')
-        return pickle.load(f)
-
-    @classmethod
-    def __calculate(self):
+    def create(self):
         """
         This function calculates the road intersection feature. It gets called
         automatically on the creation of this class.
@@ -337,8 +322,23 @@ class RoadIntersectionDensity:
                                 self._block_size, self._scale)
         feature = np.reshape(feature, (1, feature.shape[0],
                                        feature.shape[1]))
+        self._feature = feature
 
-        return feature
+    def visualize(self):
+        plt.imshow(self._feature[0])
+        plt.show()
+
+    @staticmethod
+    def save(rid_object, path):
+        LOG.info("Saving RID feature as: %s", path)
+        f = open(path, 'wb')
+        pickle.dump(rid_object, f)
+
+    @staticmethod
+    def load(path):
+        LOG.info("Opening RID feature file: %s", path)
+        f = open(path, 'rb')
+        return pickle.load(f)
 
     @classmethod
     def __create_density_map(self, points, image_shape):
@@ -408,10 +408,10 @@ class RoadIntersectionDensity:
 
         """
         feature_shape = feature.shape
-        zoom_level = [float(image_shape[0]) / (self._block_size *
-                      feature_shape[0]),
-                      float(image_shape[1]) / (self._block_size *
-                      feature_shape[1])]
+        zoom_level = [float(image_shape[0]) /
+                      (self._block_size * feature_shape[0]),
+                      float(image_shape[1]) /
+                      (self._block_size * feature_shape[1])]
 
         # For the scipy UserWarning:
         # To compensate for the round() used in the zoom() when we want to use
