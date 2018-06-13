@@ -270,20 +270,23 @@ class Classify:
 
         Xtrain, ytrain, Xtest, ytest = self.dataset.get_dataset()
 
-        # for index in self.classifier_indices:
-        #     classifier = self.classifiers[index]
-        #     classifier.fit(Xtrain, ytrain)
-        #     prediction = classifier.predict(Xtest)
+        for index in self.classifier_indices:
+            classifier = self.classifiers[index]
+            classifier.fit(Xtrain, ytrain)
+            prediction = classifier.predict(Xtest)
 
-        #     self._create_confusion(prediction, ytest, folder, index)
-        #     self._create_overlay(prediction, ytest, folder, index)
+            self._create_confusion(prediction, ytest, folder, index)
+            self._create_overlay(prediction, ytest, folder, index)
         self._create_metrics(folder)
 
 if __name__ == "__main__":
     scales_list = [[50, 100, 150]]
+    block_size_list = [20, 40, 60]
 
-    for scales in scales_list:
-        dataset = Dataset([imagefiles[0], imagefiles[2]], imagefiles[1],
-                          shapefile, ['hog', 'lsr', 'rid'], scales=scales)
-        classify = Classify(dataset)
-        classify.classify()
+    for block_size in block_size_list:
+        for scales in scales_list:
+            dataset = Dataset([imagefiles[0], imagefiles[2]], imagefiles[1],
+                              shapefile, ['hog', 'lsr', 'rid'], scales=scales,
+                              block_size=block)
+            classify = Classify(dataset)
+            classify.classify()

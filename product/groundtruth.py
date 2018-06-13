@@ -9,6 +9,7 @@ from rasterio import mask
 from matplotlib import pyplot as plt
 from scipy.ndimage import zoom
 
+
 def overlay_groundtruth(groundtruth, image, block_size):
     groundtruth = zoom(groundtruth, block_size, order=0)
     plt.axis('off')
@@ -16,6 +17,7 @@ def overlay_groundtruth(groundtruth, image, block_size):
     plt.imshow(groundtruth, alpha=0.5)
     plt.savefig('image.png', format='png', dpi=1000)
     plt.show()
+
 
 def create_groundtruth(mask, block_size=20, threshold=0.1):
     """

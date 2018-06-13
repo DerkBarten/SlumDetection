@@ -4,7 +4,7 @@ import logging
 import numpy as np
 
 from util import read_geotiff
-from rid import RoadIntersectionDensity
+from rid import  Kernel, RoadIntersections, RoadIntersectionDensity, ktype
 
 LOG = logging.getLogger(__file__)
 logging.basicConfig(level=logging.INFO)
@@ -132,10 +132,11 @@ class Feature:
 
             kernel = Kernel(road_width=15, road_length=50,
                             kernel_type=ktype.GAUSSIAN)
-            intersections = RoadIntersections(image_path, kernel,
+            intersections = RoadIntersections(self._image_path, kernel,
                                               peak_min_distance=100)
-            rid = RoadIntersectionDensity(image_path, intersections, scale=80,
-                                          block_size=30)
+            rid = RoadIntersectionDensity(self._image_path, intersections, scale=80,
+                                          block_size=self._block_size)
+            rid.create()
             RoadIntersectionDensity.save(rid, path)
 
     def get(self):
@@ -158,14 +159,14 @@ class Feature:
         if rid_feature:
             folder = self.__get_folder_name(feature_names=rid_feature,
                                             scales=[max(self._scales)])
-            feature_path = get_feature_from_folder(folder)
+            feature_path = self.__get_feature_from_folder(folder)
 
             if feature_path is None:
                 err = "Cannot find specified feature folder: {}".format(folder)
                 raise IOError(err)
 
             rid = RoadIntersectionDensity.load(feature_path)
-            rid_feature = rid.get_feature()
+            rid_feature = rid.get()
 
         if len(spfeas_features) > 0 and len(rid_feature) > 0:
             self._feature = np.concatenate((spfeas_features, rid_feature),
