@@ -1,4 +1,13 @@
-seaborn
-fiona
-rasterio
-pysal
+pandas==0.23.0
+seaborn==0.8.1
+Fiona==1.7.12
+numpy==1.14.3
+matplotlib==2.2.2
+scikit_image==0.13.1
+PySAL==1.14.3
+rasterio==0.36.0
+scipy==1.0.0
+gdal==2.3.0
+imblearn==0.0
+skimage==0.0
+scikit_learn==0.19.1
