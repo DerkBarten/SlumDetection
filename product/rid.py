@@ -3,6 +3,7 @@ import cv2
 import numpy as np
 import math
 import pickle
+import logging
 
 from enum import Enum
 from scipy.ndimage import zoom
@@ -16,6 +17,10 @@ from util import read_geotiff, read_image, convert_to_grayscale
 from scipy import signal as sg
 from scipy import ndimage as nd
 from matplotlib import pyplot as plt
+
+
+LOG = logging.getLogger(__file__)
+logging.basicConfig(level=logging.INFO)
 
 
 class ktype(Enum):
@@ -78,8 +83,7 @@ class Kernel:
             return self.__create_negative_kernel()
         if self._kernel_type == ktype.GAUSSIAN:
             return self.__create_gaussian_kernel()
-        print("ERROR: Invalid kernel specified")
-        exit()
+        raise ValueError("Invalid kernel specified")
 
     @classmethod
     def __create_original_kernel(self):
@@ -108,7 +112,7 @@ class Kernel:
     @classmethod
     def __create_increase_kernel(self):
         """
-        Creates a kernel where the ends of the intersection count the most. 
+        Creates a kernel where the ends of the intersection count the most.
 
         Returns:
             A kernel containing the shape of a cross; nxn numpy matrix
@@ -355,7 +359,7 @@ class RoadIntersectionDensity:
         height = image_shape[0]
         width = image_shape[1]
         scaled_block_size = self._block_size * 4
-        
+
         density_map = np.zeros((int(math.floor(float(height) /
                                     scaled_block_size)),
                                 int(math.floor(float(width) /
@@ -426,8 +430,7 @@ class RoadIntersectionDensity:
 
 if __name__ == '__main__':
     if len(sys.argv) < 2:
-        print("Please supply an image")
-        exit()
+        raise Exception("Please supply an image")
 
     image_path = sys.argv[1]
 
