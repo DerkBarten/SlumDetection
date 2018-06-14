@@ -4,6 +4,7 @@ import logging
 import numpy as np
 
 from util import read_geotiff
+from groundtruth import reshape_image
 from rid import  Kernel, RoadIntersections, RoadIntersectionDensity, ktype
 
 LOG = logging.getLogger(__file__)
@@ -167,14 +168,13 @@ class Feature:
                                           block_size=self._block_size)
             rid.load(feature_path)
             rid_feature = rid.get()
-            from groundtruth import reshape_image
-            print(type(rid_feature))
-            print(rid_feature.shape)
-            rid_feature = reshape_image(rid_feature, self.image.shape, self._block_size, max(self._scales))
+            
+            rid_feature = reshape_image(rid_feature, self.image.shape,
+                                        self._block_size, max(self._scales))
+
+
 
         if len(spfeas_features) > 0 and len(rid_feature) > 0:
-            print(rid_feature.shape)
-            print(spfeas_features.shape)
             self._feature = np.concatenate((spfeas_features, rid_feature),
                                            axis=0)
         elif len(spfeas_features) > 0:

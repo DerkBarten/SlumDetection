@@ -90,8 +90,7 @@ class Dataset:
         mask = create_mask(shapefile, image.path)
         groundtruth = create_groundtruth(mask, block_size=self.block_size,
                                          threshold=0.6)
-        groundtruth = reshape_image(groundtruth, (image.shape[1],
-                                    image.shape[2]), self.block_size,
+        groundtruth = reshape_image(groundtruth, image.shape, self.block_size,
                                     max(self.scales))
 
         X = []
@@ -118,13 +117,19 @@ class Dataset:
         for image in self.train_images:
             train_features = self._load_features(image)
             X, y = self._create_dataset(image, train_features)
+            # print(X.shape)
+            # print(y.shape)
 
             Xtrain = np.concatenate((Xtrain, X), axis=0)
             ytrain = np.concatenate((ytrain, y), axis=0)
 
+        # print(Xtrain.shape)
+        # print(ytrain.shape)
+
         scaler = StandardScaler().fit(Xtrain)
         Xtrain = scaler.transform(Xtrain)
         Xtest = scaler.transform(Xtest)
+        
 
         Xtrain, ytrain = shuffle(Xtrain, ytrain)
         Xtrain, ytrain = SMOTE().fit_sample(Xtrain, ytrain)
@@ -188,7 +193,7 @@ class Classify:
         plot_confusion_matrix(metrics.confusion_matrix(ytest, prediction),
                               classes=['Informal', 'Formal'],
                               title='Confusion Matrix')
-
+        LOG.info("Saving confusion as: {}".format(path))
         plt.savefig(path, format='png', dpi=1200)
         plt.clf()
 
@@ -204,9 +209,11 @@ class Classify:
         # Compensate for the padding
         plt.axis('off')
         image = self.test_image.RGB
-        image = np.dstack((image[0], image[1], image[2]))
+        #image = np.dstack((image[0], image[1], image[2]))
         plt.imshow(image)
         plt.imshow(prediction, alpha=0.5)
+        plt.show()
+        LOG.info("Saving overlay as: {}".format(path))
         plt.savefig(path, format='png', dpi=1000)
         plt.clf()
 
@@ -216,11 +223,13 @@ class Classify:
                    for index in self.classifier_indices]
         metrics = pd.DataFrame(columns=columns)
 
+        LOG.info("Start creating metrics")
         for index in self.classifier_indices:
             tmp = np.empty((0, 2))
             classifier = self.classifiers[index]
             Xtrain, ytrain, Xtest, ytest = self.dataset.get_dataset()
             for i in range(self.experiments):
+                LOG.info("Experiment {}/{}".format(index * i + i, self.experiments * len(self.classifier_indices)))
                 classifier.fit(Xtrain, ytrain)
                 prediction = classifier.predict(Xtest)
 
@@ -237,6 +246,7 @@ class Classify:
         basename = self._get_basename()
         name = "metrics_" + basename + "_" + ".csv"
         path = os.path.join(folder, name)
+        LOG.info("Saving metrics as: {}".format(path))
         metrics.to_csv(path, sep=',')
 
     def _get_basename(self):
@@ -253,8 +263,9 @@ class Classify:
         for feature in self.feature_names:
             f_string += "_" + feature
 
-        return "TR{}_TE_{}_SC{}_F{}".format(tr_string, te_string, sc_string,
-                                            f_string)
+        return "TR{}_TE_{}_BK_{}_SC{}_F{}".format(tr_string, te_string,
+                                                  self.block_size,
+                                                  sc_string,  f_string)
 
     def classify(self):
         folder = os.path.join("results", self._get_basename())
@@ -264,8 +275,8 @@ class Classify:
         Xtrain, ytrain, Xtest, ytest = self.dataset.get_dataset()
 
         LOG.info("Classifying {}".format(self._get_basename()))
-        LOG.info("Saving results at {}".format(folder))
         for index in self.classifier_indices:
+            LOG.info("Classifying using {}".format(self._get_classifier_name(index)))
             classifier = self.classifiers[index]
             classifier.fit(Xtrain, ytrain)
             prediction = classifier.predict(Xtest)
@@ -276,19 +287,19 @@ class Classify:
 
 if __name__ == "__main__":
     scales_list = [[50, 100, 150]]
-    block_size_list = [10, 20, 40, 60]
+    block_size_list = [20]
 
     section_1 = Image('data/section_1.tif')
     section_2 = Image('data/section_2.tif')
     section_3 = Image('data/section_3.tif')
 
     test_image = section_2
-    train_images = [section_3]
+    train_images = [section_1, section_3]
 
     for block_size in block_size_list:
         for scales in scales_list:
             dataset = Dataset(train_images, test_image,
-                              shapefile, ['hog', 'lsr', 'rid'], scales=scales,
+                              shapefile, ['hog','lsr'], scales=scales,
                               block_size=block_size)
             classify = Classify(dataset)
             classify.classify()
