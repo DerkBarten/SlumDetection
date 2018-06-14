@@ -12,7 +12,7 @@ from skimage.feature import peak_local_max
 from pysal.esda.getisord import G_Local
 from pysal.esda.moran import Moran_Local
 from pysal.weights.Distance import DistanceBand
-from util import read_geotiff, read_image, convert_to_grayscale
+from util import read_geotiff, Image
 
 from scipy import signal as sg
 from scipy import ndimage as nd
@@ -214,9 +214,9 @@ class RoadIntersections:
 
     """
     @classmethod
-    def __init__(self, image_path, kernel, peak_min_distance=150):
+    def __init__(self, image, kernel, peak_min_distance=150):
         self._peak_min_distance = peak_min_distance
-        self._image_path = image_path
+        self._image = image
         self._kernel = kernel
         self._intersections = None
 
@@ -242,8 +242,7 @@ class RoadIntersections:
         if self._intersections is None:
             self._intersections = self.__calculate()
 
-        image = read_image(self._image_path)
-        plt.imshow(image)
+        plt.imshow(self._image.RGB)
         plt.scatter(self._intersections[:, 1], self._intersections[:, 0],
                     c='r', alpha=0.5)
         plt.axis('off')
@@ -256,9 +255,7 @@ class RoadIntersections:
         intersections in an image.
 
         """
-        image = read_image(self._image_path)
-        gray_image = convert_to_grayscale(image)
-        gray_image = cv2.threshold(gray_image, 0, 255, cv2.THRESH_BINARY |
+        gray_image = cv2.threshold(self._image.grayscale, 0, 255, cv2.THRESH_BINARY |
                                    cv2.THRESH_OTSU)[1]
         kernel = self._kernel.get()
         convolution = sg.convolve(gray_image, kernel, "valid")
@@ -285,9 +282,8 @@ class RoadIntersectionDensity:
     This class represents the road intersection feature
     """
     @classmethod
-    def __init__(self, image_path, intersections, block_size=20, scale=150):
-        self._image_path = image_path
-        self._intersections = intersections
+    def __init__(self, image, block_size=20, scale=150):
+        self._image = image
         self._block_size = block_size
         self._scale = scale
         self._feature = None
@@ -299,49 +295,49 @@ class RoadIntersectionDensity:
 
         """
         if self._feature is None:
-            self._feature = self.__calculate()
+            raise Exception("Feature is not yet created, run create() first.")
 
         return self._feature
 
-    def create(self):
+    def create(self, intersections):
         """
         This function calculates the road intersection feature. It gets called
         automatically on the creation of this class.
 
         """
-        intersections = self._intersections.get()
-
-        image = read_image(self._image_path)
-        image_shape = image.shape
-
-        density_map = self.__create_density_map(intersections, image_shape)
+        density_map = self.__create_density_map(intersections.get())
         radius = int(self._scale / self._block_size)
         feature = self.__create_hotspot_map(density_map, radius)
-        feature = self.__interpolate_feature(feature, image_shape)
-        feature = reshape_image(feature, (image.shape[0], image.shape[1]),
-                                self._block_size, self._scale)
+        feature = self.__interpolate_feature(feature)
+        feature = reshape_image(feature, (self._image.shape[0],
+                                self._image.shape[1]), self._block_size,
+                                self._scale)
         feature = np.reshape(feature, (1, feature.shape[0],
                                        feature.shape[1]))
         self._feature = feature
 
     def visualize(self):
+        if self._feature is None:
+            raise Exception("Feature not yet calculated, please run create() or load a feature using load()")
+
         plt.imshow(self._feature[0])
         plt.show()
 
-    @staticmethod
-    def save(rid_object, path):
+    def save(self, path):
         LOG.info("Saving RID feature as: %s", path)
         f = open(path, 'wb')
-        pickle.dump(rid_object, f)
+        if self._feature is not None:
+            pickle.dump(self._feature, f)
+        else:
+            LOG.warning("RID feature was not yet calculated on save")
 
-    @staticmethod
-    def load(path):
+    def load(self, path):
         LOG.info("Opening RID feature file: %s", path)
         f = open(path, 'rb')
-        return pickle.load(f)
+        self._feature = pickle.load(f)
 
     @classmethod
-    def __create_density_map(self, points, image_shape):
+    def __create_density_map(self, points):
         """
         This function rasterizes the intersection points to a grid built from
         blocks of size block_size and in the shape of the image. This is
@@ -356,8 +352,8 @@ class RoadIntersectionDensity:
             A rasterized version of the intersection points; nxm numpy matrix
 
         """
-        height = image_shape[0]
-        width = image_shape[1]
+        height = self._image.shape[0]
+        width = self._image.shape[1]
         scaled_block_size = self._block_size * 4
 
         density_map = np.zeros((int(math.floor(float(height) /
@@ -369,7 +365,7 @@ class RoadIntersectionDensity:
             h = int(point[0] / scaled_block_size)
             w = int(point[1] / scaled_block_size)
 
-            if point[0] < image_shape[0] and point[1] < image_shape[1]:
+            if point[0] < height and point[1] < width:
                 density_map[h, w] += 1
         return density_map
 
@@ -390,7 +386,7 @@ class RoadIntersectionDensity:
         return np.reshape(g, (density_map.shape[0], density_map.shape[1]))
 
     @classmethod
-    def __interpolate_feature(self, feature, image_shape):
+    def __interpolate_feature(self, feature):
         """
         This function resizes and interpolates the feature matrix to the
         dimensions corresponding to the image with the correct block size. A
@@ -408,9 +404,9 @@ class RoadIntersectionDensity:
 
         """
         feature_shape = feature.shape
-        zoom_level = [float(image_shape[0]) /
+        zoom_level = [float(self._image.shape[0]) /
                       (self._block_size * feature_shape[0]),
-                      float(image_shape[1]) /
+                      float(self._image.shape[1]) /
                       (self._block_size * feature_shape[1])]
 
         # For the scipy UserWarning:
@@ -432,13 +428,13 @@ if __name__ == '__main__':
     if len(sys.argv) < 2:
         raise Exception("Please supply an image")
 
-    image_path = sys.argv[1]
+    image = Image(sys.argv[1])
 
     kernel = Kernel(road_width=15, road_length=50, kernel_type=ktype.GAUSSIAN)
-    intersections = RoadIntersections(image_path, kernel,
+    intersections = RoadIntersections(image, kernel,
                                       peak_min_distance=100)
-    rid = RoadIntersectionDensity(image_path, intersections, scale=80,
+    rid = RoadIntersectionDensity(image, scale=80,
                                   block_size=30)
-
+    rid.create(intersections)
     intersections.visualize()
     rid.visualize()

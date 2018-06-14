@@ -24,9 +24,9 @@ class Feature:
                         'lsr'; string.
     """
     @classmethod
-    def __init__(self, image_path, block_size=20, scales=[50], bands=[1, 2, 3],
+    def __init__(self, image, block_size=20, scales=[50], bands=[1, 2, 3],
                  feature_names=['hog']):
-        self._image_path = image_path
+        self._image = image
         self._block_size = block_size
         self._scales = scales
         self._bands = bands
@@ -53,7 +53,7 @@ class Feature:
                                                     'TR')
 
         folder = "features/features/{}__BD{}-{}-{}_BK{}_{}_{}/".format(
-                    os.path.basename(os.path.splitext(self._image_path)[0]),
+                    self._image.filename,
                     self._bands[0], self._bands[1], self._bands[2],
                     self._block_size, scale_string, feature_string)
         return folder
@@ -112,7 +112,7 @@ class Feature:
                     return
                 scale_string = " ".join(map(str, self._scales))
                 feature_string = " ".join(map(str, spfeas_features))
-                spfeas = cmd.format(self._image_path, self._block_size,
+                spfeas = cmd.format(self._image.path, self._block_size,
                                     self._bands[0], self._bands[1],
                                     self._bands[2], scale_string,
                                     feature_string)
@@ -132,12 +132,12 @@ class Feature:
 
             kernel = Kernel(road_width=15, road_length=50,
                             kernel_type=ktype.GAUSSIAN)
-            intersections = RoadIntersections(self._image_path, kernel,
+            intersections = RoadIntersections(self._image, kernel,
                                               peak_min_distance=100)
-            rid = RoadIntersectionDensity(self._image_path, intersections, scale=80,
+            rid = RoadIntersectionDensity(self._image, scale=80,
                                           block_size=self._block_size)
-            rid.create()
-            RoadIntersectionDensity.save(rid, path)
+            rid.create(intersections)
+            rid.save(path)
 
     def get(self):
         if self._feature:
@@ -165,7 +165,9 @@ class Feature:
                 err = "Cannot find specified feature folder: {}".format(folder)
                 raise IOError(err)
 
-            rid = RoadIntersectionDensity.load(feature_path)
+            rid = RoadIntersectionDensity(self._image, scale=max(self._scales),
+                                          block_size=self._block_size)
+            rid.load(feature_path)
             rid_feature = rid.get()
 
         if len(spfeas_features) > 0 and len(rid_feature) > 0:
@@ -182,13 +184,13 @@ class Feature:
         return self._block_size
 
     @property
-    def image_path(self):
-        return self._image_path
-
-    @property
     def feature_names(self):
         return self._feature_names
 
     @property
     def scales(self):
         return self._scales
+
+    @property
+    def image(self):
+        return self._image
