@@ -7,12 +7,11 @@ import numpy as np
 
 
 class Image:
-    @classmethod
     def __init__(self, image_path):
         self._image_path = image_path
         self._image = self.__read_image(self._image_path)
 
-    @classmethod
+    
     def __read_image(self, image_path):
         image = cv2.imread(image_path)
         return cv2.cvtColor(image, cv2.COLOR_BGR2RGB)

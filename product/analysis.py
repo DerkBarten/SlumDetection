@@ -93,15 +93,16 @@ class Analysis:
 if __name__ == "__main__":
     shapefile = 'data/slums_approved.shp'
     feature_names_list = [['rid']]
-    block_size_list = [20]
+    block_size_list = [10, 20, 40, 60]
     scales_list = [[50, 100, 150]]
-    image = Image('data/section_1.tif')
-
-    for feature_names in feature_names_list:
-        for block_size in block_size_list:
-            for scales in scales_list:
-                feature = Feature(image, block_size=block_size,
-                                  scales=scales, bands=[1, 2, 3],
-                                  feature_names=feature_names)
-                feature.create()
-                Analysis.analyze(feature, shapefile)
+    images = [Image('data/section_2.tif'), Image('data/section_3.tif')]
+    
+    for image in images:
+        for feature_names in feature_names_list:
+            for block_size in block_size_list:
+                for scales in scales_list:
+                    feature = Feature(image, block_size=block_size,
+                                    scales=scales, bands=[1, 2, 3],
+                                    feature_names=feature_names)
+                    feature.create()
+                    # Analysis.analyze(feature, shapefile)

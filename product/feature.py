@@ -23,7 +23,6 @@ class Feature:
         feature_name:   The name of the feature, this is either 'hog' or
                         'lsr'; string.
     """
-    @classmethod
     def __init__(self, image, block_size=20, scales=[50], bands=[1, 2, 3],
                  feature_names=['hog']):
         self._image = image
@@ -33,7 +32,6 @@ class Feature:
         self._feature_names = feature_names
         self._feature = None
 
-    @classmethod
     def __get_folder_name(self, feature_names=None, scales=None):
         """
         Finds the path to the feature file based on the parameters used in its
@@ -169,8 +167,14 @@ class Feature:
                                           block_size=self._block_size)
             rid.load(feature_path)
             rid_feature = rid.get()
+            from groundtruth import reshape_image
+            print(type(rid_feature))
+            print(rid_feature.shape)
+            rid_feature = reshape_image(rid_feature, self.image.shape, self._block_size, max(self._scales))
 
         if len(spfeas_features) > 0 and len(rid_feature) > 0:
+            print(rid_feature.shape)
+            print(spfeas_features.shape)
             self._feature = np.concatenate((spfeas_features, rid_feature),
                                            axis=0)
         elif len(spfeas_features) > 0:

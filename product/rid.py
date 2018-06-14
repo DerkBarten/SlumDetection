@@ -47,7 +47,6 @@ class Kernel:
                         listed in the ktype enum; integer
 
     """
-    @classmethod
     def __init__(self, road_width=30, road_length=70,
                  kernel_type=ktype.GAUSSIAN):
         self._road_width = road_width
@@ -67,7 +66,7 @@ class Kernel:
             self._kernel = self.__create()
         return self._kernel
 
-    @classmethod
+    
     def __create(self):
         """
         This function is the parent function in the creation of convolution
@@ -85,7 +84,7 @@ class Kernel:
             return self.__create_gaussian_kernel()
         raise ValueError("Invalid kernel specified")
 
-    @classmethod
+    
     def __create_original_kernel(self):
         """
         This function creates a type of kernel that was used as a proof of
@@ -109,7 +108,7 @@ class Kernel:
         r2 = np.concatenate((hr, cr, hr), axis=1)
         return np.concatenate((r1, r2, r1), axis=0)
 
-    @classmethod
+    
     def __create_increase_kernel(self):
         """
         Creates a kernel where the ends of the intersection count the most.
@@ -134,7 +133,7 @@ class Kernel:
         kernel[kernel > max_val] = max_val
         return kernel
 
-    @classmethod
+    
     def __create_negative_kernel(self):
         """
         Creates a kernel where the area outside the cross is negative.
@@ -167,7 +166,7 @@ class Kernel:
         kernel[kernel < min_val] = min_val
         return kernel
 
-    @classmethod
+    
     def __calculate_row_negative_kernel(self, i, min_val):
         """
         A helper function for the negative kernel.
@@ -175,7 +174,7 @@ class Kernel:
         return np.concatenate((np.arange(-1,  i * -1, -1),
                                np.full(self._road_length - i + 1, i * -1)))
 
-    @classmethod
+    
     def __create_gaussian_kernel(self):
         """
         Creates a kernel where the cross of the kernel is built using two
@@ -196,7 +195,7 @@ class Kernel:
         kernel = np.maximum(r1, r2)
         return kernel
 
-    @classmethod
+    
     def __rotate_kernel(self, kernel, degrees):
         return nd.rotate(kernel, degrees)
 
@@ -213,7 +212,6 @@ class RoadIntersections:
                             intersection detection; integer
 
     """
-    @classmethod
     def __init__(self, image, kernel, peak_min_distance=150):
         self._peak_min_distance = peak_min_distance
         self._image = image
@@ -248,7 +246,6 @@ class RoadIntersections:
         plt.axis('off')
         plt.show()
 
-    @classmethod
     def __calculate(self):
         """
         This function uses convolution as a method for finding road
@@ -264,7 +261,6 @@ class RoadIntersections:
 
         return self.__relocate_peaks(peaks)
 
-    @classmethod
     def __relocate_peaks(self, peaks):
         """
         This function relocates the peaks by the half of the kernel width.
@@ -281,7 +277,6 @@ class RoadIntersectionDensity:
     """
     This class represents the road intersection feature
     """
-    @classmethod
     def __init__(self, image, block_size=20, scale=150):
         self._image = image
         self._block_size = block_size
@@ -336,7 +331,6 @@ class RoadIntersectionDensity:
         f = open(path, 'rb')
         self._feature = pickle.load(f)
 
-    @classmethod
     def __create_density_map(self, points):
         """
         This function rasterizes the intersection points to a grid built from
@@ -369,7 +363,6 @@ class RoadIntersectionDensity:
                 density_map[h, w] += 1
         return density_map
 
-    @classmethod
     def __create_hotspot_map(self, density_map, radius):
         """
         Create a hotspot map from the intersection density map.
@@ -385,7 +378,6 @@ class RoadIntersectionDensity:
         g = G_Local(y, w).Zs
         return np.reshape(g, (density_map.shape[0], density_map.shape[1]))
 
-    @classmethod
     def __interpolate_feature(self, feature):
         """
         This function resizes and interpolates the feature matrix to the
@@ -436,5 +428,5 @@ if __name__ == '__main__':
     rid = RoadIntersectionDensity(image, scale=80,
                                   block_size=30)
     rid.create(intersections)
-    intersections.visualize()
+    #intersections.visualize()
     rid.visualize()

@@ -2,12 +2,13 @@ import itertools
 import os
 import enum
 import pickle
+import logging
 import numpy as np
 import pandas as pd
 import sklearn.metrics as metrics
 
-from util import read_geotiff
-from analysis import get_features
+from util import read_geotiff, Image
+from feature import Feature
 from groundtruth import create_mask, create_groundtruth, reshape_image
 
 from matplotlib import pyplot as plt
@@ -23,14 +24,9 @@ from imblearn.over_sampling import SMOTE, ADASYN
 from scipy.ndimage import zoom
 from scipy.ndimage.interpolation import shift
 
+LOG = logging.getLogger(__file__)
+logging.basicConfig(level=logging.INFO)
 
-imagefiles = {
-    0: 'data/section_1.tif',
-    1: 'data/section_2.tif',
-    2: 'data/section_3.tif',
-    3: 'data/section_4.tif',
-    4: 'data/section_5.tif'
-}
 shapefile = 'data/slums_approved.shp'
 
 
@@ -80,18 +76,18 @@ class Dataset:
         self.feature_shape = None
         self._create_train_test()
 
-    def _load_features(self, image_path):
-        if os.path.exists(image_path):
-            features = get_features(image_path, self.block_size, self.scales,
-                                    self.bands, self.feature_names)
+    def _load_features(self, image):
+        if os.path.exists(image.path):
+            features = Feature(image, self.block_size, self.scales,
+                               self.bands, self.feature_names).get()
+            
             features[features == np.inf] = 0
             return features
         print("Feature does not exist")
         exit()
 
-    def _create_dataset(self, path, feature):
-        image = np.array(read_geotiff(path))
-        mask = create_mask(shapefile, path)
+    def _create_dataset(self, image, feature):
+        mask = create_mask(shapefile, image.path)
         groundtruth = create_groundtruth(mask, block_size=self.block_size,
                                          threshold=0.6)
         groundtruth = reshape_image(groundtruth, (image.shape[1],
@@ -119,9 +115,9 @@ class Dataset:
         Xtrain = np.empty((0, Xtest.shape[1]))
         ytrain = np.ravel(np.empty((0, 1)))
 
-        for path in self.train_images:
-            train_features = self._load_features(path)
-            X, y = self._create_dataset(path, train_features)
+        for image in self.train_images:
+            train_features = self._load_features(image)
+            X, y = self._create_dataset(image, train_features)
 
             Xtrain = np.concatenate((Xtrain, X), axis=0)
             ytrain = np.concatenate((ytrain, y), axis=0)
@@ -193,7 +189,6 @@ class Classify:
                               classes=['Informal', 'Formal'],
                               title='Confusion Matrix')
 
-        print("Saving confusion at: {}".format(path))
         plt.savefig(path, format='png', dpi=1200)
         plt.clf()
 
@@ -208,11 +203,10 @@ class Classify:
         prediction = zoom(prediction, self.block_size, order=0)
         # Compensate for the padding
         plt.axis('off')
-        image = np.array(read_geotiff(self.test_image))
+        image = self.test_image.RGB
         image = np.dstack((image[0], image[1], image[2]))
         plt.imshow(image)
         plt.imshow(prediction, alpha=0.5)
-        print("Saving overlay at: {}".format(path))
         plt.savefig(path, format='png', dpi=1000)
         plt.clf()
 
@@ -243,14 +237,13 @@ class Classify:
         basename = self._get_basename()
         name = "metrics_" + basename + "_" + ".csv"
         path = os.path.join(folder, name)
-        print("Saving metrics at: {}".format(path))
         metrics.to_csv(path, sep=',')
 
     def _get_basename(self):
         tr_string = ""
-        for name in self.train_images:
-            tr_string += "_" + os.path.basename(os.path.splitext(name)[0])
-        te_string = os.path.basename(os.path.splitext(self.test_image)[0])
+        for image in self.train_images:
+            tr_string += "_" + image.filename
+        te_string = self.test_image.filename
 
         sc_string = ""
         for scale in self.scales:
@@ -270,6 +263,8 @@ class Classify:
 
         Xtrain, ytrain, Xtest, ytest = self.dataset.get_dataset()
 
+        LOG.info("Classifying {}".format(self._get_basename()))
+        LOG.info("Saving results at {}".format(folder))
         for index in self.classifier_indices:
             classifier = self.classifiers[index]
             classifier.fit(Xtrain, ytrain)
@@ -281,11 +276,18 @@ class Classify:
 
 if __name__ == "__main__":
     scales_list = [[50, 100, 150]]
-    block_size_list = [20, 40, 60]
+    block_size_list = [10, 20, 40, 60]
+
+    section_1 = Image('data/section_1.tif')
+    section_2 = Image('data/section_2.tif')
+    section_3 = Image('data/section_3.tif')
+
+    test_image = section_2
+    train_images = [section_3]
 
     for block_size in block_size_list:
         for scales in scales_list:
-            dataset = Dataset([imagefiles[0], imagefiles[2]], imagefiles[1],
+            dataset = Dataset(train_images, test_image,
                               shapefile, ['hog', 'lsr', 'rid'], scales=scales,
                               block_size=block_size)
             classify = Classify(dataset)
