@@ -1,4 +1,5 @@
-
+import matplotlib
+matplotlib.use('GTK')
 import os
 import seaborn
 import logging
@@ -39,7 +40,8 @@ class Analysis:
         feature_string = Feature.get_feature_string(feature_names)
 
         foldername = "analysis/{}_{}_BK{}_{}"
-
+        
+        LOG.info("Saving feature analysis ...")
         for i, f in enumerate(features):
             featurename = "{}_{}_{}_BK{}_{}_F{}.png"
             featurefolder = foldername.format(image.filename, feature_string,
@@ -105,4 +107,4 @@ if __name__ == "__main__":
                                     scales=scales, bands=[1, 2, 3],
                                     feature_names=feature_names)
                     feature.create()
-                    # Analysis.analyze(feature, shapefile)
+                    Analysis.analyze(feature, shapefile)

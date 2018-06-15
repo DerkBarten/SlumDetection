@@ -141,13 +141,13 @@ class Feature:
     def get(self):
         if self._feature:
             return self._feature
-
-        spfeas_features = sorted(set(self._feature_names).
+       
+        spfeas_feature_names = sorted(set(self._feature_names).
                                  intersection(['hog', 'lsr']))
-        rid_feature = sorted(set(self._feature_names).intersection(['rid']))
+        rid_feature_name = sorted(set(self._feature_names).intersection(['rid']))
 
-        if spfeas_features:
-            folder = self.__get_folder_name(feature_names=spfeas_features)
+        if spfeas_feature_names:
+            folder = self.__get_folder_name(feature_names=spfeas_feature_names)
             feature_path = self.__get_feature_from_folder(folder)
             if feature_path is None:
                 err = "Cannot find specified feature folder: {}".format(folder)
@@ -155,8 +155,8 @@ class Feature:
 
             spfeas_features = np.array(read_geotiff(feature_path))
 
-        if rid_feature:
-            folder = self.__get_folder_name(feature_names=rid_feature,
+        if rid_feature_name:
+            folder = self.__get_folder_name(feature_names=rid_feature_name,
                                             scales=[max(self._scales)])
             feature_path = self.__get_feature_from_folder(folder)
 
@@ -173,13 +173,12 @@ class Feature:
                                         self._block_size, max(self._scales))
 
 
-
         if len(spfeas_features) > 0 and len(rid_feature) > 0:
             self._feature = np.concatenate((spfeas_features, rid_feature),
                                            axis=0)
-        elif len(spfeas_features) > 0:
+        elif len(spfeas_feature_names) > 0:
             self._feature = spfeas_features
-        elif len(rid_feature) > 0:
+        elif len(rid_feature_name) > 0:
             self._feature = rid_feature
         return self._feature
 
