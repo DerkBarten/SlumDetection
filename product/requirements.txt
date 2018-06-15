@@ -9,5 +9,4 @@ rasterio==0.36.0
 scipy==1.0.0
 gdal==2.3.0
 imblearn==0.0
-skimage==0.0
 scikit_learn==0.19.1

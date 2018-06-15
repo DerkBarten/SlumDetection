@@ -354,12 +354,12 @@ class RoadIntersectionDensity:
                                     scaled_block_size)),
                                 int(math.floor(float(width) /
                                     scaled_block_size))))
-
+        
         for point in points:
             h = int(point[0] / scaled_block_size)
             w = int(point[1] / scaled_block_size)
-
-            if point[0] < height and point[1] < width:
+            
+            if h < density_map.shape[0] and w < density_map.shape[1]:
                 density_map[h, w] += 1
         return density_map
 
