@@ -129,7 +129,7 @@ class Dataset:
         scaler = StandardScaler().fit(Xtrain)
         Xtrain = scaler.transform(Xtrain)
         Xtest = scaler.transform(Xtest)
-        
+
 
         Xtrain, ytrain = shuffle(Xtrain, ytrain)
         Xtrain, ytrain = SMOTE().fit_sample(Xtrain, ytrain)
@@ -212,7 +212,6 @@ class Classify:
         #image = np.dstack((image[0], image[1], image[2]))
         plt.imshow(image)
         plt.imshow(prediction, alpha=0.5)
-        plt.show()
         LOG.info("Saving overlay as: {}".format(path))
         plt.savefig(path, format='png', dpi=1000)
         plt.clf()
@@ -287,7 +286,7 @@ class Classify:
 
 if __name__ == "__main__":
     scales_list = [[50, 100, 150]]
-    block_size_list = [20]
+    block_size_list = [20, 40, 60]
 
     section_1 = Image('data/section_1.tif')
     section_2 = Image('data/section_2.tif')
@@ -299,7 +298,7 @@ if __name__ == "__main__":
     for block_size in block_size_list:
         for scales in scales_list:
             dataset = Dataset(train_images, test_image,
-                              shapefile, ['hog','lsr'], scales=scales,
+                              shapefile, ['hog','lsr', 'rid'], scales=scales,
                               block_size=block_size)
             classify = Classify(dataset)
             classify.classify()
