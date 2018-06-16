@@ -1,6 +1,7 @@
 \section{Results}
 % prec:0.154787009701     f1:0.179024390244       jac:0.0983123493169
 
+
 We performed experiments to evaluate the performance of the feature classification. The experimental setup described in the previous section shows that we have many parameters that could influence the classification performance. We will therefore first show results for a certain set of parameters that performed well. In the further sections, we explore the effects of different parameters, such as different feature sets, classification algorithms, and test images.
 
 %In this case, the classifiers were trained on section two and three and tested on section one. Furthermore, these results were obtained using synthetic oversampling using the SMOTE method.
@@ -65,12 +66,16 @@ Figure \ref{fig:res_best} shows the most best classification we could achieve us
 	\label{fig:res_bar_0}
 \end{figure}
 
-The bar plot in Figure \ref{fig:res_bar_0} show the classification performance for the four feature sets on the three sections. To reduce complexity, we only display the results of the classifier with the highest performance instead of all classifiers. Furthermore, we only display Matthews Coefficient because, in many experiments, both values would be very similar.
-It seems that HoG performs well for all three sections. LSR is more variable between the three sections. In the second section, LSR is close to HoG in performance, but in section three, it really underperformed. RID seems reasonable in the first section but it has very low performance for the other two sections. The combination of all features seems to perform well, although it is not better than HoG in any section.
+
+Since we use combinations of sections and features, the performance might be different for different combinations. To gain insight in the influence of the features and sections on performance, we display the classification performance of all combinations of test images and features in Figure \ref{fig:res_bar_0}. To reduce the complexity of the bar plot, we only display the results of the classifier with the highest performance and use Matthews Coefficient as the sole metric.
+
+%Furthermore to reduce complexity, we only display Matthews Coefficient as we have observed that both metrics provide often similar values, therefore reducing the need to explicitly use the two metrics of performance.
 
 \subsection{Classifier Performance}
 
-Although Figure \ref{fig:res_bar_0} shows the maximum performance of the features, it does not display the individual performance of the classifiers. We therefore compare the classification algorithms side by side to gain more insight in the performance differences of the classification algorithms. This comparison is displayed in Figure \ref{fig:res_bar_1}. The bar plot displays the maximum performance that a classifier has obtained for any feature set or test image. To measure performance, we used the maximum of Matthews Coefficient and the F1-Score. It turned out that, for all classifiers, the set of parameters that produced the maximum of Matthews Coefficient was the same set of parameters with the maximum F1-score. That the measurements by two different algorithms is similar suggests that the measure of performance is consistent.
+Although Figure \ref{fig:res_bar_0} shows the maximum performance of the features, it does not display the performance of the individual classifiers. We therefore compare the classification algorithms side by side to gain more insight in the performance differences between the classification algorithms, which is displayed in Figure \ref{fig:res_bar_1}. The performance was measured used the maximum of Matthews Coefficient and the F1-Score the classifier had achieved for any test image or feature. It turned out that, for all classifiers, the set of parameters that produced the maximum of Matthews Coefficient was the same set of parameters for the maximum F1-score. This seems to suggest that two measures of performance are consistent with each other.
+
+ % The bar plot displays the maximum performance that a classifier has obtained for any feature set and test image. 
 
 \pgfplotstableread[col sep = comma]{results/classifiers.csv}\dataone
 
@@ -105,11 +110,10 @@ Although Figure \ref{fig:res_bar_0} shows the maximum performance of the feature
 	\label{fig:res_bar_1}
 \end{figure}
 
-Figure \ref{fig:res_bar_1} shows that Gradient Boosting was able to produce the best results. The Decision Tree and Random Forrest had the lowest maximum performance. Because this is the maximum performance it does not necessarily follow that this level of performance is also achieved for other parameters as well. We will not investigate the difference in performance between classification algorithm for certain data and parameters any further since this is out of the scope of our thesis.
 
 \subsection{Effect of different Scales}
 
-As we have discussed in the feature evaluation, we suspect increased scale to have a positive effect on the classification performance of the features. In this experiment, the only variable is the different scales. The all other parameters are fixed. We use a single feature set containing all features and section 2 as the test image. This setup was chosen because it has shown to produced good results in the previous experiments, as displayed in Figure \ref{fig:res_bar_0}. The Matthews coefficient on the y axis is scaled up to display the difference in performance more clearly.
+As we have discussed in the feature evaluation, we suspect increased scale to have a positive effect on the classification performance of the features. In this experiment, the only variable is a different scale. The other constant parameters are: section 2 as the test image, a block size of 20 and all. This set of parameters was chosen because it has shown to produced good results in the previous experiment, as displayed in Figure \ref{fig:res_bar_0}. 
 
 \begin{figure}
 	\centering
@@ -171,20 +175,97 @@ As we have discussed in the feature evaluation, we suspect increased scale to ha
 	
 	\end{axis}
 	\end{tikzpicture}
-	\caption{Effects of increased scale for all features on Section 2 as test image}
+	\caption{Effects of scale on classification performance}
 	\label{fig:res_plot_0}
 \end{figure}
 
 The results in Figure \ref{fig:res_plot_0} seem to indicate that increased scale does not necessarily results in improved performance. However, the same experiment, run with Section 1 as test image, did see a slight improvement of performance.
 
 \subsection{Effect of different Block sizes}
-% TODO: do on section 1, 2, 3 for scales (50, 100, 150) for (all featatures)
+In the feature evaluation section, we observed that increased block size did seem to influence the difference between the formal and informal value distributions. Being able to use a large block size while maintaining similar results is highly preferable to a small block size as the computational cost increases squared for a linear decrease in block size. We will evaluate if our observation from the feature evaluation translates to constant performance with a decreasing computational load. Besides the block sizes used in the evaluation section, we also run the experiment with a block size of 10, to discover if this might improve performance. The experiment uses the constant parameters: section 2 as test image, all three features, and the scales 50, 100 and 150. The variable parameter in this experiment is the block size, which will be tested on performance for the values 10, 20, 40 and 60.
 
 
+\pgfplotstableread[col sep = comma]{results/block_size.csv}\datatwo
 
+\begin{figure}
+	\begin{tikzpicture}
+	\begin{axis}[
+	%ybar,
+	%bar width=.5cm,
+	width=\textwidth,
+	height=.5\textwidth,
+	ymajorgrids = true,
+	legend pos = north west,
+	ylabel={Matthews Coefficient},
+	symbolic x coords={10, 20, 40, 60},
+	xtick=data,
+	xlabel={Block Size},
+	yticklabel style={
+		/pgf/number format/fixed,
+		/pgf/number format/precision=2,
+		/pgf/number format/fixed zerofill
+	},
+	scaled y ticks=false,
+	legend columns=5, 
+	legend style={
+		/tikz/column 2/.style={
+			column sep=5pt,
+		},
+		at={(0.0, -0.17)},
+	}
+	]
+	\addplot table[x=Block Size, y=DecisionTreeClassifier]{\datatwo};
+	\addplot table[x=Block Size, y=RandomForestClassifier]{\datatwo};
+	\addplot table[x=Block Size, y=MLPClassifier]{\datatwo};
+	\addplot table[x=Block Size, y=AdaBoostClassifier]{\datatwo};
+	\addplot table[x=Block Size, y=GradientBoostingClassifier]{\datatwo};
+
+	\legend{DecisionTree, RandomForest, MLP, AdaBoost, GradientBoost}
+	\end{axis}
+	
+	\end{tikzpicture}
+	\caption{The effects of the block size on classification performance}
+	\label{fig:res_bar_2}
+\end{figure}
+
+The results of the experiment are displayed in Figure \ref{fig:res_bar_2}. As we have hypothesized, increasing the block size generally does not seem to reduce performance. A block size of 10 seems to perform quite poorly for all classifiers, except for the decision tree, which has fairly constant performance for all tested block sizes.
 
 \subsection{Effects of oversampling}
-As hinted earlier, oversampling is an important part in classification. Without oversampling, the classifiers are likely to produce trivial results. Oversampling is a common method to balance a dataset. In this section, we evaluate three different oversampling methods. These are random oversampling, SMOTE and ADASYN. The first method randomly picks entries of the minority class and copies these. The last two methods create new synthetic examples that suit the data well.
+As hinted earlier, oversampling can be an important part in classification because the classifiers are likely to produce trivial results otherwise. Oversampling is a common method to balance a dataset, although there are various different approaches for oversampling. In this experiment, we compare three different oversampling methods to the performance achieved without oversampling. These three methods are: random oversampling, SMOTE and ADASYN. The first method randomly picks entries of the minority class and copies these. The last two methods create new synthetic examples based on the members of the minorty class.
 %TODO: extend
 
+
+\pgfplotstableread[col sep = comma]{results/oversampling.csv}\datathree
+
+\begin{figure}
+	\begin{tikzpicture}
+	\begin{axis}[
+	ybar,
+	bar width=.5cm,
+	width=\textwidth,
+	height=.5\textwidth,
+	ymajorgrids = true,
+	legend pos = north west,
+	ylabel= Maximum Performance,
+	symbolic x coords={Nothing, Random, ADASYN, SMOTE},
+	xtick=data,
+	yticklabel style={
+		/pgf/number format/fixed,
+		/pgf/number format/precision=2,
+		/pgf/number format/fixed zerofill
+	},
+	scaled y ticks=false,
+	]
+	\addplot table[x=Methods,y=F1-Score]{\datathree};
+	\addplot table[x=Methods,y=Matthews]{\datathree};
+	
+	\legend{F1-Score, Matthews Coefficient}
+	\end{axis}
+	
+	\end{tikzpicture}
+	\caption{The effect of oversampling on classification performance}
+	\label{fig:res_bar_3}
+\end{figure}
+
+Regarding the results in Figure \ref{fig:res_bar_3}, it seems that any oversampling methods increases the performance significantly. Furthermore, there does not seems te be a large difference between the methods.
 

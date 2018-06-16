@@ -2,9 +2,22 @@
 % road intersection density:
 % do not know if it didnt work because not all intersections detected or if the hypothesis is just wrong.
 % The slums are too few and way too small with these approaches
+% Will be combined with other sets of features (max)
+
+
+% Compare to other research, CRITICIZE Graesser :p
 
 % Why test image 2 works best?
 
+
+
+
+
+% Features & Sections
+It seems that HoG performs well for all three sections. LSR is more variable between the three sections. In the second section, LSR is close to HoG in performance, but in section three, it really underperformed. RID seems reasonable in the first section but it has very low performance for the other two sections. The combination of all features seems to perform well, although it is not better than HoG in any section.
+
+% classifier performance
+Figure \ref{fig:res_bar_1} shows that Gradient Boosting was able to produce the best results. The Decision Tree and Random Forrest had the lowest maximum performance. Because this is the maximum performance it does not necessarily follow that this level of performance is also achieved for other parameters as well. We will not investigate the difference in performance between classification algorithm for certain data and parameters any further since this is out of the scope of our thesis.
 
 
 Besides that, it is hard to evaluate if the hypothesis for slum detection is correct. This is because we do not know if the hypothesis is false or if the intersection extraction does not produce correct intersections. This is why it is important to have a ground truth of the intersections in the image because this allows to conclude with reasonable certainty if this approach method for slum detection is valid.

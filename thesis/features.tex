@@ -1,71 +1,25 @@
 \section{Conventional Feature Extraction Methods}
-Studies often use a combination of features in the detection of informal settlements. Our research will use methods for feature extraction that performed well in previous research \cite{graesser2012image}. The methods we use are the Histogram of Oriented Gradients (HoG) and Line Support Region (LSR) features. Both HoG and LSR are already implemented in a Python library. This library, called spfeas, that is based on the research Graesser \textit{et al.} conducted on the classification of formal and informal neighborhoods \cite{graesser2012image}. Besides these two features we design a new method that measures the difference 
-in prevalence and distribution of road intersections between formal and informal areas. This is based on the belief that there is a difference in this aspect between formal and informal areas.
+Researchers in this field of study often use a combination of features in the detection of informal settlements. Our research uses features that performed well in previous research. The use two methods for extracting features from the satellite images; these are the Histogram of Oriented Gradients (HoG) and Line Support Region (LSR) features. Both HoG and LSR are implemented in a Python library, called spfeas, which is based on the research of Graesser \textit{et al.} \cite{graesser2012image}. Along side these features, we design a new feature that is based on the difference 
+in distribution of road intersections between formal and informal areas. This is based on the belief that there is an observable difference between formal and informal areas in this aspect.
 
 \subsection{Terminology}
-The paper of Graesser \textit{et al.} \cite{graesser2012image} uses blocks of pixels instead of each individual pixel when extracting features from images.  This is to ease the computational load because the extraction methods used are
-computationally quite expensive, especially LSR. These blocks of pixels are of 20 by
-20 pixels in the paper. The size of these pixel blocks is referred to as the \textit{block size}. In our research, the block size will differ from
-this value to evaluate the affect to the performance of the features.
-In addition to blocks, the paper also uses a set of different scales for the
-calculation of features. A scale specifies the pixels around a block that
-are used for the calculation of that block. This allows blocks to be
-spatially connected to the surrounding areas, which can increase the
-performance of features.
+The paper of Graesser \textit{et al.} divides the image in small blocks instead of pixels when extracting features from the satellite images. The features are calculated for each block of pixels instead of each pixel itself, which significantly lowers the computational load as the extraction methods can be computationally quite expensive. The dimensions of the blocks are referred to as the \textit{block size},  which is 20 by 20 pixels in the paper of Graesser \textit{et al.}. In our research, various block sizes will evaluated for the effect on the classification performance.
+Besides \textit{block size} , another important parameter in the paper is the \textit{scale} of a feature. The \textit{scale} specifies the pixels surrounding the block that should be included in the calculation of the feature, allowing blocks to be
+spatially connected to the surrounding areas, which may increase performance.
 
 \subsection{Histogram of Oriented Gradients}
-% designed for only settlement detection
-% as supporting feature
-% theory part
-% however, Graesser does work for differentiating
-% picture for explaination?
 
+Although the pattent application describing the Histogram of Oriented Gradients was submitted in 1986, the approach only became popular in 2005, after a paper used this method to detect humans on images \cite{dalal2005histograms}. The Histogram of Oriented gradients creates a histogram for every block in the image, were the histogram contains the gradient orientation of the pixels in the block and surrounding area, as determined by the scale and block size parameter. In case of the detection of humans, for example, the visual visual differences between humans and the background manifests itself in the gradient orientations of the image, which the Histogram of Oriented Gradients is able to capture. The difference in gradient orientation therefore enables objects with distinct visual characteristics, such as humans, to be detected from images.
 
-The Histogram of Oriented Gradients was originally used for the detection of
-man-made structures in images. The features retrieved from the histogram were
-able to differentiate between natural and man-made sections in an image. This
-approach of man-made structure detection relies on the difference in the
-distrubution of gradients in a particular region of the image. Because man-made
-structures are often consists of straight lines and regular forms, this
-contrasts the irregular forms that are naturally formed. This difference in
-appearance translates to a difference in the distribution of gradients in
-man-made structures and nature.
+Beyond the detection of humans, a paper from 2003 showed that this approach can also be used to detect man made structures in photographs \cite{kumar2003man}, which used images of buildings surrounded by vegetation. The Histogram of Oriented Gradients method described in the paper of Graesser \textit{et al.} is based on this paper, although they used satellite images instead of regular photographs from nature. As in the method for the detection of humans with the Histogram of Oriented Gradients, the paper from Graesser \textit{et al.} captures characteristics of a certain class, which are, in this case, the characteristics of informal neighborhoods. In case of slums, these characteristics are the diverse orientations of gradients in a slum area due to diverse building orientations compared to formal structures. In contrast to slums, formal buildings are often placed in a regular pattern with consistent orientation.
 
-In satellite images, the difference of the Histogram of Oriented Gradients
-between nature and human settlements is quite large. Eventhough HoG was
-originallly used for differentiating between nature and man-made structures,
-the paper of Graesser et al was able to succesfully to use HoG between formal
-and informal neighborhoods. The paper uses the disparate spatial distribution of
-buildings in formal and informal regions. The
-placement of houses in formal regions are often placed in a regular pattern
-with fixed orientations. Informal areas, in contrast, are usually constructed
-without a design or regular pattern. This difference in regularity is
-a characteristic that can be used for classification of formal or informal
-settlements.
+Graesser \textit{et al} extracts five features from the Histogram of Oriented Gradients: first and second order of the heaved central shift moment, variance, skew, and kurtosis. These properties of the histogram are used as features to describe the histogram. These 5 features are calculated for every color band of the rgb image, resulting in a total of 15 features for the Histogram of Gradients. According to the results presented in the paper, these 15 features could produce an accuracy of 65 to 75 percent, although it must be noted that this feature was applied to specific regions where the visual difference between formal and informal was substantial. Furthermore, the morphology of the slums in their area of study is different that the slums in Bangalore.
 
-The order of regularity of an area can be captured using the number of
-orientations in which buildings are constructed. Few distinct orientations suggest
-a formal settlements while many orientations suggest informal. The orientations
-of buildings are calculated using the gradients returned by the application of
-a binary filter on the image. The gradients are quantized into a set of
-orientations or bins. This results in a histogram commonly named the Histogram
-of Oriented Gradients. High peaks in the HoG correspond to a multitude of
-similar gradients, thus uniformity in the image. Since uniformity is linked
-to formal settlements, high peaks in the histogram correlate with formal
-settlements. The informal settlements, on the other hand, are characterized by
-the absence of peaks in the HoG due to the multitude of different gradients
-caused by the irregular placement of buildings.
-
-Applied in practice, the paper from Graesser et al extracts five
-characteristics from the HoG: two types of mean, variance, skew, and
-kurtosis. These properties of the histogram are used as features to
-describe the histogram and differentiate between formal and informal regions.
-These 5 features will be calculated for every color band of the image,
-resulting in a grand total of 15 features for the Histogram of Gradients.
-According to the results presented in the paper, these 15 features alone could
-result in an accuracy of 65 to 75 percent. It must be noted, however, that this feature was applied to specific regions where the visual difference between formal and informal was substantial, which is often not the case.
 
 \subsection{Line Support Region Features}
+
+The line support regions method was originally used for the detection of straight lines in photographs \cite{burns1986extracting}. As with the Histogram of Oriented Gradients, this method used gradient orientation to characterize parts in the image, in this case, straight lines. This approach groups pixels together with similar gradient orientation based on the fact that straight lines are in essence regions of pixels with identical gradients. 
+
 
 The formality of regions can be for a part be determined by observing the
 spatial distribution of neighborhoods. In the same manner as HoG characterized
