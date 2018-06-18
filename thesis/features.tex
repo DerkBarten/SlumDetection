@@ -18,23 +18,22 @@ Graesser \textit{et al} extracts five features from the Histogram of Oriented Gr
 
 \subsection{Line Support Region Features}
 
-The line support regions method was originally used for the detection of straight lines in photographs \cite{burns1986extracting}. As with the Histogram of Oriented Gradients, this method used gradient orientation to characterize parts in the image, in this case, straight lines. This approach groups pixels together with similar gradient orientation based on the fact that straight lines are in essence regions of pixels with identical gradients. 
+The Line Support Regions method was originally used for the detection of straight lines in photographs \cite{burns1986extracting}. As with the Histogram of Oriented Gradients, this method is a spatial feature and uses gradient orientation to characterize parts in the image, in this case, straight lines. This approach groups pixels together with similar gradient orientation based on the fact that straight lines are in essence regions of pixels with identical gradients. 
+
+This approach was shown to be suited for land use classification \cite{unsalan2004classifying} \cite{unsalan2006gradient}, and has been used in slum and informal region detection since \cite{graesser2012image} \cite{accra} \cite{colombo}. LSR characterizes neighborhoods in the their lines, which often correspond to the contours of buildings. In formal neighborhoods, these lines are often relatively long since the formal structures tend to be bigger in size than informal structures. This contrast in the properties of lines in certain regions can characterize the region as either formal or informal.
+
+As with the Histogram of Oriented Gradients, LSR is implemented in spfeas in accordance to the paper of Graesser \textit{et al.} \cite{graesser2012image}. The paper uses three statistical features extracted from the LSR, these are: line length entropy, mean, and entropy of line contrasts. Together with three color bands, this brings the total to nine features for a single scale. Using the LSR features for the scales 50, 100, and 200, the paper achieved an accuracy of 60 to 75 percent.
+
+%In the same manner as HoG characterized
+%areas by the orientation their buildings, neighborhoods, alternatively, can be
+%characterized by the size of their buildings. Informal settlements generally
+%lack the presence of large buildings in contrast with formal regions. The size
+%of constructions can be characterized using the Line Support Region (LSR)
+%features \cite{unsalan2004classifying}. Likewise to HoG, LSR utilizes gradients
+%calculated from remote sensing imagery. LSR uses the fact that straight lines
+%have uniform gradients. In practice, natural photographs hardly contain
+%perfectly straight lines, which results in similar but non uniform gradients of
+%lines. Therefore, LSR uses groups similar gradients to represent a line in
+%images to detect semi straight lines in images \cite{burns1986extracting}.
 
 
-The formality of regions can be for a part be determined by observing the
-spatial distribution of neighborhoods. In the same manner as HoG characterized
-areas by the orientation their buildings, neighborhoods, alternatively, can be
-characterized by the size of their buildings. Informal settlements generally
-lack the presence of large buildings in contrast with formal regions. The size
-of constructions can be characterized using the Line Support Region (LSR)
-features \cite{unsalan2004classifying}. Likewise to HoG, LSR utilizes gradients
-calculated from remote sensing imagery. LSR uses the fact that straight lines
-have uniform gradients. In practice, natural photographs hardly contain
-perfectly straight lines, which results in similar but non uniform gradients of
-lines. Therefore, LSR uses groups similar gradients to represent a line in
-images to detect semi straight lines in images \cite{burns1986extracting}.
-
-The LSR is implemented in spfeas in accordance to the paper of Graesser \textit{et al.} \cite{graesser2012image}. The paper uses three statistical features extracted
-from the LSR, these are: line length entropy, mean, and entropy of line
-contrasts. Together with three color bands, this brings the total to nine
-features for a single scale. Using only LSR features and scales 50, 100, and 200, the paper achieved an accuracy of 60 to 75 percent.
