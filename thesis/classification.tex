@@ -24,12 +24,9 @@ These feature sets are: LSR, HoG, RID combined in a single set, together with th
 Besides discovering the effects of test image and features of performance, we will also evaluate the impact of scale and block size on the classification performance. In these two experiments, the only variable is the scale and block size, which allows us to conclude about the impact of these parameters on the performance. In all other experiments, the scale and block size will have a constant value, which is displayed in Figure \ref{fig:params}.
 
 
-% TODO: balanced dataset here instead of oversampling
-As explained in the data preparation section, oversampling is an important aspect for the performance of classification algorithms. In all experiments described above, we use a single oversampling method that we observed performed well, although we have not thoroughly explored the impact on the performance. We will therefore create a separate experiment to discover the effects of various oversampling methods on the classification performance. 
-%
-%Similarly to the scales parameter, we will conduct a separate experiment to discover the effects of different data balancing methods.
+As explained in the data preparation section, using a balanced dataset is essential for the performance of classification algorithms. In the experiments described above, we use the SMOTE oversampling method to balance the dataset. The SMOTE method performed well although other oversampling options were not thoroughly explored. We therefore create a separate experiment to discover the effects of various oversampling methods on the classification performance and compare this to the performance without oversampling. 
 
-Lastly, to reduce the impact of randomness from the classifiers, we run the experiment 5 times and use the mean of the experiments. summarizes the most important parameters of the experiments. We will explicitly state when different parameters are used.
+Lastly, to reduce the impact of randomness from the classifiers, the measured performance is the mean of five repeats of the experiments.
 
 \begin{figure}
 	\centering

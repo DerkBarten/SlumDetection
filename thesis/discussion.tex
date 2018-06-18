@@ -1,7 +1,40 @@
 \section{Discussion}
+We have shown that with our approach, we are able to detect slums from satellite images to a certain extend. Eventhough the performance seems low, the result displayed in \ref{fig:res_best} is far from random noise and it certainly detects a large number of slums. As the confusion plot shows, there are a significant number of false positives and false negatives. We will discuss the possible causes of this performance in the next parts.
+
+% sections and features
+In the evaluation section, SLR seemed to be more distinct than HoG, however, HoG seems to perform better in classification. Furthermore, in the evaluation section, section 1 seemed to perform best, however, in classification, section 2 is the highest performing section. The performance of RID was as expected from the feature evaluation, quite poorly. It seems that for the other two features, it does not nececcarily mean that a better distinction is better performant. However, the number of features could also play a role in this since HoG has about twice as many features as LSR, which might lead us to believe that in this case, quantity better than quality. Perhaps this counts for the RID as well since this has only a single feature. 
+
+As we have discussed, the performance of RID depends a lot of specific parameters that are used. These parameters could be different even within the same image, as we observed with the different sections. Therefore, this approach might not be suitable for use on large scale images, since it heavily depends on local road structures. This might be one of the reason why this feature is lacking in performance, compared to the other two features. The tweaking of parameters might not be worth the effort.
+
+We have experimented with different classification algorithms because it is not apparent which algorithm is best performant for our data. This showed some insight in what classifiers worked well with our data. Just to illustrate, what i mean with suit the data. Various algortithms might handle high dimensional data well while others are optimized for lower dimensional data, the same goes for class imbalance. Conclusively, some classifiers are higher performant than other classifiers for certain data. Besides, there is a diffrence in complexity as well. For instance, decision trees have a low complexity to ensamble learners such as AdaBoost or Gradient Boost, which might not capture complex relationships in the data as well as the other learners. In our case, Gradient Boost seems to be the highest performent, although there might still be room for improvement. We have only used the default parameters for the classification algorithms, an extra tweaking of the parameters to fit our dataset better might improve performance somewhat more.
+
+
+
+
+In our reference study from Graesser et al, the performance is measured in accuracy. As we have discussed, in our case, accuracy is a poor measure for performance due to large class differences in our dataset. However, in general, studies in this field express their results using accuracy, which makes it is hard to fairly compare their results to ours.
+
+
+
+% FEATURES
+% SECTIONS: Only used small sections though
+% The slums are too few and way too small with these approaches
+
 % road intersection density:
 % do not know if it didnt work because not all intersections detected or if the hypothesis is just wrong.
-% The slums are too few and way too small with these approaches
+
+
+% discuss matthews coefficient as correct measure
+In case of a perfect match between groundtruth and prediction, the matthews coefficient would be one. 
+
+
+
+
+%the data
+As we have mentioned in the challenges section, there are multiple factors which introduce noise to the dataset, such as missmatches between groundtruth and satellite images and the inclusion of non slum areas as slum. It could be that a part of the mismatches in the classification is caused by this noise. Furthermore, eventhough oversampling was used, the high class imbalance might potential performance as well
+%TODO only 2 classes
+
+
+
 % Will be combined with other sets of features (max)
 
 
@@ -11,13 +44,12 @@
 
 
 
-
-
-% Features & Sections
-It seems that HoG performs well for all three sections. LSR is more variable between the three sections. In the second section, LSR is close to HoG in performance, but in section three, it really underperformed. RID seems reasonable in the first section but it has very low performance for the other two sections. The combination of all features seems to perform well, although it is not better than HoG in any section.
+% strange hog is better
 
 % classifier performance
-Figure \ref{fig:res_bar_1} shows that Gradient Boosting was able to produce the best results. The Decision Tree and Random Forrest had the lowest maximum performance. Because this is the maximum performance it does not necessarily follow that this level of performance is also achieved for other parameters as well. We will not investigate the difference in performance between classification algorithm for certain data and parameters any further since this is out of the scope of our thesis.
 
 
-Besides that, it is hard to evaluate if the hypothesis for slum detection is correct. This is because we do not know if the hypothesis is false or if the intersection extraction does not produce correct intersections. This is why it is important to have a ground truth of the intersections in the image because this allows to conclude with reasonable certainty if this approach method for slum detection is valid.
+
+
+
+%Besides that, it is hard to evaluate if the hypothesis for slum detection is correct. This is because we do not know if the hypothesis is false or if the intersection extraction does not produce correct intersections. This is why it is important to have a ground truth of the intersections in the image because this allows to conclude with reasonable certainty if this approach method for slum detection is valid.
