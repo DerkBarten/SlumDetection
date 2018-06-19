@@ -1,164 +1,95 @@
 
 \section{Feature Evaluation}
 
-The success on classification depends on the predictive value of the features. For that reason it is necessary asses whether a feature is useful in the discrimination between the formal and informal classes. The evaluation requires the satellite image to be divided into the formal and informal classes. This division is represented using a ground truth; this is a mask covering the satellite image indicating where the informal areas are located.
+Successful classification largely depends on the predictive value of the features, which is why we evaluate whether a feature is will be useful in the discrimination between the formal and informal classes. The evaluation requires the satellite image to be divided into the formal and informal classes. This division is represented using a ground truth, which is a mask covering the satellite image the location of informal areas. The mask is used to divide each block of pixels into the two classes: either formal or informal. Each block contains a vector of features, characterizing that particular block of pixels. All blocks of the same class will be grouped together, allowing for the analysis of the distribution values of the two classes. If the distribution of the values of a certain feature varies substantially between the two classes, it should be a suitable candidate for classification.
 
-The mask is used to divide each block of pixels into the two classes: formal or
-informal. Each block contains a vector of features, characterizing that particular
-block. When blocks of the same class are grouped together, the values of the features
-of the same class are grouped together. This allows for the analysis of the distribution of the features in both classes. If the distribution of the values of a certain feature varies substantially between the two classes, this indicates as a suitable candidate for classification.
+The ground truth mask is constructed using a vector file containing the boundaries of informal areas. The boundary file is rasterized and applied on top of the satellite image, creating a mask of the location of the informal areas. Because the feature calculation is performed on blocks instead of pixels, we therefore transform the pixel based mask into a block based mask. In this new block based mask, every pixel represents a block of pixels in the original image. The pixels with the value zero represent formal blocks of pixels while ones represent informal blocks of pixels.
 
-The groundtruth mask is constructed using a vector file containing the
-boundaries of informal areas. The boundary file is rasterized and applied on
-top of the satellite image, creating a mask of the location of the informal
-areas. In our case, classification and feature calculation is performed on
-blocks instead of pixels. Therefore, the pixel based mask is transformed into a block based
-mask. In this new block based mask, every pixel represents a block of pixels. In this mask pixels with the value zero represent formal blocks of pixels. Ones represent informal blocks of pixels. This effectively creates a ground truth of the informal areas in the satellite image.  
+We visualize the predictive value the features using a boxplot and a kernel density estimation plot. When a feature is distinctive, the distribution of the values in the two classes will be different, thus creating a visual difference in both plots. We attempted to use KL divergence as an objective measurement as an alternative for the visual inclined box plot and kernel density estimation. However, we were not able to extract reasonable KL divergence values from our data as for many outcomes would indicate a divergence of infinite value. We will therefore visually evaluate the differences between the formal and informal value distributions in the two types of plots.
 
-We visualize the predictive value of a feature can be visualized using a boxplot of the two
-classes. When a feature is distinctive on its own, the distribution of the values in the two classes will be different. The data used for the evaluation comes from three small sections of the image. As priorly mentioned, this creates a more even division of classes which should provide a more accurate evaluation of the selected feature. We attempted to use KL divergence as an objective measurement as an alternative for the visual inclined box plot and kernel density estimation. However, we were not able to extract reasonable KL divergence values from our data, since for many outcomes would point to a divergence of infinite value. We will therefore visually evaluate the differences between the formal and informal value distributions.
+The features will be calculated for all combinations of image sections, color bands, block sizes, and scales. This resulted in large amounts of data, of which only a selection will be shown in the following sections. For HoG, LSR and RID the features are extracted from the three sections presented in Figure
+\ref{fig:sections} for all three color bands. To analyze the impact of the block size and scale parameters, the block sizes 20, 40 and 60 will be used in combination with the scales 50, 100, 150. The individual
+impact of each of the two parameters, is evaluated by the use of a comparison between the baseline and the increased parameter. This is, for example, a comparison between the results obtained from a block size of 20 compared to a block size of 60, with all other parameters constant. This is on the assumption that all parameters are independent from all other parameters.
 
-% TODO: make sure numbers here are valid
-The features will be calculated for all combinations of image sections, color
-bands, block sizes, and scales. This resulted in large amounts of data, of
-which only a selection will be shown in the following sections. For HoG, LSR and RID the features are extracted from the three sections presented in Figure
-\ref{fig:sections} on all the three color bands. To analyze the impact of the
-block size and scale parameters, block sizes 20, 40 and 60 will be used in
-combination with scales 50, 100, 150 and 200. The block sizes will be combined
-together with the scales, resulting in a large number of combinations of
-parameters.  Some combinations, however, are not valid, e.g when the scale is
-smaller than the block size, and will therefore be omitted. The individual
-impact of each of the two parameters, is evaluated by the use of a comparison
-between the baseline and the increased parameter. This is, for example,
-a comparison between the results obtained from a block size of 20 compared to
-a block size of 60, with all other parameters constant. 
-
-Because every combination of image section, block size and scale will have
-three different results due to the RGB color bands, we refrain from visualizing
-all bands and pick the first band, which is red. The results do actually vary
-a bit between the red, green, and blue band, but it is not significant enough
-to explicitly visualize all three versions of the same result. Furthermore, only
-a single feature for each extraction method is shown to reduce the number of
-plots. This feature will be the most expressive feature of the feature extraction method.
+Because every combination of image section, block size and scale will have three different results due to the RGB color bands, we refrain from visualizing all bands and pick the first band, which is red. The results seem to vary slightly between the red, green, and blue band, although it is not significant. Furthermore, we will select the most expressive feature for each extraction method to reduce the complexity of the visualization.
 
 \subsection{Histogram of Oriented Gradients}
 
 \begin{figure}
 \centering
 \begin{tabular}{cc}
-  \subfloat{\includegraphics[width=5cm]{images/HoG/inc_bk/section_1_boxplot_hog_BK20_SC100_F2}}&
-  \subfloat{\includegraphics[width=5cm]{images/HoG/inc_bk/section_1_boxplot_hog_BK60_SC100_F2}}\\ 
-  \subfloat{\includegraphics[width=5cm]{images/HoG/inc_bk/section_1_kde_hog_BK20_SC100_F2}}&
-  \subfloat{\includegraphics[width=5cm]{images/HoG/inc_bk/section_1_kde_hog_BK60_SC100_F2}}
+  \subfloat{\includegraphics[width=7cm]{images/HoG/inc_bk/section_1_boxplot_hog_BK20_SC100_F2}}&
+  \subfloat{\includegraphics[width=7cm]{images/HoG/inc_bk/section_1_boxplot_hog_BK60_SC100_F2}}\\ 
+  \subfloat{\includegraphics[width=7cm]{images/HoG/inc_bk/section_1_kde_hog_BK20_SC100_F2}}&
+  \subfloat{\includegraphics[width=7cm]{images/HoG/inc_bk/section_1_kde_hog_BK60_SC100_F2}}
 \end{tabular}
 \caption{The effect of increased block size on the HoG features. From left to
 right: a block size of 20 and 60 respectively.}
 \label{hog_inc_bk}
 \end{figure}
 
-For the HoG, the third feature is selected for visualization in this section.
-This feature best illustrated the difference in distribution. Figure
-\ref{hog_inc_bk} shows the effect of an increased block size on the
-distribution of values in both classes. This example uses a constant scale of
-100 pixels and a variable block size of 20 and 60 pixels. The experiment with
-a block size of 40 is performed as well, but is omitted from the figure to keep
-the results brief. A more comprehensive visualization of the evaluation can be
-found in the appendix. It seems that the block size, in this case, does not
-influence the both distributions significantly. As a result an increase in the
-size of a block should have little to no influence on the predictive value of
-the feature.
+For the Histogram of Oriented Gradients, the third feature is selected for visualization in this section. Figure \ref{hog_inc_bk} shows the effect of an increased block size on the distribution of values in both classes. This example uses a constant scale of 100 pixels and a variable block size of 20 and 60 pixels. It seems that the block size, in this case, does not influence the both distributions significantly. As a result an increase in the size of a block within the tested range should have little to no influence on the predictive value of the feature.
 
 \begin{figure}
 \centering
 \begin{tabular}{cc}
-  \subfloat{\includegraphics[width=5cm]{images/HoG/inc_sc/section_1_boxplot_hog_BK20_SC50_F2}}&
-  \subfloat{\includegraphics[width=5cm]{images/HoG/inc_sc/section_1_boxplot_hog_BK20_SC150_F2}}\\
-  \subfloat{\includegraphics[width=5cm]{images/HoG/inc_sc/section_1_kde_hog_BK20_SC50_F2}}&
-  \subfloat{\includegraphics[width=5cm]{images/HoG/inc_sc/section_1_kde_hog_BK20_SC150_F2}}\\
+  \subfloat{\includegraphics[width=7cm]{images/HoG/inc_sc/section_1_boxplot_hog_BK20_SC50_F2}}&
+  \subfloat{\includegraphics[width=7cm]{images/HoG/inc_sc/section_1_boxplot_hog_BK20_SC150_F2}}\\
+  \subfloat{\includegraphics[width=7cm]{images/HoG/inc_sc/section_1_kde_hog_BK20_SC50_F2}}&
+  \subfloat{\includegraphics[width=7cm]{images/HoG/inc_sc/section_1_kde_hog_BK20_SC150_F2}}\\
 \end{tabular}
 \caption{The effect of increased scale on the HoG features. From left to
 right: a scale of 50 and 150 respectively}
 \label{hog_inc_sc}
 \end{figure}
 
-Figure \ref{hog_inc_sc} illustrates the effect of increased scale on a constant
-block size. It seems to indicate that an increased scale leads to an increased
-separation of the two distribution, thus increasing the predictive value of the
-feature. Scales larger than 150 do not seem to improve the performance. In
-contrast, the performance actually seems to decrease with scales larger than
-150. Therefore, for the HoG features, the scale of 150 is used in all further
-experiments. In the paper of Graesser \textit{et al.} combined multiple scales to detect the different slums of different scales in the image. The effect of multiple scales on our image data will be discussed in the classification section.
+Figure \ref{hog_inc_sc} illustrates the effect of increased scale on a constant block size. It seems to indicate that an increased scale leads to an increased separation of the two distribution, thus increasing the predictive value of the feature. Scales larger than 150 do not seem to improve the performance. In contrast, the performance actually seems to decrease with scales larger than 150. In the paper of Graesser \textit{et al.} combined multiple scales to detect the different slums of different scales in the image. The effect of multiple scales on our image data will be discussed in the classification section.
 
 \subsection{Line Support Region}
 
-The most distinctive feature of LSR was chosen for visualization, in this case,
-the second feature. This feature is the mean, which seems to distinct the formal and informal classes quite well. The mean of the first image section is visualized in because this section
-produced the most distinct results from the three sections. Similar to the
-analysis of HoG, the increase of the block size does not influence the
-distribution of the two classes. The difference is as negligible as displayed in
-the comparison of the HoG in Figure \ref{hog_inc_bk}
-
-%\begin{figure}
-%\begin{tabular}{cc}
-%  \subfloat{\includegraphics[width=4cm]{images/LSR/inc_bk/s1/section_1_boxplot_lsr_BK20_SC100_F1}}&
-%  \subfloat{\includegraphics[width=4cm]{images/LSR/inc_bk/s1/section_1_boxplot_lsr_BK60_SC100_F1}}\\
-%  \subfloat{\includegraphics[width=4cm]{images/LSR/inc_bk/s1/section_1_kde_lsr_BK20_SC100_F1}}&
-%  \subfloat{\includegraphics[width=4cm]{images/LSR/inc_bk/s1/section_1_kde_lsr_BK60_SC100_F1}}
-%\end{tabular}
-%\caption{The effect of increased block size on the second SLR feature. From left to
-%right: a block size of 20 and 60 respectively.}
-%\label{lsr_inc_bk}
-%\end{figure}
+The Line Support Region feature visualized is the line mean. We showed the results from the first section because it produced the most distinct results from the three sections. The performances of the different sections will be evaluated in the results section. Similar to the analysis of HoG, the increase of the block size does not influence the distribution of the two classes. The difference is as negligible as displayed in the comparison of the HoG in Figure \ref{hog_inc_bk}
 
 \begin{figure}
 \centering
 \begin{tabular}{cc}
-  \subfloat{\includegraphics[width=5cm]{images/LSR/inc_sc/s1/section_1_boxplot_lsr_BK20_SC50_F1}}&
-  \subfloat{\includegraphics[width=5cm]{images/LSR/inc_sc/s1/section_1_boxplot_lsr_BK20_SC150_F1}}\\
-  \subfloat{\includegraphics[width=5cm]{images/LSR/inc_sc/s1/section_1_kde_lsr_BK20_SC50_F1}}&
-  \subfloat{\includegraphics[width=5cm]{images/LSR/inc_sc/s1/section_1_kde_lsr_BK20_SC150_F1}}
+  \subfloat{\includegraphics[width=7cm]{images/LSR/inc_sc/section_1_boxplot_lsr_BK20_SC50_F1}}&
+  \subfloat{\includegraphics[width=7cm]{images/LSR/inc_sc/section_1_boxplot_lsr_BK20_SC150_F1}}\\
+  \subfloat{\includegraphics[width=7cm]{images/LSR/inc_sc/section_1_kde_lsr_BK20_SC50_F1}}&
+  \subfloat{\includegraphics[width=7cm]{images/LSR/inc_sc/section_1_kde_lsr_BK20_SC150_F1}}
 \end{tabular}
 \caption{The effect of increased scale on the second SLR feature. From left to
 right: a scale of 50 and 150 respectively.}
 \label{lsr_inc_sc}
 \end{figure}
 
-An increase in scale of the LSR feature is visualized in Figure
-\ref{lsr_inc_sc}. Similar to the features from the Histogram of Oriented gradients, it appears
-that an increase in scale seems to increase the difference between the
-distributions of the formal and informal classes.  However, the the clear
-division between distributions does not translate to the other two sections. In
-section 2 the distributions are somewhat distinct. Section 3 has barely any
-distinction between the two distributions. The use of the other LSR features
-together with the two different color bands does not seem to improve the results either. This might be caused by the presence of vegetation in section 2 and 3. The difference in vegetation can
-be seen in Figure \ref{fig:sections} where the image sections are displayed. However, this hypothesis is based on speculation and should be verified by extracting LSR features from sections with and without vegetation.
+An increase in scale of the LSR feature is visualized in Figure \ref{lsr_inc_sc}. Similar to the features from the Histogram of Oriented gradients, it appears that an increase in scale seems to increase the difference between the distributions of the formal and informal classes, although this is not as clear in the other two sections.
+
 
 \subsection{Road Intersection Density}
 
 \begin{figure}
 	\centering
 	\begin{tabular}{ccc}
-		\subfloat{\includegraphics[width=5cm]{images/RID/1}}&
-		\subfloat{\includegraphics[width=5cm]{images/RID/2}}&
-		\subfloat{\includegraphics[width=5cm]{images/RID/3}}\\
-		\subfloat{\includegraphics[width=5cm]{images/RID/4}}&
-		\subfloat{\includegraphics[width=5cm]{images/RID/5}}&
-		\subfloat{\includegraphics[width=5cm]{images/RID/6}}\\
+		\subfloat{\includegraphics[height=3.8cm]{images/RID/1}}&
+		\subfloat{\includegraphics[height=3.8cm]{images/RID/2}}&
+		\subfloat{\includegraphics[height=3.8cm]{images/RID/3}}\\
+		\subfloat{\includegraphics[height=3.8cm]{images/RID/4}}&
+		\subfloat{\includegraphics[height=3.8cm]{images/RID/5}}&
+		\subfloat{\includegraphics[height=3.8cm]{images/RID/6}}\\
 	\end{tabular}
 	\caption{The distribution of values for the Road Intersection Density feature. Top: Scale 150; Bottom: Scale 50}
 	\label{rid}
 \end{figure}
 
 
-The road intersection density method only generates a single feature. This feature, as discussed earlier, is the result of the Gettis and Ord local G function. Like HoG and LSR, this method can use different block sizes and scales as well. However, in this case, the meaning of the scale and block size is a bit different. In the calculation of the G function, in order to map the hotspot to the same dimension of the two other features, the points returned by the intersection detection need to be rasterized on a grid. This grid is in the same dimensions as the two other features and each block in the grid represents a block in the image, just like the blocksize. Every block in the grid has a counter of the number of intersections that fall in that specific block. The G function is calculated over this grid, resulting in a feature of the correct dimensions. The scale is used in the determination of the radius of each block. The G function is calculated using the block in combination with its surrounding neighbors. The scale, in this case, determines the radius around each block in the grid which blocks are identified as a neighbor.\newline\newline
+Unlike HoG and LSR, the road intersection density method generates a single feature that is produced by the Gettis and Ord local G function. RID uses different block sizes and scales as well, although, in this case, the meaning of the scale and block size is slightly different. In the calculation of the G function, in order to map the hotspot to the same dimensions of the two other features, the points returned by the intersection detection need to be rasterized onto a grid. This grid has the same dimensions as the two other features, with each block in the grid representing a pixel block in the image. Every block in the grid contains a counter of the number of intersections that fall within that block. The G function is calculated over this grid, resulting in a feature of the correct dimensions. The scale is used in the determination of the neighborhood around a block, just like HoG and LSR although the shape is a circle instead of a square.\newline\newline
+
 \noindent
-Figure \ref{rid} shows the differences in distribution for the RID feature for scales 150 and 50. The low scale seems to create artifacts and does not have a distinctly different distribution. The higher scale, on the other hand, does seem to have a difference in distribution, although not quite significant. For the other sections, even at scale 150, the results are similar to the bottom right image in the figure. Because we use three sections in the evaluation of the features, the road intersection density method is complicated to use. In this evaluation, we have only used the parameters that work well with the first section and applied this to the second and third section. As mentioned in the section about the design of the RID method, the parameters are very specific to the content of the image. This parameter tweaking makes it difficult to scale to different images.
+Figure \ref{rid} shows the differences in distribution for the RID feature for scales 150 and 50. The low scale seems to create artifacts and does not have a distinctly different distribution. The higher scale, on the other hand, does seem to have a difference in distribution, although not quite significant. The other sections have results are similar to the bottom right image in the figure.  In this evaluation, we have only used the parameters that work well with the first section and applied this to the second and third section; this is likely cause for the low performance in the other sections. We would have to use three different sets of parameters to increase performance for the other two sections. It is clear that this approach does not seems scalable to large images where there will be a large variance in the types of roads.
 
 \subsection{Conclusion}
 
-% TODO: make sure numbers are valid
-With the right parameters, there is a clear distinction between the two classes for both the HoG and LSR features. RID, in contrast, does not seem to have a clear distinction. It seems that, in general, an increase in scale improves the distinctness of the two classes. However, increasing the scale is computationally expensive. On these smaller subsections alone, the time to compute features at a high scale is measured in hours rather than minutes. Using features with high scales on large images would therefore not be feasable. Besides, increasing the scale gives diminishing returns while taking significantly more time to compute. We will therefore use 150 as the maximum scale.
-Since increasing the block size did not seem to improve performance, we keep the blocksize at 20 pixels as in the paper by Graesser \textit{et al}. We will test our hypothesis of the effect of block size and scale during the feature classification experiments.
-% TODO: dot in et al?? -^
+With the right parameters, there is a clear distinction between the two classes for both the HoG and LSR features. RID, in contrast, does not seem to have a clear distinction, likely caused by a lack of specific parameters for section 2 and 3. For HoG and LSR, it seems that an increase in scale improves the distinctness of the two classes, although increased scale is computationally expensive. On the three sections, the time to compute features at a high scale is measured in hours rather than minutes. Using features with high scales on large images would therefore be discouraged. Besides, increasing the scale seems to give diminishing returns while taking significantly more time to compute. We will therefore use 150 as the maximum scale.
+For HoG and LSR, the block size did not seem to improve or decrease performance. As a result, we would get the same performance with large block sizes as small block sizes using less computation. For now, the block size remains 20 pixels as the paper by Graesser \textit{et al.} describes. We will test our hypothesis of the effect of block size and scale during the feature classification experiments.
 
 
