@@ -35,10 +35,21 @@ Currently, the majority of studies uses the pixel image data of informal regions
 
 Our thesis continues with the work performed by Graesser \textit{et al.} \cite{graesser2012image}. The paper characterized formal and informal neighborhoods using a set of different features extracted from satellite images. Their approach was able to successfully characterize the two types of neighborhoods with high accuracy in certain parts of the urban landscape. We will evaluate two of the feature extraction methods described in the paper from Graesser \textit{et al.} and attempt to reproduce similar results with satellite images from Bangalore. These methods are the Histogram of Oriented Gradients and Line support regions. Beyond the replication and evaluation of previous research, the methods of feature extraction used by Graesser \textit{et al.} are extended with an additional new method. This method creates a feature based on the density of road intersections in an image. The feature created from this method will be compared to the existing features and measured for its performance. The features produced by the three methods will combined and used by a set of different classification methods. We will evaluate the different classification methods to discover the most suitable classification method for our image and its features. 
 
+\begin{figure}
+	\centering
+	\begin{tabular}{cc}
+		\subfloat[Section 1]{\includegraphics[width=.5\textwidth, height=.5\textwidth]{images/section_1_gt}}&
+		\subfloat[Section 2]{\includegraphics[width=.5\textwidth, height=.5\textwidth]{images/section_2_gt}}\\
+		\subfloat[Section 3]{\includegraphics[width=.5\textwidth, height=.5\textwidth]{images/section_3_gt}}&
+		\subfloat[Location of Sections]{\includegraphics[width=.5\textwidth]{images/west-bangalore_sections_num}}
+	\end{tabular}
+	\caption{The images used for evaluation and classification}
+	\label{fig:sections}
+\end{figure}
 
 
 \subsection{Data and Area of Study}
-The image data used for the thesis is displayed in Figure \ref{fig:sections}d, a larger version of the image is included in appendix A. The content of this image contain a large area of Bangalore, which is the capital city of the Indian state of Karnataka, located in south-central India. Bangalore experienced fast growth in population from 8.4 million in 2011 to 12.3 million in 2017, becoming the third largest city in India\cite{popcount2017}. One of the reasons for its sudden growth is the large IT sector together with better living standards and infrastructure. This rapid increase in population has led to a shortage of housing which, in turn, caused an increase in the number of slums in the city. At present, the city is estimated to have over two thousand slums. These slums account for 25 to 35 percent of the urban population \cite{roy2018survey}.
+The image data used for this thesis contains a large area of Bangalore and is displayed in Figure \ref{fig:sections}d. Bangalore is the capital city of the Indian state of Karnataka, located in south-central India. It experienced fast growth in population from 8.4 million in 2011 to 12.3 million in 2017, becoming the third largest city in India\cite{popcount2017}. One of the reasons for its sudden growth is the large IT sector together with better living standards and infrastructure. This rapid increase in population has led to a shortage of housing which, in turn, caused an increase in the number of slums in the city. At present, the city is estimated to have over two thousand slums. These slums account for 25 to 35 percent of the urban population \cite{roy2018survey}.
 
 The image in Figure \ref{fig:sections}d has a resolution of 52,322 by 31,789 pixels with a file size of 6.19GiB and extends in latitude and longitude from  (12\degree54'22.729", 77\degree31'58.631") in the south-west to (12\degree59'37.414", 77\degree40'37.776") in the northeast. The image was created in 2016 by the earth observation satellite WorldView3 owned by DigitalGlobe. The WorldView3 satellite produces multiple types of images with varying degrees of resolution. The panchromatic images have a resolution of 0.31 meter in contrast to the multiband images have a significantly lower resolution of 1.24 meter. The project uses pan-sharpened images, which combines the high resolution panchromatic- and the low-resolution multiband images to create high-resolution RGB images.
 
@@ -49,7 +60,6 @@ Besides image data, we also use shapefiles with the vectorized location and shap
 
 The distinction between formal and informal regions is often quite challenging. There are a lot of factors that could introduce noise to the dataset, hindering correct classification. For instance, some areas might have been missed during the survey. Also, the shapefile defining boundaries of the slums are simplified in shape and sometimes imprecise in location as well. The location of the slums and the shapes of the boundaries can be observed in Figure \ref{fig:sections}. As a result of these sharp and simple shapes,  areas that are not part of a slum by itself are included as slums nevertheless, for example, parts of roads, vegetation or open spaces. Moreover, the shapefile was not created at the same time as the satellite image; the shapefiles were created a few months after the satellite image was captured. This is especially a problem since the slums in Bangalore are very dynamic and can change drastically in just a few months. It is therefore important to use shapefiles and satellite images from similar dates. A difference between the shapefile and the satellite image will very likely increase the number of false positives and negatives. An example of the difference between shapefile and satellite image can be seen in Figure \ref{fig:sections} b. In the middle left of Section 2, there is a large patch of blue roofs that is very likely a slum even though it is not annotated as such. Similar discrepancies occur in the other sections as well. 
 
-% TODO: appendix -v
 Besides noise in the dataset, another challenge is the scarcity of informal settlements.  The slums we aim to detect are small and highly distributed throughout the city. Figure \ref{fig:sections}d illustrates this point quite well. The relatively small number of slums causes the dataset of formal and informal regions to become quite skewed.
 
 In our case, everything that is not the specific type of slum we are looking for is automatically considered formal, which actually often not true. Instead of formal housing, this class includes a large range of different types of buildings. Furthermore, fields and lakes in the image are also included in the formal class. Therefore, the formal class should be considered as the class that includes all things except a specific type of slum. As a result, the formal regions will have a large amount of variance of visual properties in the image. The diverse content of the formal class of visual characteristics might hinder the effectiveness of classification between formal and informal regions. However, this is the only class division that is possible since we do not possess the location and shapes of the other types of land cover.
@@ -64,15 +74,4 @@ The satellite image displayed in Figure \ref{fig:sections}d is transformed into 
 %  \label{fig:section_3}
 %\end{figure}
 
-\begin{figure}
-\centering
-\begin{tabular}{cc}
-  \subfloat[Section 1]{\includegraphics[width=.5\textwidth, height=.5\textwidth]{images/section_1_gt}}&
-  \subfloat[Section 2]{\includegraphics[width=.5\textwidth, height=.5\textwidth]{images/section_2_gt}}\\
-  \subfloat[Section 3]{\includegraphics[width=.5\textwidth, height=.5\textwidth]{images/section_3_gt}}&
-  \subfloat[Location of Sections]{\includegraphics[width=.5\textwidth]{images/west-bangalore_sections_num}}
-\end{tabular}
-\caption{The images used for evaluation and classification}
-\label{fig:sections}
-\end{figure}
 

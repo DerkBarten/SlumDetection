@@ -320,7 +320,7 @@ class RoadIntersectionDensity:
 
     def save(self, path):
         LOG.info("Saving RID feature as: %s", path)
-        f = open(path, 'wb')
+        f = open(path, 'w')
         if self._feature is not None:
             pickle.dump(self._feature, f)
         else:
@@ -328,7 +328,7 @@ class RoadIntersectionDensity:
 
     def load(self, path):
         LOG.info("Opening RID feature file: %s", path)
-        f = open(path, 'rb')
+        f = open(path, 'r')
         self._feature = pickle.load(f)
 
     def __create_density_map(self, points):

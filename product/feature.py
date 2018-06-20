@@ -5,7 +5,7 @@ import numpy as np
 
 from util import read_geotiff
 from groundtruth import reshape_image
-from rid import  Kernel, RoadIntersections, RoadIntersectionDensity, ktype
+from rid import Kernel, RoadIntersections, RoadIntersectionDensity, ktype
 
 LOG = logging.getLogger(__file__)
 logging.basicConfig(level=logging.INFO)
@@ -14,8 +14,7 @@ logging.basicConfig(level=logging.INFO)
 class Feature:
     """
     Args:
-        image_path:     The name of the image the feature file was created
-                        from; string.
+        image:          The image object to use in creation of the feature
         block:          The block size used in the creation of the feature;
                         integer.
         scale:          The scale used in the creation of the feature, integer.
@@ -168,12 +167,15 @@ class Feature:
                                           block_size=self._block_size)
             rid.load(feature_path)
             rid_feature = rid.get()
-            
+            rid_feature = rid_feature[0]
+            print(rid_feature.shape)
             rid_feature = reshape_image(rid_feature, self.image.shape,
                                         self._block_size, max(self._scales))
+            rid_feature = np.reshape(rid_feature, (1, rid_feature.shape[0],
+                                                   rid_feature.shape[1]))
+            print(rid_feature.shape)
 
-
-        if len(spfeas_features) > 0 and len(rid_feature) > 0:
+        if len(spfeas_feature_names) > 0 and len(rid_feature_name) > 0:
             self._feature = np.concatenate((spfeas_features, rid_feature),
                                            axis=0)
         elif len(spfeas_feature_names) > 0:

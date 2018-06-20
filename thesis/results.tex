@@ -4,7 +4,7 @@
 	\centering
 	\begin{tabular}{cc}
 		\subfloat{\includegraphics[width=0.5\textwidth]{images/BestOverlay}}&
-		\subfloat{\includegraphics[width=0.478\textwidth]{images/BestConfusionCrop}}
+		\subfloat{\includegraphics[width=0.57\textwidth]{images/BestConfusion}}
 	\end{tabular}
 	\caption{Classification of Section 2 using HoG and Gradient Boosting}
 	\label{fig:res_best}
@@ -49,7 +49,7 @@ As we have described in the previous section, we perform multiple experiments to
 
 \subsection{Feature Performance}
 
-Because we use combinations of sections and features, the performance is likely to vary between different parameter combinations. We display the classification performance of all combinations of test images and features in Figure \ref{fig:res_bar_0} to discover the influence of the features and sections on performance. To reduce the complexity of the bar plot, we only display the results of the classifier with the highest performance and use Matthews Coefficient as the sole metric. In the experiment, HoG achieves the highest performance for all three sections. LSR seems to be more variable in performance than HoG over the three sections, although it is close to the performance of HoG in section 2. In contrast, RID achieves low performance for all sections. Lastly, the combination of all features performs slightly less than HoG in all three sections.
+Because we use combinations of sections and features, the performance is likely to vary between different parameter combinations. We display the classification performance of all combinations of test images and features in Figure \ref{fig:res_bar_0} to discover the influence of the features and sections on performance. To reduce the complexity of the bar chart, we only display the results of the classifier with the highest performance and use Matthews Coefficient as the sole metric. In the experiment, HoG achieves the highest performance for all three sections. LSR seems to be more variable in performance than HoG over the three sections, although it is close to the performance of HoG in section 2. In contrast, RID achieves low performance for all sections. Lastly, the combination of all features performs slightly less than HoG in all three sections.
 
 
 \pgfplotstableread[col sep = comma]{results/classifiers.csv}\dataone

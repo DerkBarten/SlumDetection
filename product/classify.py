@@ -18,9 +18,8 @@ from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier
 from sklearn.ensemble import GradientBoostingClassifier
 from sklearn.neural_network import MLPClassifier
-from imblearn.over_sampling import RandomOverSampler
+from imblearn.over_sampling import RandomOverSampler, SMOTE, ADASYN
 from imblearn.under_sampling import RandomUnderSampler
-from imblearn.over_sampling import SMOTE, ADASYN
 from scipy.ndimage import zoom
 from scipy.ndimage.interpolation import shift
 
@@ -53,6 +52,8 @@ def plot_confusion_matrix(cm, classes,
                  color="white" if cm[i, j] > thresh else "black")
     plt.ylabel('True label')
     plt.xlabel('Predicted label')
+    # Little more room for the X label
+    plt.gcf().subplots_adjust(bottom=0.2)
 
 
 def get_metrics(prediction, ytest):
@@ -189,12 +190,12 @@ class Classify:
         classifier_name = self._get_classifier_name(classifier_index)
         name = "confusion_" + basename + "_" + classifier_name + ".png"
         path = os.path.join(folder, name)
-
-        plot_confusion_matrix(metrics.confusion_matrix(ytest, prediction),
-                              classes=['Informal', 'Formal'],
+        matrix = metrics.confusion_matrix(ytest, prediction)
+        plot_confusion_matrix(matrix,
+                              classes=['Formal', 'Informal'],
                               title='Confusion Matrix')
         LOG.info("Saving confusion as: {}".format(path))
-        plt.savefig(path, format='png', dpi=1200)
+        plt.savefig(path, format='png', dpi=200)
         plt.clf()
 
     def _create_overlay(self, prediction, ytest, folder, classifier_index):
@@ -213,7 +214,7 @@ class Classify:
         plt.imshow(image)
         plt.imshow(prediction, alpha=0.5)
         LOG.info("Saving overlay as: {}".format(path))
-        plt.savefig(path, format='png', dpi=1000)
+        plt.savefig(path, format='png', dpi=400)
         plt.clf()
 
     def _create_metrics(self, folder):
@@ -286,7 +287,8 @@ class Classify:
 
 if __name__ == "__main__":
     scales_list = [[50, 100, 150]]
-    block_size_list = [20, 40, 60]
+    block_size_list = [20]
+    features = ['hog']
 
     section_1 = Image('data/section_1.tif')
     section_2 = Image('data/section_2.tif')
@@ -298,7 +300,7 @@ if __name__ == "__main__":
     for block_size in block_size_list:
         for scales in scales_list:
             dataset = Dataset(train_images, test_image,
-                              shapefile, ['hog','lsr', 'rid'], scales=scales,
+                              shapefile, features, scales=scales,
                               block_size=block_size)
             classify = Classify(dataset)
             classify.classify()

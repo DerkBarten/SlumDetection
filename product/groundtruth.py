@@ -69,14 +69,16 @@ def create_mask(shapefile, imagefile, maskname=None):
 
 def create_dataset(feature, groundtruth):
     height, width = groundtruth.shape
+    print(feature.shape)
+    print(groundtruth.shape)
     dataset = {'feature': [], 'formality': []}
 
     for i in range(height):
         for j in range(width):
             if (groundtruth[i, j] == 0):
-                dataset['formality'].append('formal')
+                dataset['formality'].append('Formal')
             else:
-                dataset['formality'].append('informal')
+                dataset['formality'].append('Informal')
             
             dataset['feature'].append(feature[i, j])
 
@@ -85,14 +87,14 @@ def create_dataset(feature, groundtruth):
 
 def create_dict(feature, groundtruth):
     height, width = groundtruth.shape
-    dataset = {'formal': [], 'informal': []}
+    dataset = {'Formal': [], 'Informal': []}
 
     for i in range(height):
         for j in range(width):
             if (groundtruth[i, j] != 0):
-                dataset['informal'].append(feature[i, j])
+                dataset['Informal'].append(feature[i, j])
             else:
-                dataset['formal'].append(feature[i, j])
+                dataset['Formal'].append(feature[i, j])
             
     return dataset
 
