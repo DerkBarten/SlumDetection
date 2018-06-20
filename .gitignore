@@ -1,12 +1,6 @@
 .*
-images
 features
 analysis
-data
-testfeatures
-literature
-thesis/notes.txt
-presentation
 *.tif
 *.png
 *.csv
