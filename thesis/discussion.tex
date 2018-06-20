@@ -1,74 +1,56 @@
 \section{Discussion}
-We have shown that with our approach, we are able to detect slums from satellite images to a certain extend. Eventhough the performance seems low, the result displayed in \ref{fig:res_best} is far from random noise and it certainly detects a large number of slums. As the confusion plot shows, there are a significant number of false positives and false negatives. We will discuss the possible causes of this performance in the next parts.
+We have shown that with our approach, we are able to detect slums from satellite images to a certain extend. Even though the performance seems low, the result displayed in \ref{fig:res_best} is far from the random noise baseline and it certainly detects certain areas with slums. As the confusion plot shows, there is a significant number of false positives and false negatives. We will discuss the possible causes of this performance in the next parts.
 
 \subsection{Features}
-In the evaluation section, SLR seemed to be more distinct than HoG, however, HoG seems to perform better in classification. Furthermore, in the evaluation section, section 1 seemed to perform best, however, in classification, section 2 is the highest performing section. The performance of RID was as expected from the feature evaluation, quite poorly. It seems that for the other two features, it does not nececcarily mean that a better distinction is better performant. However, the number of features could also play a role in this since HoG has about twice as many features as LSR, which might lead us to believe that in this case, quantity better than quality. Perhaps this counts for the RID as well since this has only a single feature. 
+In the evaluation section, LSR seemed to be more distinct than HoG, however, HoG seems to achieve higher performance in the classification. Furthermore, in the evaluation section, section 1 seemed to perform best, however, in classification, section 2 is the highest performing section. The performance of RID was as expected from the feature evaluation, quite poorly. It seems that, for HoG and LSR, it does not necessarily entail that a high distinction translates to better performance. However, the number of features could also play a role in this since HoG has about twice as many features as LSR, which might lead us to believe that in this case, quantity superior to quality. Perhaps this counts for the RID as well since this has only a single feature.
 
-Compared to the results obtained by Graesser et al for HoG and LSR, our results seems to be poor. Although it might be a bit difficult to compare our results. Firstly, Graesser et al uses accuracy instead of the matthews coefficient, which, as we explained could results in completely different values for the same data. Secondly, the data used by Graesser et al is very different than ours. To illustrate, their paper shows test sections where roughly 50\% is informal and the other half is formal with clear distinctions between the classes. Our data is far more imbalanced and less distinct, making a comparison in performance a bit unfair. This scarcity and small scale of our minority class might partly explain why these approaches did not work well in our case but did work for Graesser et al.
+Compared to the results obtained by Graesser \textit{et al.} using HoG and LSR, our results seems to be inferior, although it is difficult to compare our results. Firstly, they use accuracy instead of the Matthews Coefficient, which could result in completely different values for the same data. Secondly, the data they used is very different than ours. To illustrate this point, their paper shows test sections where roughly 50\% is informal and the other half is formal with clear distinctions between the classes. Our data is far more imbalanced and less distinct, making a direct comparison in performance unfair. This scarcity and the small scale of our minority class might partially explain why these approaches did not perform at the level observed by Graesser \textit{et al}.
 
-As we have discussed, the performance of RID depends a lot of specific parameters that are used. These parameters could be different even within the same image, as we observed with the different sections. Therefore, this approach might not be suitable for use on large scale images, since it heavily depends on local road structures. This might be one of the reason why this feature is lacking in performance, compared to the other two features. The tweaking of parameters might not be worth the effort.
+As we have discussed, the performance of RID depends a lot of specific parameters that could be different even within the same image, as we observed with the different sections. Therefore, this approach might not be suitable for use on large scale images as it heavily depends on local road structures. This might be one of the reason why this feature is lacking in performance compared to the other two features. The adjusting the parameters to speficic image sections might not be worth the effort. Besides the use for slum detection, this method of intersection detection might still be applicable for different problems as it produced accurate detections at relatively low computational cost.
 
-In our case, the combination of the three features did not result in a higher performance than the individual features. The poor performance of the RID feature might have caused the performance of the feature set to decline, although we have not verified this. Using different features and combination might improved the performance.
+In our case, the combination of the three features did not result in a higher performance than the individual features. The poor performance of the RID feature might have caused the performance of the feature set to decline, although we have not verified this. Using additional features in combination with HoG and LSR might improved the performance.
 
 
 \subsection{Classification Algorithms}
-We have experimented with different classification algorithms because it is not apparent which algorithm is best performant for our data. This showed some insight in what classifiers worked well with our data. Just to illustrate, what i mean with suit the data. Various algortithms might handle high dimensional data well while others are optimized for lower dimensional data, the same goes for class imbalance. Conclusively, some classifiers are higher performant than other classifiers for certain data. Besides, there is a diffrence in complexity as well. For instance, decision trees have a low complexity to ensamble learners such as AdaBoost or Gradient Boost, which might not capture complex relationships in the data as well as the other learners. In our case, Gradient Boost seems to be the highest performent, although there might still be room for improvement. We have only used the default parameters for the classification algorithms, an extra tweaking of the parameters to fit our dataset better might improve performance somewhat more.
+The experiment provided insight in what classifiers performed well using our data, as performance might significantly change depending on the structure of the data. To illustrate, various algorithms might handle high dimensional data well while others are optimized for lower dimensional data; the same principle applies the class imbalance. Therefore, some classifiers are perform better than other classifiers for certain data. Besides the structure of the data, there can be a difference in complexity as well. For instance, the Decision Tree classifier has a low complexity compared to ensemble learners,  such as AdaBoost or Gradient Boost, and might not capture complex relationships in the data. In our case, Gradient Boost seems to produce the highest performance, although there might still be room for improvement. We have only used the default parameters for the classification algorithms, further adjustments in the classifier parameters might improve performance.
 
 
-\subsection{Scale and Block size}
-We have used three different scales to find out the effects of scale on classification. In the paper of Graesser et al, they use a combination of three scales as well, although these scales are in octave of each other, such as 50, 100 and 200, instead of our 50, 100 and 150. Using octave scales might improve performance.
+\subsection{Scale and Block Size}
+We have used three different scales to find out the effects of scale on classification and observed mixed results, it seemed that the performance of increased scale depends on the test image. It is therefore inconclusive what effect the scale has on the classification performance. Besides, the paper of Graesser \textit{et al.} uses a combination of three scales as well, although these scales are in octave of each other, such as 50, 100 and 200, instead of our 50, 100 and 150, which might cause performance differences.
+\newline
 
-We have tested different block sizes as well. Using a high block size without performance loss could greatly reduce computational load. However, results of different block sizes are a bit tricky to compare. A small block size has exponentially more data points that large block sizes. Our measure of performance might penalize small block sizes more than large block sizes on the number of data points. Furthermore, large block sizes will have fewer data points, which therefore might achieve better classification performance. Regarding the classification of a block as slum or non slum, because we use vector shape files, we have to rasterize the vector files to our block representation. We qualify a block as a slum block when 60\% of the block falls within the boundary of the shapefile. This introduces a lot of noise on the edges where some slums are excluded while non slum might be included. With increasing block sizes, the boundaries of the slums will become more coarse and might therefore affect performance.
+\noindent
+Besides scales, we have tested different block sizes as well because a large block size without performance loss could greatly reduce computational load. The block size 10, interestingly enough, detected almost no slums for any classifier, neither as true or false positives. It could be that the block size is to small to contain enough information, although we have not verified this. It seems that, in general, performance remains stable when using larger block sizes up to 60, although this did not apply for the GradientBoost classifier, which experienced a slight decline in performance. Furthermore, we have only tested four different block sizes, further experiments with increased number of block sizes and different parameters might establish this as a general rule.
+
+The results of the different block sizes might be difficult to compare correctly because a small block size has exponentially more data points that large block sizes. This might lead our measures of performance to penalize small block sizes over large block sizes since large block sizes will have fewer data points. Besides, we qualify a pixel block as a slum when 60\% of the block surface area falls within the boundary a slum in the shape file. This introduces a noise on the edges of the slums where some slums are excluded while non slum might be included. A change in block size might therefore either increase or decrease this noise, making a performance comparison difficult. The extend of these potential factors on performance might be further investigated.
 
 \subsection{Oversampling}
-The oversampling methods seems to significantly improve performance compared to the imbalanced dataset. Although, besides oversampling, there are other methods for balancing the dataset, such as undersampling or selecting all slums from other parts in the image as well. With oversampling, we only used the 1:1 ratio, although a slight minority in slums might reduce false positives, which could be further explored. Furthermore, we could also use outlier detection to detect slums. Also, we could reduce the informal class my removing vegetation and open space, as we will discuss in future work.
+The oversampling methods seems to significantly improve performance compared to the imbalanced dataset. Besides oversampling, there are other methods for balancing the dataset that we have not used. With oversampling, we have only used the 1:1 ratio, although a slight minority in slums might reduce false positives, which could be explored further. We could also have used outlier detection to detect or reduce the informal class my removing vegetation and open space. 
 
 \subsection{Performance Measures}
-As we have explained, we use two indicators for performance, the F1-score and Matthew's coefficient. However, Matthews score is not designed for our purposes. As we have discussed, the borders of the slums detected slums could be quite coarse due to the block size and the shapes of the slums. This could lead to many false classification although the position and shape slum is roughly correctly classified. The predictions should not be penalized on the accuracy of the shape, but encouraged by identifying the correct location and roughly the correct shape. This could for instance be done by finding the center of the predicted slum and claculating the difference to the center of closest ground truth slum, altough this is beyond the scope of this thesis.
+We use two indicators for performance, the F1-score and Matthew's coefficient, although these methods are not designed for our purposes. The borders of the slums detected slums could be quite coarse due to the block size, the shapefile or the dynamics of the slums. This could lead to many false classification although the position and shape slum is roughly correctly classified. The predictions should not be penalized on the accuracy of the shape, but encouraged by identifying the correct location and roughly the correct shape. This could for instance be done by finding the center of the predicted slum and calculating the difference to the center of closest ground truth slum. This is a promising future direction that is beyond the scope of our thesis.
 
 \subsection{Data}
-As we have mentioned in the challenges section, there are multiple factors which introduce noise to the dataset, such as missmatches between groundtruth and satellite images and the inclusion of non slum areas as slum. It could be that a part of the mismatches in the classification is caused by this noise. The use of only two classes could hinder performance significantly. Removing areas without construction, such as vegetation or open fields, might remove noise and improve performance.
+In the experiments, we used the three sections and did not apply our methods to the entire image. This would be an interesting follow-up experiment as we do not know how the performance will translate to the whole of Bangalore. Furthermore, we could also use different satellite images of different specifications of the same areas to evaluate the impact on classification performance.
 
+%As we have mentioned in the challenges section, there are multiple factors which introduce noise to the dataset, such as missmatches between groundtruth and satellite images and the inclusion of non slum areas as slum. It could be that a part of the mismatches in the classification is caused by this noise. The use of only two classes could hinder performance significantly. Removing areas without construction, such as vegetation or open fields, might remove noise and improve performance.
 
+\subsection{Final Remarks}
+All our code and results are available at \url{https://github.com/DerkBarten/SlumDetection} and is free to use and to be expanded upon. A description of the architecture and functionality is included in the repository as well.
 
-
-
-% TODO: Compare to other papers
-In our reference study from Graesser et al, the performance is measured in accuracy. As we have discussed, in our case, accuracy is a poor measure for performance due to large class differences in our dataset. However, in general, studies in this field express their results using accuracy, which makes it is hard to fairly compare their results to ours.
-
-
-
-% FEATURES
-
-
-
-% road intersection density:
-% do not know if it didnt work because not all intersections detected or if the hypothesis is just wrong.
-
-
-
-
-
-
-
-
+Besides our specific method, general slum detection methods from satellite images are ethically challenging. Obtaining the locations of slums can both be used to support people in need as well as providing a tool for governments to evict inhabitants from their homes. Even though this thesis is written for academic purposes, it is important to realize that these methods should be used with care to reduce human suffering instead of causing it.
 
 
 % Will be combined with other sets of features (max)
 
 
-% Compare to other research, CRITICIZE Graesser :p
+% Compare to other research, CRITICIZE Graesser :p LAMBASTE
 
 % Why test image 2 works best?
-
-
 
 % strange hog is better
 
 % classifier performance
-
-
-
 
 
 %Besides that, it is hard to evaluate if the hypothesis for slum detection is correct. This is because we do not know if the hypothesis is false or if the intersection extraction does not produce correct intersections. This is why it is important to have a ground truth of the intersections in the image because this allows to conclude with reasonable certainty if this approach method for slum detection is valid.

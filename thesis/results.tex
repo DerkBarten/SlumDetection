@@ -12,10 +12,6 @@
 
 As we have described in the previous section, we perform multiple experiments to evaluate the performance of the feature classification under varying parameters. The maximum performance we were able to obtained is illustrated in Figure \ref{fig:res_best}. This results was achieved using the second section as test image with the HoG features, the scales 50, 100 and 150 and Gradient Boosting. This resulted in a F1-Score of 0.19 and a Matthews Coefficient of 0.17. The confusion matrix in the same figure displays the number of correct and incorrect classifications. In the next sections, we will discover the effects of various parameters on the classification performance.
 
-
-
-
-
 \pgfplotstableread[col sep = comma]{results/features_sections.csv}\datazero
 
 \begin{figure}[]
@@ -53,7 +49,7 @@ As we have described in the previous section, we perform multiple experiments to
 
 \subsection{Feature Performance}
 
-Since we use combinations of sections and features, the performance might be different for different combinations. To gain insight in the influence of the features and sections on performance, we display the classification performance of all combinations of test images and features in Figure \ref{fig:res_bar_0}. To reduce the complexity of the bar plot, we only display the results of the classifier with the highest performance and use Matthews Coefficient as the sole metric. In the experiment, HoG achieves the highest performance for all three sections. LSR seems to be more variable in performance than HoG over the three sections, although it is close to the performance of HoG in section 2. In contrast, RID achieves low performance for all sections. Furthermore, the combination of all features performs slightly less than HoG in all three sections.
+Because we use combinations of sections and features, the performance is likely to vary between different parameter combinations. We display the classification performance of all combinations of test images and features in Figure \ref{fig:res_bar_0} to discover the influence of the features and sections on performance. To reduce the complexity of the bar plot, we only display the results of the classifier with the highest performance and use Matthews Coefficient as the sole metric. In the experiment, HoG achieves the highest performance for all three sections. LSR seems to be more variable in performance than HoG over the three sections, although it is close to the performance of HoG in section 2. In contrast, RID achieves low performance for all sections. Lastly, the combination of all features performs slightly less than HoG in all three sections.
 
 
 \pgfplotstableread[col sep = comma]{results/classifiers.csv}\dataone
@@ -94,9 +90,6 @@ Since we use combinations of sections and features, the performance might be dif
 Although Figure \ref{fig:res_bar_0} shows the maximum performance of the features, it does not display the performance of the individual classifiers. We therefore compare the classification algorithms side by side to gain more insight in the performance differences between the classification algorithms, which is displayed in Figure \ref{fig:res_bar_1}. The performance was measured used the maximum of Matthews Coefficient and the F1-Score the classifier had achieved for any test image or feature. It turned out that, for all classifiers, the set of parameters that produced the maximum of Matthews Coefficient was the same set of parameters for the maximum F1-score. This seems to suggest that two measures of performance are consistent with each other.
 
 Gradient Boosting was able to produce achieve the highest performance, followed by MLP and AdaBoost. The Decision Tree and Random Forrest had the lowest maximum performance, although this order in performance is not necessarily fixed, as is illustrated by the Figures \ref{fig:res_plot_0} and \ref{fig:res_bar_2}.
-
-
-
 
 \begin{figure}[]
 	\centering
@@ -164,9 +157,7 @@ Gradient Boosting was able to produce achieve the highest performance, followed 
 
 \subsection{Effect of different Scales}
 
-As we have discussed in the feature evaluation, we suspect increased scale to have a positive effect on the classification performance of the features. In this experiment, the only variable is a different scale. The other constant parameters are: section 2 as the test image, a block size of 20 and all. This set of parameters was chosen because it has shown to produced good results in the previous experiment, as displayed in Figure \ref{fig:res_bar_0}. The results of the experiment in Figure \ref{fig:res_plot_0} seems to indicate that increased scale does not necessarily results in improved performance. However, the same experiment, run with Section 1 as test image, did see a slight improvement of performance.
-
-
+As we have discussed in the feature evaluation, we suspect increased scale to have a positive effect on the classification performance of the features. In this experiment, the only variable is a different scale. The other constant parameters are: section 2 as the test image, a block size of 20 and all features. This set of parameters was chosen because it has shown to produced good results in the previous experiment, as displayed in Figure \ref{fig:res_bar_0}. The results of the experiment in Figure \ref{fig:res_plot_0} seems to indicate that increased scale does not necessarily results in improved performance. However, we performed the same experiment using Section 1 as test image and did see a slight improvement of performance.
 
 
 \pgfplotstableread[col sep = comma]{results/block_size.csv}\datatwo
@@ -213,7 +204,7 @@ As we have discussed in the feature evaluation, we suspect increased scale to ha
 \end{figure}
 
 \subsection{Effect of different Block sizes}
-In the feature evaluation section, we observed that increased block size did seem to influence the difference between the formal and informal value distributions. Being able to use a large block size while maintaining similar results is highly preferable to a small block size as the computational cost increases squared for a linear decrease in block size. We will evaluate if our observation from the feature evaluation translates to constant performance with a decreasing computational load. Besides the block sizes used in the evaluation section, we also run the experiment with a block size of 10, to discover if this might improve performance. The experiment uses the constant parameters: section 2 as test image, all three features, and the scales 50, 100 and 150. The variable parameter in this experiment is the block size, which will be tested on performance for the values 10, 20, 40 and 60. The results of the experiment are displayed in Figure \ref{fig:res_bar_2} and, as we have hypothesized, an increase in the block size generally does not seem to reduce performance. A reduction in block size to 10 seems significantly reduce performance for all classifiers, except for the decision tree, which has fairly constant performance for all tested block sizes.
+In the feature evaluation section, we observed that increased block size did not seem to influence the difference between the formal and informal value distributions. Being able to use a large block size while maintaining similar results is highly preferable to a small block size as the computational cost increases squared for a linear decrease in block size. We will evaluate if our observation from the feature evaluation translates to constant performance with a decreasing computational load. Besides the block sizes used in the feature evaluation section, we also run the experiment with a block size of 10 to discover if this might improve performance. The experiment uses the constant parameters: section 2 as test image, all three features, and the scales 50, 100 and 150. The variable parameter in this experiment is the block size, which will be tested on performance for the values 10, 20, 40 and 60. The results of the experiment are displayed in Figure \ref{fig:res_bar_2} and, as we have hypothesized, an increase in the block size generally does not seem to reduce performance. A reduction in block size to 10 seems significantly reduce performance for all classifiers, except for the decision tree, which has fairly constant performance for all tested block sizes.
 
 
 
@@ -249,9 +240,10 @@ In the feature evaluation section, we observed that increased block size did see
 	\label{fig:res_bar_3}
 \end{figure}
 
+
+% TODO: more adasyn?
 \subsection{Effects of oversampling}
-As hinted earlier, oversampling can be an important part in classification because the classifiers are likely to produce trivial results otherwise. Oversampling is a common method to balance a dataset, although there are various different approaches for oversampling. In this experiment, we compare three different oversampling methods to the performance achieved without oversampling. These three methods are: random oversampling, SMOTE and ADASYN. The first method randomly picks entries of the minority class and copies these. The last two methods create new synthetic examples based on the members of the minorty class.
-The results displayed in Figure \ref{fig:res_bar_3} seem to indicate that any oversampling method increases the classification performance to the same extend, regardless of the method used.
+In this experiment, we compare the three different oversampling methods to the performance achieved without oversampling, which are: random oversampling, SMOTEBoost and ADASYN. We performed the experiment with the default parameters displayed in Figure \ref{fig:params} with the second section as test image and a variable oversampling method. The performance for these parameters is displayed in Figure \ref{fig:res_bar_3}, which seems to indicate that any oversampling method increases the classification performance to the same extend, regardless of the method used.
 
 
 
