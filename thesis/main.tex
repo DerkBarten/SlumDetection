@@ -11,7 +11,13 @@
 \usepackage{pgfplots}
 \usepackage{tikz}
 \usepackage{gensymb}
-\usepackage{hyperref}
+\usepackage[hidelinks]{hyperref}
+\usepackage{relsize}
+\usepackage{svg}
+
+\usepackage{mathtools}
+\DeclarePairedDelimiter\ceil{\lceil}{\rceil}
+\DeclarePairedDelimiter\floor{\lfloor}{\rfloor}
 
 \addbibresource{references.bib}
 
@@ -37,6 +43,10 @@
 \input{title}
 \end{titlepage}
 %\thispagestyle{empty}
+\clearpage
+
+\tableofcontents
+
 \clearpage
 
 \input{introduction}

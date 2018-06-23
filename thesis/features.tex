@@ -2,10 +2,29 @@
 Researchers in this field of study often use a combination of features in the detection of informal settlements. Our research uses features that performed well in previous research. The use two methods for extracting features from the satellite images; these are the Histogram of Oriented Gradients (HoG) and Line Support Region (LSR) features. Both HoG and LSR are implemented in a Python library, called spfeas, which is based on the research of Graesser \textit{et al.} \cite{graesser2012image}. Along side these features, we design a new feature that is based on the difference 
 in distribution of road intersections between formal and informal areas. This is based on the belief that there is an observable difference between formal and informal areas in this aspect.
 
+\begin{figure}
+	\centering
+	\includegraphics[width=0.5\textwidth]{images/block_scale}
+	\caption{An example of block size and scale}
+	\label{fig:block_scale}
+\end{figure}
+
+
 \subsection{Terminology}
-The paper of Graesser \textit{et al.} divides the image in small blocks instead of pixels when extracting features from the satellite images. The features are calculated for each block of pixels instead of each pixel itself, which significantly lowers the computational load as the extraction methods can be computationally quite expensive. The dimensions of the blocks are referred to as the \textit{block size},  which is 20 by 20 pixels in the paper of Graesser \textit{et al.}. In our research, various block sizes will evaluated for the effect on the classification performance.
-Besides \textit{block size} , another important parameter in the paper is the \textit{scale} of a feature. The \textit{scale} specifies the pixels surrounding the block that should be included in the calculation of the feature, allowing blocks to be
-spatially connected to the surrounding areas, which may increase performance.
+The paper of Graesser \textit{et al.} divides the image in small blocks instead of pixels when extracting features from the satellite images. The features are calculated for each block of pixels instead of each pixel individually, which significantly lowers the computational load as the extraction methods can be computationally quite expensive. The dimensions of the blocks are referred to as the \textit{block size},  which is 20 by 20 pixels in the paper of Graesser \textit{et al.}. In our research, various block sizes will evaluated for the effect on the classification performance. Besides \textit{block size}, another important parameter in the paper is the \textit{scale} of a feature. The \textit{scale} specifies an n x n block around the pixel block that should be included in the calculation of the feature.
+
+Figure \ref{fig:block_scale} is an example of how the size of the block and the scale are used in the calculation of the features from an image. In this example, the size of the image is 120 by 120 pixels and is divided into blocks of the 20 by 20 pixels each, which is the block size. In this example, the scale is the area around each of 80 by 80 pixels. For every block in the image, starting from the top left to the bottom right, the features are calculated over the area covered by the scale. To clarify, if we extract $n$ features from the image in the example, the dimensions of the feature vector would be (6 x 6 x $n$). The block size essentially controls the resolution of the calculated feature vector with an increased block size causing a decreased resolution and the same in reverse. In practice, the block size is almost never a multiple of the image size. Furthermore, in the border regions of the image using a scale larger than the block size, the outer blocks where the scale falls of the edge of the image are discarded as well. This results in a smaller feature vector than dividing the size of the image by the block size.
+
+\begin{figure}[h]
+	\centering
+	$\mathlarger{ p_x = \ceil*{\frac{i_x}{b_x}} - \ceil*{\frac{i_x - s_x - b_x}{b_x}} }$
+	\caption{Definition of the padding calculation in the $x$-direction}
+	\label{padding}
+\end{figure}
+
+Figure \ref{padding} shows displays the equation to calculate how many blocks will be removed as padding $p$ for a certain image $i$ with the combination of scale $s$ and block size $b$. We displayed the function for the calculation of the padding in the $x$-direction, although this will be different for the $y$-direction if the image, scale of block size different is not of the same width and length. In our case, only the images will have different a different width and length; the scales and block sizes will be $n$x$n$, thus we will be referring two these parameters with a single value $n$ instead of $n$x$n$
+
+We used this equation to predict the dimensions of the features that the Spfeas Python library would produce after we supplied the input image and the accompanying parameters. We need this prediction to reshape the ground truth into same shape as the produced features. If the shape of the ground truth do not match, we cannot correctly label the values from the feature vector as either belonging to the formal or informal class and produce the dataset for training and testing for the classification algorithms.
 
 \subsection{Histogram of Oriented Gradients}
 
@@ -13,7 +32,31 @@ Although the pattent application describing the Histogram of Oriented Gradients 
 
 Beyond the detection of humans, a paper from 2003 showed that this approach can also be used to detect man made structures in photographs \cite{kumar2003man}, which used images of buildings surrounded by vegetation. The Histogram of Oriented Gradients method described in the paper of Graesser \textit{et al.} is based on this paper, although they used satellite images instead of regular photographs from nature. As in the method for the detection of humans with the Histogram of Oriented Gradients, the paper from Graesser \textit{et al.} captures characteristics of a certain class, which are, in this case, the characteristics of informal neighborhoods. In case of slums, these characteristics are the diverse orientations of gradients in a slum area due to diverse building orientations compared to formal structures. In contrast to slums, formal buildings are often placed in a regular pattern with consistent orientation.
 
-Graesser \textit{et al} extracts five features from the Histogram of Oriented Gradients: first and second order of the heaved central shift moment, variance, skew, and kurtosis. These properties of the histogram are used as features to describe the histogram. These 5 features are calculated for every color band of the rgb image, resulting in a total of 15 features for the Histogram of Gradients. According to the results presented in the paper, these 15 features could produce an accuracy of 65 to 75 percent, although it must be noted that this feature was applied to specific regions where the visual difference between formal and informal was substantial. Furthermore, the morphology of the slums in their area of study is different that the slums in Bangalore.
+
+The Python library that is based on the paper of Graesser \textit{et al} extracts different features from the Histogram of Oriented Gradients than the ones described in the paper. The paper uses the first two central moments together with three orientation features, but they are ill described; the library instead uses four central moments together with a maximum. Because we use the implementation from the library, we will only discuss the features that are used in the library instead of the paper. 
+
+The four central moments that are used form a set of values that characterize a probability distribution relative to the mean of the distribution. These characteristics of a distribution, better known as the mean, variance, skew and kurtosis, are defined using the formula displayed in \ref{central_moments}. In this formula, $n$ is the order of the central moment, $\mu_{n}$ is the $n$-th central moment and $\mu$ without a subscript is the mean of the distribution on which the central moments are based. The zero-th and first central moment are trivial because $n=0$ and $n=1$ will always result in 1 and 0 respectively. Instead of using the trivial first central moment, the library uses the regular mean instead. The other three central moments, variance, skew and kurtosis are calculated using the formula in \ref{central_moments} for $n=2$, $n=3$, and $n=4$, respectively. Besides the central moments, the fifth feature is a maximum although, due to lack of documentation, it is unclear what this maximum actually refers to.
+
+\begin{figure}[h]
+	\centering
+	$\mathlarger{\mu_{n} = \int_{-\infty}^{+\infty} (x-\mu)^nf(x)dx} $
+	\caption{The definition of the central moments}
+	\label{central_moments}
+\end{figure}
+
+Instead of using a single scale for feature calculation, the paper of Graesser \textit{et al.} uses octaves of three scales, meaning that the size of the scale doubles for every scale. To illustrate, the scale octaves used for both the Histogram of Gradients and the Line Support Regions, is 50, 100, and 200. To summarize: in the paper, a single HoG feature vector contains five values, since the feature is performed for three different scales, the total values in the feature vector results in 15. Although it is not mentioned in the paper, the library calculates the features for the different color bands as well, resulting in 45 values instead of 15. This implies that in the paper only a single color band was used.
+
+According to the results presented in the paper, these 15 features could produce an accuracy of 65 to 75 percent. However, this feature was applied to specific image regions where the visual difference between formal and informal was substantial. It is therefore debatable whether this performance is to be attributed to the Histogram of Oriented Gradients or the specific contents of the image. Besides, the morphology of the slums in their area of study is different that the slums in Bangalore, making a comparison difficult.
+
+
+%uses the Histogram of Oriented gradients to create five statistical features that characterize the distribution of values in the histogram. Four of these features are central moments calculated on the distribution of values in the Histogram of Oriented Gradients.
+%
+%
+%
+
+
+
+%Graesser \textit{et al} extracts five features from the Histogram of Oriented Gradients: first and second order of the heaved central shift moment, variance, skew, and kurtosis. These properties of the histogram are used as features to describe the histogram. These 5 features are calculated for every color band of the rgb image, resulting in a total of 15 features for the Histogram of Gradients. According to the results presented in the paper, these 15 features could produce an accuracy of 65 to 75 percent, although it must be noted that this feature was applied to specific regions where the visual difference between formal and informal was substantial. Furthermore, the morphology of the slums in their area of study is different that the slums in Bangalore.
 
 
 \subsection{Line Support Region Features}
@@ -22,7 +65,7 @@ The Line Support Regions method was originally used for the detection of straigh
 
 This approach was shown to be suited for land use classification \cite{unsalan2004classifying} \cite{unsalan2006gradient}, and has been used in slum and informal region detection since \cite{graesser2012image} \cite{accra} \cite{colombo}. LSR characterizes neighborhoods in the their lines, which often correspond to the contours of buildings. In formal neighborhoods, these lines are often relatively long since the formal structures tend to be bigger in size than informal structures. This contrast in the properties of lines in certain regions can characterize the region as either formal or informal.
 
-As with the Histogram of Oriented Gradients, LSR is implemented in spfeas in accordance to the paper of Graesser \textit{et al.} \cite{graesser2012image}. The paper uses three statistical features extracted from the LSR, these are: line length entropy, mean, and entropy of line contrasts. Together with three color bands, this brings the total to nine features for a single scale. Using the LSR features for the scales 50, 100, and 200, the paper achieved an accuracy of 60 to 75 percent.
+As with the Histogram of Oriented Gradients, LSR is implemented in Spfeas in accordance to the paper of Graesser \textit{et al.} \cite{graesser2012image}. The paper uses three statistical features extracted from the LSR, these are: line length entropy, mean, and entropy of line contrasts. Together with three color bands, this brings the total to nine features for a single scale. Using the LSR features for the scales 50, 100, and 200, the paper achieved an accuracy of 60 to 75 percent.
 
 %In the same manner as HoG characterized
 %areas by the orientation their buildings, neighborhoods, alternatively, can be
