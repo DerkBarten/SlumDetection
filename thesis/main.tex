@@ -14,6 +14,8 @@
 \usepackage[hidelinks]{hyperref}
 \usepackage{relsize}
 \usepackage{svg}
+\usepackage{filecontents}
+\usepackage[nottoc,numbib]{tocbibind}
 
 \usepackage{mathtools}
 \DeclarePairedDelimiter\ceil{\lceil}{\rceil}
@@ -28,6 +30,7 @@
 \titleformat{\section}{\LARGE\sc}{\thesection.}{1em}{}
 \titleformat{\subsection}{\normalsize\it}{\thesection.\thesubsection}{0.9em}{}
 \titleformat{\subsubsection}{\small\it}{\thesection.\thesubsection.\thesubsubsection}{0.9em}{}
+
 
 
 \pgfplotsset{compat=1.11,
@@ -68,6 +71,7 @@
 
 \clearpage
 
+\addcontentsline{toc}{section}{References}
 \printbibliography
 
 \clearpage

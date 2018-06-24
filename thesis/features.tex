@@ -35,7 +35,7 @@ Beyond the detection of humans, a paper from 2003 showed that this approach can 
 
 The Python library that is based on the paper of Graesser \textit{et al} extracts different features from the Histogram of Oriented Gradients than the ones described in the paper. The paper uses the first two central moments together with three orientation features, but they are ill described; the library instead uses four central moments together with a maximum. Because we use the implementation from the library, we will only discuss the features that are used in the library instead of the paper. 
 
-The four central moments that are used form a set of values that characterize a probability distribution relative to the mean of the distribution. These characteristics of a distribution, better known as the mean, variance, skew and kurtosis, are defined using the formula displayed in \ref{central_moments}. In this formula, $n$ is the order of the central moment, $\mu_{n}$ is the $n$-th central moment and $\mu$ without a subscript is the mean of the distribution on which the central moments are based. The zero-th and first central moment are trivial because $n=0$ and $n=1$ will always result in 1 and 0 respectively. Instead of using the trivial first central moment, the library uses the regular mean instead. The other three central moments, variance, skew and kurtosis are calculated using the formula in \ref{central_moments} for $n=2$, $n=3$, and $n=4$, respectively. Besides the central moments, the fifth feature is a maximum although, due to lack of documentation, it is unclear what this maximum actually refers to.
+The four central moments that are used form a set of values that characterize a probability distribution relative to the mean of the distribution. These characteristics of a distribution, better known as the mean, variance, skew and kurtosis, are defined using the formula displayed in \ref{central_moments} \cite{grimmett2001probability}. In this formula, $n$ is the order of the central moment, $\mu_{n}$ is the $n$-th central moment and $\mu$ without a subscript is the mean of the distribution on which the central moments are based. The zero-th and first central moment are trivial because $n=0$ and $n=1$ will always result in 1 and 0 respectively. Instead of using the trivial first central moment, the library uses the regular mean instead. The other three central moments, variance, skew and kurtosis are calculated using the formula in \ref{central_moments} for $n=2$, $n=3$, and $n=4$, respectively. Besides the central moments, the fifth feature is a maximum although, due to lack of documentation, it is unclear what this maximum actually refers to.
 
 \begin{figure}[h]
 	\centering
@@ -61,11 +61,35 @@ According to the results presented in the paper, these 15 features could produce
 
 \subsection{Line Support Region Features}
 
-The Line Support Regions method was originally used for the detection of straight lines in photographs \cite{burns1986extracting}. As with the Histogram of Oriented Gradients, this method is a spatial feature and uses gradient orientation to characterize parts in the image, in this case, straight lines. This approach groups pixels together with similar gradient orientation based on the fact that straight lines are in essence regions of pixels with identical gradients. 
+The Line Support Regions method was originally used for the detection of straight lines in photographs \cite{burns1986extracting}. As with the Histogram of Oriented Gradients, this method is a spatial feature and uses gradient orientation to characterize parts in the image, in this case, straight lines. This approach groups pixels together with similar gradient orientation based on the fact that straight lines are in essence regions of pixels with similar gradients. 
 
-This approach was shown to be suited for land use classification \cite{unsalan2004classifying} \cite{unsalan2006gradient}, and has been used in slum and informal region detection since \cite{graesser2012image} \cite{accra} \cite{colombo}. LSR characterizes neighborhoods in the their lines, which often correspond to the contours of buildings. In formal neighborhoods, these lines are often relatively long since the formal structures tend to be bigger in size than informal structures. This contrast in the properties of lines in certain regions can characterize the region as either formal or informal.
+This approach was shown to be suited for land use classification \cite{unsalan2004classifying} \cite{unsalan2006gradient}, and has been used in slum and informal region detection since \cite{graesser2012image} \cite{accra} \cite{colombo}. LSR characterizes neighborhoods in the their lines, which often correspond to the contours of buildings. In formal neighborhoods, these lines are often relatively long since the formal structures tend to be bigger in size than informal structures. Furthermore, according the the paper \cite{unsalan2004classifying}, line contrast can be used as well to differentiate between land use, as developed areas tend to have high contrast as opposed to low contrast in underdeveloped areas. The difference in contrast can , for instance, be caused by the presence of asphalt, shining roof material and vegetation, which tends to lack in underdeveloped regions. In the paper, this approach was used to differentiate between urban areas and rural areas, although this is now used as well to differentiate between region types within an urban area.
 
-As with the Histogram of Oriented Gradients, LSR is implemented in Spfeas in accordance to the paper of Graesser \textit{et al.} \cite{graesser2012image}. The paper uses three statistical features extracted from the LSR, these are: line length entropy, mean, and entropy of line contrasts. Together with three color bands, this brings the total to nine features for a single scale. Using the LSR features for the scales 50, 100, and 200, the paper achieved an accuracy of 60 to 75 percent.
+LSR is implemented in the Spfeas library in accordance to the paper of Graesser \textit{et al.} \cite{graesser2012image}. The paper uses the line length entropy, mean, and entropy of line contrasts as statistical features from the Line Support Regions, although the paper does not describe this process detail. The paper to which Graesser \textit{et al.} refers to, describes the process of calculating these statistical features by means of using three coefficients produced by a Fourrier Transformation \cite{unsalan2004classifying}. These coefficients are $(\alpha_{-1}, \beta_{-1})$, $(\alpha_{0}, \beta_{0})$, and $(\alpha_{1}, \beta_{1})$ of which the derivation can be found in the paper.
+
+\begin{figure}[h]
+	\centering
+	$$\mathlarger{\mu_{xy} = (\alpha_{0}, \beta_{0})}$$
+	$$\mathlarger{l = 2\left[\sqrt{\alpha_{1}^2 + \beta_{1}^2} + \sqrt{\alpha_{-1}^2 + \beta_{-1}^2}\right]}$$
+	$$\mathlarger{\theta = \frac{\arctan(\frac{\beta_{1}}{\alpha_{1}}) + \arctan(\frac{\beta_{-1}}{\alpha_{-1}})}{2}}$$
+	\caption{Definition of the center of mass $\mu_{xy}$, the line length $l$ and orientation $\theta$}
+	\label{line_def}
+\end{figure}
+
+Using these coefficients, we can characterize the lines detected within the scale of a block by using the center of mass $\mu_{xy}$, the line length $l$ and orientation $\theta$ with the formula displayed in Figure \ref{line_def}. The most straight forward statistical feature is the mean, which is calculated by taking the mean of all $l$ values of the detected line support regions. The other two features, the entropy of the line length and the line contrast,  are calculated using the entropy formula in Figure \ref{line_entropy_def}. 
+
+\begin{figure}[h]
+	
+	$$ \mathlarger{E = -\sum_{i=1}^{N} \left[ h(i) \log_2(h(i))\right]}$$
+	\caption{Definition of the entropy function}
+	\label{line_entropy_def}
+\end{figure}
+
+In the creation of the line length entropy, the length of the lines in the area is collected in a histogram with bins representing the different length of the lines. The paper\cite{unsalan2004classifying} describes a total of 37 bins ranging from 5 to 150 pixels. Regarding the formula in Figure \ref{line_entropy_def}, using the histogram $h$ with $N$ bins, we can calculate the entropy of the line length $E_l$.
+
+The line contrasts are calculated by finding the maximum gradient for every line support region. These maximum gradients are, as the line contrasts calculation, collected in a histogram of 31 bins, ranging from 5 to 3000. A more detailed description including the formula for the maximum feature selection can be found in the paper \cite{unsalan2004classifying}. The histogram is used by the entropy function defined in Figure \ref{line_entropy_def} and results in the line contrast entropy $E_c$.
+
+The paper by Graesser \textit{et al.} uses the same octave scale and block size used for HoG, resulting in a total of 9 features. Again, since we use three color bands, the number of features used in our implementation is multiplied by three relative to the paper. Using the LSR features, the paper achieved an accuracy of 60 to 75 percent.
 
 %In the same manner as HoG characterized
 %areas by the orientation their buildings, neighborhoods, alternatively, can be
