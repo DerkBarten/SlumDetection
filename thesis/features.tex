@@ -1,5 +1,5 @@
 \section{Conventional Feature Extraction Methods}
-Researchers in this field of study often use a combination of features in the detection of informal settlements. Our research uses features that performed well in previous research. The use two methods for extracting features from the satellite images; these are the Histogram of Oriented Gradients (HoG) and Line Support Region (LSR) features. Both HoG and LSR are implemented in a Python library, called spfeas, which is based on the research of Graesser \textit{et al.} \cite{graesser2012image}. Along side these features, we design a new feature that is based on the difference 
+Researchers in this field of study often use a combination of features in the detection of informal settlements. Our research uses features that performed well in previous research. The use two methods for extracting features from the satellite images; these are the Histogram of Oriented Gradients (HoG) and Line Support Region (LSR) features. Both HoG and LSR are implemented in a Python library, called \textit{Spfeas}, which is based on the research of Graesser \textit{et al.} \cite{graesser2012image}. Along side these features, we design a new feature that is based on the difference 
 in distribution of road intersections between formal and informal areas. This is based on the belief that there is an observable difference between formal and informal areas in this aspect.
 
 \begin{figure}
@@ -11,9 +11,9 @@ in distribution of road intersections between formal and informal areas. This is
 
 
 \subsection{Terminology}
-The paper of Graesser \textit{et al.} divides the image in small blocks instead of pixels when extracting features from the satellite images. The features are calculated for each block of pixels instead of each pixel individually, which significantly lowers the computational load as the extraction methods can be computationally quite expensive. The dimensions of the blocks are referred to as the \textit{block size},  which is 20 by 20 pixels in the paper of Graesser \textit{et al.}. In our research, various block sizes will evaluated for the effect on the classification performance. Besides \textit{block size}, another important parameter in the paper is the \textit{scale} of a feature. The \textit{scale} specifies an n x n block around the pixel block that should be included in the calculation of the feature.
+The paper of Graesser \textit{et al.} divides the image in small blocks instead of pixels when extracting features from the satellite images. The features are calculated for each block of pixels instead of each pixel individually, which significantly lowers the computational load as the extraction methods can be computationally quite expensive. The dimensions of the blocks are referred to as the \textit{block size},  which is 20 by 20 pixels in the paper of Graesser \textit{et al}. In our research, various block sizes will evaluated for the effect on the classification performance. Besides \textit{block size}, another important parameter in the paper is the \textit{scale} of a feature. The \textit{scale} specifies an n x n block around the pixel block that should be included in the calculation of the feature.
 
-Figure \ref{fig:block_scale} is an example of how the size of the block and the scale are used in the calculation of the features from an image. In this example, the size of the image is 120 by 120 pixels and is divided into blocks of the 20 by 20 pixels each, which is the block size. In this example, the scale is the area around each of 80 by 80 pixels. For every block in the image, starting from the top left to the bottom right, the features are calculated over the area covered by the scale. To clarify, if we extract $n$ features from the image in the example, the dimensions of the feature vector would be (6 x 6 x $n$). The block size essentially controls the resolution of the calculated feature vector with an increased block size causing a decreased resolution and the same in reverse. In practice, the block size is almost never a multiple of the image size. Furthermore, in the border regions of the image using a scale larger than the block size, the outer blocks where the scale falls of the edge of the image are discarded as well. This results in a smaller feature vector than dividing the size of the image by the block size.
+Figure \ref{fig:block_scale} is an example of how the size of the block and the scale are used in the calculation of the features from an image. In this example, the size of the image is 120 by 120 pixels and is divided into blocks of the 20 by 20 pixels each, which is the block size. In this example, the scale is the area around each of 80 by 80 pixels. For every block in the image, starting from the top left to the bottom right, the features are calculated over the area covered by the scale. To clarify, if we extract $n$ features from the image in the example, the dimensions of the feature vector would be (6 x 6 x $n$). The block size essentially controls the resolution of the calculated feature vector with an increased block size causing a decreased resolution and the same in reverse. In practice, the block size is almost never a multiple of the image size. In the border regions of the image using a scale larger than the block size, the outer blocks where the scale falls of the edge of the image are discarded. This results in a smaller feature vector than simply dividing the size of the image by the block size.
 
 \begin{figure}[h]
 	\centering
@@ -22,9 +22,9 @@ Figure \ref{fig:block_scale} is an example of how the size of the block and the 
 	\label{padding}
 \end{figure}
 
-Figure \ref{padding} shows displays the equation to calculate how many blocks will be removed as padding $p$ for a certain image $i$ with the combination of scale $s$ and block size $b$. We displayed the function for the calculation of the padding in the $x$-direction, although this will be different for the $y$-direction if the image, scale of block size different is not of the same width and length. In our case, only the images will have different a different width and length; the scales and block sizes will be $n$x$n$, thus we will be referring two these parameters with a single value $n$ instead of $n$x$n$
+Figure \ref{padding} shows displays the equation to calculate how many blocks will be removed as padding $p$ for a certain image $i$ with the combination of scale $s$ and block size $b$. We displayed the function for the calculation of the padding in the $x$-direction, although this will be different for the $y$-direction if the image, scale or block size is not of equal width and length. In our case, only the images will have a different width and length; the scales and block sizes will always be $n$x$n$, thus we will be referring two these parameters with a single value $n$ instead of $n$x$n$
 
-We used this equation to predict the dimensions of the features that the Spfeas Python library would produce after we supplied the input image and the accompanying parameters. We need this prediction to reshape the ground truth into same shape as the produced features. If the shape of the ground truth do not match, we cannot correctly label the values from the feature vector as either belonging to the formal or informal class and produce the dataset for training and testing for the classification algorithms.
+We used this equation to predict the dimensions of the features that the Python library would produce after we supplied the input image and the accompanying parameters. We need this prediction to reshape the ground truth into same shape as the produced features. If the shape of the ground truth does not match the size of the feature, we cannot correctly label the values from the feature vector as either belonging to the formal or informal class and produce the dataset for training and testing for the classification algorithms.
 
 \subsection{Histogram of Oriented Gradients}
 
@@ -47,16 +47,6 @@ The four central moments that are used form a set of values that characterize a 
 Instead of using a single scale for feature calculation, the paper of Graesser \textit{et al.} uses octaves of three scales, meaning that the size of the scale doubles for every scale. To illustrate, the scale octaves used for both the Histogram of Gradients and the Line Support Regions, is 50, 100, and 200. To summarize: in the paper, a single HoG feature vector contains five values, since the feature is performed for three different scales, the total values in the feature vector results in 15. Although it is not mentioned in the paper, the library calculates the features for the different color bands as well, resulting in 45 values instead of 15. This implies that in the paper only a single color band was used.
 
 According to the results presented in the paper, these 15 features could produce an accuracy of 65 to 75 percent. However, this feature was applied to specific image regions where the visual difference between formal and informal was substantial. It is therefore debatable whether this performance is to be attributed to the Histogram of Oriented Gradients or the specific contents of the image. Besides, the morphology of the slums in their area of study is different that the slums in Bangalore, making a comparison difficult.
-
-
-%uses the Histogram of Oriented gradients to create five statistical features that characterize the distribution of values in the histogram. Four of these features are central moments calculated on the distribution of values in the Histogram of Oriented Gradients.
-%
-%
-%
-
-
-
-%Graesser \textit{et al} extracts five features from the Histogram of Oriented Gradients: first and second order of the heaved central shift moment, variance, skew, and kurtosis. These properties of the histogram are used as features to describe the histogram. These 5 features are calculated for every color band of the rgb image, resulting in a total of 15 features for the Histogram of Gradients. According to the results presented in the paper, these 15 features could produce an accuracy of 65 to 75 percent, although it must be noted that this feature was applied to specific regions where the visual difference between formal and informal was substantial. Furthermore, the morphology of the slums in their area of study is different that the slums in Bangalore.
 
 
 \subsection{Line Support Region Features}
@@ -91,16 +81,5 @@ The line contrasts are calculated by finding the maximum gradient for every line
 
 The paper by Graesser \textit{et al.} uses the same octave scale and block size used for HoG, resulting in a total of 9 features. Again, since we use three color bands, the number of features used in our implementation is multiplied by three relative to the paper. Using the LSR features, the paper achieved an accuracy of 60 to 75 percent.
 
-%In the same manner as HoG characterized
-%areas by the orientation their buildings, neighborhoods, alternatively, can be
-%characterized by the size of their buildings. Informal settlements generally
-%lack the presence of large buildings in contrast with formal regions. The size
-%of constructions can be characterized using the Line Support Region (LSR)
-%features \cite{unsalan2004classifying}. Likewise to HoG, LSR utilizes gradients
-%calculated from remote sensing imagery. LSR uses the fact that straight lines
-%have uniform gradients. In practice, natural photographs hardly contain
-%perfectly straight lines, which results in similar but non uniform gradients of
-%lines. Therefore, LSR uses groups similar gradients to represent a line in
-%images to detect semi straight lines in images \cite{burns1986extracting}.
 
 

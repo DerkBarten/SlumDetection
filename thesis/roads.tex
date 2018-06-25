@@ -113,11 +113,33 @@ In conclusion, the use of a cross shaped kernel together with convolution seems 
 		\subfloat{\includegraphics[width=7cm]{images/hotspotint}}&
 		\subfloat{\includegraphics[width=7cm]{images/hotspot}}
 	\end{tabular}
-	\caption{Hotspots extracted from the detected intersections}
+	\caption{Hotspots extracted from the detected intersections. Left: Detected road intersections; Right: Resulting hotspot map of the local G function}
 	\label{fig:roads_hotspot}
 \end{figure}
 
-The positions of the road intersections allow for the feature extraction of the road intersection density. Since the objective does not concern the precise location the intersections of a region, misclassified or missed intersections are not of high concern, as long as the area is well represented by the correctly detected intersections. The density of road intersections in an area, is characterized by hotspot analysis using the Getis and Ord's local G function \cite{getis1992analysis}. The local G function is a meaure of spatial association between spatially distributed instance data. In our case, these instances are the locations of the intersections. The local G function is able to detect local hotspots and coldspots in instance data, effectively indicating the location of hotspots and coldspots in the density of intersections in the image of interest. This method for hotspot detection is implemented in the PySal python packackage \cite{rey2010pysal}. In order to create a feature from the local G function, the detected intersection need to be rasterized in the shape of the feature vector used in the other feature extraction methods. This rasterization allows for the feature to be easily combined with the features extracted from the satellite image using HoG and LSR. From this point on, we will refer to this feature extraction method as the Road Intersection Density or RID.
+
+The positions of the road intersections extracted from the image are used to create a intersection density map of the area. The density of road intersections in an area is measured using spatial statistics provided by the Getis and Ord's local G function \cite{getis1992analysis}. The local G function is a measure of spatial association between spatially distributed data. In our case, this data is the locations of the intersections in the image. The local G function is able to detect local hotspots and coldspots in instance data, effectively indicating the location of hotspots and coldspots in the density of intersections in the image of interest.
+
+\begin{figure}[h]
+	\centering
+	$ \mathlarger{\mathlarger{\mathlarger{ G_i(d) = \frac{\sum\limits_{j=1}^{n}w_{ij}(d)x_j}{\sum\limits_{j=1}^{n}x_j} }}} $
+	\caption{Definition of the local G function}
+	\label{g_function}
+\end{figure}
+
+
+The formula of the Getis-Ord local G function $G_i(d)$ is displayed in Figure \ref{g_function}, which defines for a data point $i$ on a Cartesian plane a ratio using the neighboring data points within a radius $d$. In our case, $i$ is the location of an intersection, with $d$ being the scale of the feature. Regarding the variables in the numerator of the fraction, $n$ is the total number of data points, $j$ is every data point that is not $i$, $w_ij{d}$ is a function that returns zero or one whether $j$ is within the radius $d$ of $i$, and $x_j$ specifies the weight of $j$. The enumerator sums up all weights $x_j$ of the data points within the radius $d$ of $i$. In our case, when using the location of road intersections, we do not have weights other than ones. However, because we rasterize the locations of the intersections to a grid in the shape of the HoG and LSR features, the weights will indicate the number of intersections that fell within a certain block in the grid. The denominator is the sum of the weights of all data points, regardless of their location. This fraction is in essence a ratio between the points within the radius of $i$ and all points. 
+
+\begin{figure}[h]
+	\centering
+	$ \mathlarger{\mathlarger{\mathlarger{ z = \frac{x - \mu}{\sigma} }}} $
+	\caption{Definition of the Z score}
+	\label{z_score}
+\end{figure}
+
+We use the ratios created by $G_i(d)$ to create a statistical feature using the Z score. This score is calculated using the formula displayed in Figure \ref{z_score} where $x$ is the $G_i(d)$, $\mu$ is the mean and $\sigma$ the standard deviation of all $G_i(d)$ \cite{kreyszig2010advanced}. The Z score is a form of outlier detection, where negative and positive scores indicate a deviation from the mean. Using the Z score, we can detect hot and cold spots in the $G_i(d)$ ratios, and therefore detect hotspots and cold spots in the density of road intersections. The exact calculation of the Z score for the local G function with definitions of the $G_i(d)$ mean and variance can be found in the paper\cite{getis1992analysis}. The Z score applied to local G function results in a map of hotspots and cold spots of the road intersections, as illustrated by Figure \ref{fig:roads_hotspot}.
+
+Both the local G function and Z score are implemented in the PySal Python packackage \cite{rey2010pysal}. The resulting map from the local G function and Z score is used as a feature and will be referred to as the \textit{Road Intersection Density} or RID for short.
 
 
 
