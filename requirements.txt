@@ -10,3 +10,7 @@ scipy==1.0.0
 gdal==2.3.0
 imblearn==0.0
 scikit_learn==0.19.1
+sklearn
+Cython
+opencv-python
+-e git://github.com/jgrss/spfeas.git#egg=spfeas
