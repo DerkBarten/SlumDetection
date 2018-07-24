@@ -1,6 +1,6 @@
 \section{Results}
 
-Figure \ref{fig:comp} presents the performance comparison between two and three class classification for the parameters listed in Table \ref{tab:params}. This figure shows three metrics for performance, Mathews Correlation Coefficient (MCC), Precision, Recall and F1 score. Both the MCC and the F1 score provide a score that depends on the balance between the precision and recall. Judging by the MCC and F1 score, it seems that for every section, the performance is doubled when using three classes instead of two.
+Figure \ref{fig:comp} presents the performance comparison between two and three class classification for the parameters listed in Table \ref{fig:params}. This figure shows three metrics for performance, Mathews Correlation Coefficient (MCC), Precision, Recall and F1 score. Both the MCC and the F1 score provide a score that depends on the balance between the precision and recall as these measures alone tend to give a wrong impression of actual performance. Judging by the MCC and F1 score, it seems that for every section, the performance is doubled when using three classes instead of two.
 
 
 \pgfplotstableread[col sep = comma]{results/2_vs_3_mcc.csv}\datazero
@@ -115,7 +115,7 @@ Figure \ref{fig:comp} presents the performance comparison between two and three 
 \end{figure}
 
 
-We have provided a visualization for the three class of the detected slums in Figure \ref{fig:vis}. In the calculation and the visualization, eventhough we use three classes, we collapse the three classes into two after classification. This is because we are not interested in how well the vegetation or buildings are classified. We only care about the performance of the slum classification. We achieve this by combining all vegetation and building into a single class, just like the two class classification. Therefore, the images displayed in Figure \ref{fig:vis} display only two classes eventhough it was trained and tested using three classes.
+We have provided a visualization for the three class of the detected slums in Figure \ref{fig:vis}. For the calculation of the performance and the visualization of the predictions, eventhough we use three classes, we collapse the three classes into two after classification. This is motivated by the fact that we are not interested in how well the vegetation or buildings are classified, we only care about the performance of the slum classification. We achieve this by combining all vegetation and building into a single class, just like the two class classification. Furthermore, this keeps the comparison between two class and three class classification fair. As a result, the images displayed in Figure \ref{fig:vis} display only two classes even though it was trained and tested using three classes.
 
 \begin{figure}[h]
 	\centering
@@ -132,10 +132,61 @@ We have provided a visualization for the three class of the detected slums in Fi
 \end{figure}
 
 
+\pgfplotstableread[col sep = comma]{results/block.csv}\datablock
+\pgfplotstableread[col sep = comma]{results/treshold.csv}\datatreshold
 
-We further experimented with the effect of different blocksizes on the performance. Small block sizes could decrease
+\begin{figure}[h]
+	\begin{tikzpicture}
+	\begin{axis}[
+		ymajorgrids = true,
+		bar width=0.5cm,
+		ylabel = Matthews Coefficient,
+		xlabel = Block Size,
+		width=.5\textwidth,
+		height=.5\textwidth,
+		enlarge x limits=0.25,
+		symbolic x coords={10, 20, 30},
+		xtick=data,
+		ymax = 1,
+		yticklabel style={
+			/pgf/number format/fixed,
+			/pgf/number format/precision=2,
+			/pgf/number format/fixed zerofill
+		},
+		scaled y ticks=false,
+		]
+		\addplot table[x=BlockSize, y=Section]{\datablock};
+		%\addplot[dotted, sharp plot, update limits=false] coordinates {(0, 0)(1, 0)}; 
+		\legend{Section 3}
+		\end{axis}
+	\end{tikzpicture}
+	\begin{tikzpicture}
+	\begin{axis}[
+	ymajorgrids = true,
+	bar width=0.5cm,
+	ylabel = Matthews Coefficient,
+	xlabel = Threshold,
+	width=.5\textwidth,
+	height=.5\textwidth,
+	enlarge x limits=0.25,
+	symbolic x coords={0.34, 0.5, 0.8},
+	xtick=data,
+	ymax = 1,
+	yticklabel style={
+		/pgf/number format/fixed,
+		/pgf/number format/precision=2,
+		/pgf/number format/fixed zerofill
+	},
+	scaled y ticks=false,
+	]
+	\addplot table[x=Threshold, y=Section]{\datatreshold};
+	%\addplot[dotted, sharp plot, update limits=false] coordinates {(0, 0)(1, 0)}; 
+	\legend{Section 3}
+	\end{axis}
+	\end{tikzpicture}
+	\caption{Performance comparison between two and three class classification}
+	\label{fig:comp}
+\end{figure}
 
 
-
-
-Furthermore, we evaluated the effect of different thresholds on performance. This does remove extra slum blocks, but it should reduce a lot of noise.
+We further experimented with the effect of different blocksizes and tresholds on the performance. Block sizes larger than 10 seems to decrease the MCC. Larger values for the thresold seems to increase performance.

@@ -1,2 +1,12 @@
 \section{Discussion}
-no oversampling used
+There is a clear improvement when using three classes instead of two, as displayed in Figure \ref{fig:comp}. Because the MCC and F1 score both use the precision and recall, it is likely that the increase in recall caused the increase of these two measures. With three classes for the third section, it seems that it is able to keep a high recall when the precision is high. In contrast, the two class classification has a significantly lower recall while the precision is equal to that of the three class classification. The improved performance results in relatively accurate predictions with very little noise, with the exception of the first section, as visualized in \ref{fig:three_classes}.
+
+Interestingly enough, Figure \ref{fig:three_classes}c seems to detects traffic as areas of slum. Upon further investigation, the morphology of cars on the road seems to match that of slums. On satellite images, cars resemble small scattered, disorganized, objects, thus both appearance and in texture similar to slums. This effect is perhaps enlarged by the fact that the features that are used are largely based on texture. Furthermore, the other two images that are used for training do not contain large amounts of traffic, therefore the algorithm has not learned that these vehicles are not slums.
+
+The experiment with the different block sizes suggests that performance drops when increasing block size. 
+
+
+
+
+
+ 
