@@ -1,0 +1,48 @@
+\section{Methodology}
+% we first tried to filter out
+% then made 3 classes
+% combine 2 classes into 1 when showing results
+
+
+\subsection{Data}
+We used the same data that was used in the thesis, including the same sections and shapefiles. 
+% quick recap of data we have
+
+We do not have land cover data indicating the areas covered with vegetation. Even if we were to have this data, the method would be more scalable if we could extract vegetation automatically from the image. 
+
+\subsection{Land Cover Extraction}
+As in the our thesis, the only shapefiles we have are the positions and boundaries of slums. To create the three class division, we require the boundaries of the vegetation and buildings as well. To create these boundaries, we have used methods for land cover extraction. For the vegetation, we have used the \textit{Normalized difference vegetation index} (NDVI) to detect vegetation in the image. This technique is an common method to detect vegetation. For the building class, as our images have little water, we defined the building class as the leftover class when the vegetation, slum and soil are removed. For this, the soil was detected using the World View Soil Index, which is similar to the calculation of NDVI. We also discovered another method for detecting buildings using NDSI, which is a snow index but surprisingly manages to capture build up areas quite accurately. Using these methods, we were able to divide the image into three classes.
+
+\begin{equation}
+NDVI = \frac{(NIR-Red)}{(NIR+Red)}
+\end{equation}
+
+\begin{figure}
+	\centering
+	\includegraphics[width=.7\textwidth]{three_classes.png}
+\end{figure}
+
+
+% NDVI and WSVI stuff
+
+\subsection{Experimental Details}
+We have run several experiments to compare the effectiveness of three classes as compared to two classes with the main experiment a comparison in performance between two and three classes with all other parameters constant. These constant parameters are displayed in the Table. We use GradientBoosting as the sole classifier. In our thesis and the work of Filtenborg, we experienced that, of all classifiers, GradientBoosting performed very well.
+The features that are used in this paper are different from the features in the original paper. Filtenborg, who worked on the same problem, was able to achieve comparatively high performance using a different set of features. These features were Lacunarity, GLCM, SIFT and TEXTON. We will continue using the same features as Filtenborg because they have shown that these features work well with our data.
+As for the window sizes and block size, our thesis discusses the impact of these parameters on performance. However, since different features are used, these conclusions might no longer be valid. We therefore use the parameters that were successfully used by Filtenborg.
+The threshold parameter indicates the percentage of pixels in a block that should be of a certain class before the block included in the class. We have set the threshold to 0.8 as we experienced that this resulted in the highest performance. We will change the treshold to different values to clarify this difference.
+Unlike the our thesis, we do not use oversampling in this experiment. We observed that oversampling reduces the performance with three class classification. We have tested this with both random oversampling and SMOTE. To keep the comparision fair, the two classes will not use oversampling.
+
+%The main objective of this thesis is to compare the performance between 2 class classification to the performance of three class classification. We use a tile size of (10, 10) and a window sizes of ((50, 50), (100, 100) and (200, 200)). We will experiment with the effect of different tile sizes when using three classes. The window sizes will be constant for all experiments. In the calculation of the performance, we collapse the vegetation and building classes into a single class.
+%The classifier that is used is GradientBoosting.
+
+\begin{figure}
+	\centering
+	\begin{tabular}{lr}
+		Classifier & GradientBoosting\\
+		Features & Lacunarity, GLCM, SIFT and TEXTON\\
+		Window Sizes & ((50, 50), (100, 100) and (200, 200))\\
+		Block Size & (10, 10)\\
+		Threshold & 0.8
+	\end{tabular}
+	\label{tab:params}
+\end{figure}

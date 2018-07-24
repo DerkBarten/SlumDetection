@@ -1,0 +1,75 @@
+\documentclass[a4paper]{article}
+
+\usepackage[backend=biber, sorting=none]{biblatex}
+\usepackage[]{geometry}
+\usepackage[font={normalsize,it}]{caption}
+\usepackage{titlesec}
+\usepackage{graphicx}
+\usepackage{subfig}
+\usepackage{amsmath}
+\usepackage[toc,page]{appendix}
+\usepackage{pgfplots}
+\usepackage{tikz}
+\usepackage{gensymb}
+\usepackage[hidelinks]{hyperref}
+\usepackage{relsize}
+\usepackage{svg}
+\usepackage{filecontents}
+\usepackage[nottoc,numbib]{tocbibind}
+\usepackage{longtable}
+
+\usepackage{mathtools}
+\DeclarePairedDelimiter\ceil{\lceil}{\rceil}
+\DeclarePairedDelimiter\floor{\lfloor}{\rfloor}
+
+\addbibresource{references.bib}
+
+\renewcommand{\thesection}{\arabic{section}}
+\renewcommand{\thesubsection}{\arabic{subsection}}
+\renewcommand{\thesubsubsection}{\arabic{subsubsection}}
+
+\titleformat{\section}{\LARGE\sc}{\thesection.}{1em}{}
+\titleformat{\subsection}{\normalsize\it}{\thesection.\thesubsection}{0.9em}{}
+\titleformat{\subsubsection}{\small\it}{\thesection.\thesubsection.\thesubsubsection}{0.9em}{}
+
+
+
+\pgfplotsset{compat=1.11,
+	/pgfplots/ybar legend/.style={
+		/pgfplots/legend image code/.code={%
+			\draw[##1,/tikz/.cd,yshift=-0.25em]
+			(0cm,0cm) rectangle (3pt,0.8em);},
+	},
+}
+\begin{document}
+
+\begin{titlepage}
+\input{title}
+\end{titlepage}
+%\thispagestyle{empty}
+\clearpage
+
+\input{introduction}
+\input{method}
+\input{results}
+
+% previous work
+
+% method
+
+% results
+
+% conclusion
+
+% discussion
+
+% future work: make 4 classes, or even 5 using soil and water. perhaps more classes leads to diminishing returns eventually
+
+\addcontentsline{toc}{section}{References}
+\printbibliography
+
+\clearpage
+%\input{appendix}
+
+\end{document}
+
