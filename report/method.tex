@@ -1,13 +1,12 @@
 \section{Methodology}
-In order to create three classes, we need at least two masks of land cover to designate areas to create three classes. As we have discussed in our thesis, we only possess a mask of the satellite image indicating the area that is determined as slum; we lack masks of the vegetation and buildup areas in Bangalore. We created the vegetation and building mask ourselves using features extracted from the satellite image that indicate these two land cover categories. By creating these masks from the image itself instead of relying on an external source, this approach of three class classification should be become more generalizable. The techniques that we have used to create the vegetation and building masks are the \textit{Normalized difference vegetation index} (NDVI) and the \textit{WorldView Soil Index} (WVSI). These techniques perform and operation on specific bands in the satellite image that allows for the characterization of different land cover categories. The NDVI calculates the ratio between the infra red and the red band, as expressed by equation \ref{eq:ndvi}. The results from this equation range from -1 to 1. The values from zero to one indicate the range from barren at zero and moving to lush vegetation when approaching one. The values close to negative one might indicate a body of water, although there are other equations made specifically for this purpose. We apply Otsu thresholding method on the range of NDVI values to find a dynamic threshold for what would be considered vegetation.
+The creation of three classes requires at least two masks of land cover to designate areas to create three classes. As we have discussed in our thesis, we only possess a mask of the satellite image indicating the area that is determined as slum; we lack masks of the vegetation and buildup areas in Bangalore. We have therefore created the vegetation and building mask ourselves using features extracted from the satellite image that indicate these two land cover categories. By creating these masks from the image itself instead of relying on an external source, the approach should become more generalizable to other satellite images and cities. The techniques that we have used to create the vegetation and building masks are the \textit{Normalized difference vegetation index} (NDVI) and the \textit{WorldView Soil Index} (WVSI) \cite{ndvi} \cite{wvsi}. These techniques perform a calculation on specific bands in the satellite image that allows for the characterization of different land cover categories. The NDVI calculates the ratio between the infra red and the red band, as expressed by equation \ref{eq:ndvi}. The results from this equation range from -1 to 1. The values from zero to one indicate the range from barren at zero and moving to lush vegetation when approaching one. The values close to negative one might indicate a body of water although there are different equations made specifically for this purpose. We apply Otsu thresholding method on the range of NDVI values to find a dynamic threshold for what would be considered vegetation \cite{otsu1979threshold}.
 
-% when vegetation overlaps with slum, remove vegetation
 \begin{equation}
 \label{eq:ndvi}
 NDVI = \frac{(NIR1 - Red)}{(NIR1 + Red)}
 \end{equation}
 
-We approached the creation building mask as a left over when the areas of soil, vegetation and slum are removed as this allows us to still use all the data from the image and avoid duplication difficulties of parts of the image that are both detected as building and vegetation. We did not have to account for water because there is only a negligible part of image water. For creation of the soil mask, we used the WVSI, as expressed in equation \ref{eq:wvsi}. We experimented with other methods for the detection of buildup areas and discovered that the snow index NDSI detected buildup areas very accurately. It compares the green band to the infra red band in the same manner as NDVI and WVSI. We refrained from using NDSI however, as it might not generalize well to different sections; it is a interesting find nevertheless.
+We approached the creation building mask as a leftover when the areas of soil, vegetation, and slum are removed; this allows us to still use all the data from the image and avoid duplication difficulties of parts of the image that are both detected as building and vegetation. We did not have to account for water because there is only a negligible part of the sections covered by water. For the creation of the soil mask, we used the WVSI, as expressed in equation \ref{eq:wvsi}. We experimented with other methods for the detection of buildup areas and discovered that the snow index NDSI detected buildup areas very accurately. It compares the green band to the infrared band in the same manner as NDVI and WVSI. We refrained from using NDSI however, as it might not generalize well to different images; it is an interesting find nevertheless.
 
 \begin{equation}
 \label{eq:wvsi}
@@ -20,44 +19,37 @@ NDSI = \frac{(Green - NIR1)}{(Green + NIR1)}
 \end{equation}
 
 
-
-
-Using these methods, we were able to divide the image into vegetation, building and slum areas. An example of this division in displayed in Figure \ref{fig:three_classes}, where the greens parts are vegetation, the blue parts are buildings and the red parts are slum. In the creation of the soil and the vegetation mask, there might be overlap with the slum mask. To avoid losing slums to the vegetation and soil masks, we subtract the slum area from both masks. This explains the regular shapes of the red patches in the image.
-
+Using these methods, we were able to divide the image into vegetation, building and slum areas. An example of this division is displayed in Figure \ref{fig:masks}, where the greens parts are vegetation, the blue parts are buildings and the red parts are slums. In the creation of the soil and the vegetation mask, there might be overlap with the slum mask. To avoid losing slums to the vegetation and soil masks, we subtract the slum area from both masks. This explains the sharp shapes of the red patches in the image.
 
 
 \begin{figure}[h]
-	\centering
-	\includegraphics[width=.7\textwidth]{three_classes.png}
-	\label{fig:three_classes}
-	\caption{The Division of Section 3 into Vegetation, Building and Slum}
+    \centering
+    \includegraphics[width=.5\textwidth]{three_classes.png}
+    \caption{The Division of Section 3 into Vegetation, Building and Slum}
+    \label{fig:masks}
 \end{figure}
 
 
-% NDVI and WSVI stuff
 
 \subsection{Experimental Details}
-The main objective of the experiments is a comparison in performance between two and three class classification with all parameters constant. These parameters are displayed in the Table \ref{tab:params}.
-We use GradientBoosting as the sole classifier; in our thesis and in the work of Filtenborg, we experienced that, GradientBoosting generally performed very well.
-The features that are used in this paper are different from the features in the original paper. Filtenborg, who worked on the same problem, was able to achieve comparatively high performance using a different set of features. These features are Lacunarity, GLCM, SIFT and TEXTON. We continued with the same features as Filtenborg as they have shown that these features performed well with our data.
-As for the window sizes and block size, our thesis discusses the impact of these parameters on performance. However, since different features are used, these conclusions might no longer be valid. We therefore reuse the parameters that were successfully used by Filtenborg.
-The threshold parameter indicates the percentage of pixels in a block that should be of a certain class before the block included in the class. We have set the threshold to 0.8 as we experienced that this resulted in the highest performance.
-Unlike the our thesis, we do not use oversampling; we observed that oversampling with both random oversampling and SMOTE reduces the performance in the three class classification. To keep the comparison fair, the neither the two class or three class classification used oversampling.
+The main objective of this report is a performance comparison with constant parameters except for the number of classes. These constant parameters are displayed in the Table \ref{tbl:params}.
+We use GradientBoosting as the sole classifier; in our thesis and in the work of Filtenborg, we experienced that it performed very well. The features that are used in this paper are different from the features in the original paper. Filtenborg, who worked on the same problem, was able to achieve comparatively high performance using a different set of features. These features are Lacunarity, GLCM, SIFT, and TEXTON. We continued with the same features as Filtenborg as they have shown that these features performed well with our data.
+As for the window sizes and block size, our thesis discusses the impact of these parameters on performance. However, because we use different features, these conclusions might no longer be valid. We, therefore, reuse the parameters that were successfully used by Filtenborg.
+The threshold parameter indicates the percentage of pixels in a block that should be of a certain class before the block included in the class. We have set the threshold to 0.8 as we experienced that this resulted in the best performance. We will show the effect of different threshold parameters beside the main experiment of the class comparison.
+Unlike the approach in our thesis, we do not use oversampling; we observed that oversampling with both random oversampling does not improve performance. To keep the comparison fair, neither the two class or three class classification uses oversampling.
 
-%The main objective of this thesis is to compare the performance between 2 class classification to the performance of three class classification. We use a tile size of (10, 10) and a window sizes of ((50, 50), (100, 100) and (200, 200)). We will experiment with the effect of different tile sizes when using three classes. The window sizes will be constant for all experiments. In the calculation of the performance, we collapse the vegetation and building classes into a single class.
-%The classifier that is used is GradientBoosting.
 
 \begin{table}
-	\centering
-	\begin{tabular}{lr}
-		\hline
-		Classifier & GradientBoosting\\
-		Features & Lacunarity, GLCM, SIFT, TEXTON\\
-		Window Sizes & ((50, 50), (100, 100), (200, 200))\\
-		Block Size & (10, 10)\\
-		Threshold & 0.8\\
-		\hline
-	\end{tabular}
-	\label{fig:params}
-	\caption{Parameters used for the experiments}
+    \centering
+    \begin{tabular}{lr}
+        \hline
+        Classifier & GradientBoosting\\
+        Features & Lacunarity, GLCM, SIFT, TEXTON\\
+        Window Sizes & ((50, 50), (100, 100), (200, 200))\\
+        Block Size & (10, 10)\\
+        Threshold & 0.8\\
+        \hline
+    \end{tabular}
+    \caption{Parameters used for the experiments}
+    \label{tbl:params}
 \end{table}

@@ -1,6 +1,6 @@
 \section{Results}
 
-Figure \ref{fig:comp} presents the performance comparison between two and three class classification for the parameters listed in Table \ref{fig:params}. This figure shows three metrics for performance, Mathews Correlation Coefficient (MCC), Precision, Recall and F1 score. Both the MCC and the F1 score provide a score that depends on the balance between the precision and recall as these measures alone tend to give a wrong impression of actual performance. Judging by the MCC and F1 score, it seems that for every section, the performance is doubled when using three classes instead of two.
+Figure \ref{fig:comp} presents the performance comparison between the two and three class classification using the parameters listed in Table \ref{tbl:params}. This figure shows three metrics for performance: the Mathews Correlation Coefficient (MCC), the F1 score, Precision, and Recall. Both the MCC and the F1 score provide a score that depends on the balance between the precision and recall as these measures alone tend to give wrong impressions of the actual performance. Judging by the MCC and F1 score, for every section, the performance is doubled when using three classes instead of two. Furthermore, there is a significant difference in recall between two class and three class classification.
 
 
 \pgfplotstableread[col sep = comma]{results/2_vs_3_mcc.csv}\datazero
@@ -9,184 +9,243 @@ Figure \ref{fig:comp} presents the performance comparison between two and three 
 \pgfplotstableread[col sep = comma]{results/2_vs_3_f1.csv}\datafone
 
 
-\begin{figure}[h]
-	\begin{tikzpicture}
-		\begin{axis}[
-			ybar,
-			ymajorgrids = true,
-			bar width=0.5cm,
-			ylabel = Matthews Coefficient,
-			width=.5\textwidth,
-			height=.5\textwidth,
-			enlarge x limits=0.25,
-			symbolic x coords={Section 1, Section 2, Section 3},
-			xtick=data,
-			ymax = 1,
-			yticklabel style={
-				/pgf/number format/fixed,
-				/pgf/number format/precision=2,
-				/pgf/number format/fixed zerofill
-			},
-			scaled y ticks=false,
-			]
-			\addplot table[x=TestImage, y=Two]{\datazero};
-			\addplot table[x=TestImage, y=Three]{\datazero};
-			%\addplot[dotted, sharp plot, update limits=false] coordinates {(0, 0)(1, 0)}; 
-			\legend{Two Classes, Three Classes}
-		\end{axis}
-	\end{tikzpicture}
-	\begin{tikzpicture}
-		\begin{axis}[
-			ybar,
-			ymajorgrids = true,
-			bar width=0.5cm,
-			ylabel = Precision,
-			width=.5\textwidth,
-			height=.5\textwidth,
-			enlarge x limits=0.25,
-			symbolic x coords={Section 1, Section 2, Section 3},
-			xtick=data,
-			ymax = 1,
-			yticklabel style={
-				/pgf/number format/fixed,
-				/pgf/number format/precision=2,
-				/pgf/number format/fixed zerofill
-			},
-			scaled y ticks=false,
-			]
-			\addplot table[x=TestImage, y=Two]{\dataone};
-			\addplot table[x=TestImage, y=Three]{\dataone};
-			%\addplot[dotted, sharp plot, update limits=false] coordinates {(0, 0)(1, 0)}; 
-			\legend{Two Classes, Three Classes}
-		\end{axis}
-	\end{tikzpicture}
-	\begin{tikzpicture}
-		\begin{axis}[
-			ybar,
-			ymajorgrids = true,
-			bar width=0.5cm,
-			ylabel = Recall,
-			width=.5\textwidth,
-			height=.5\textwidth,
-			enlarge x limits=0.25,
-			symbolic x coords={Section 1, Section 2, Section 3},
-			xtick=data,
-			ymax = 1,
-			yticklabel style={
-				/pgf/number format/fixed,
-				/pgf/number format/precision=2,
-				/pgf/number format/fixed zerofill
-			},
-			scaled y ticks=false,
-			]
-			\addplot table[x=TestImage, y=Two]{\datatwo};
-			\addplot table[x=TestImage, y=Three]{\datatwo};
-			%\addplot[dotted, sharp plot, update limits=false] coordinates {(0, 0)(1, 0)}; 
-			\legend{Two Classes, Three Classes}
-		\end{axis}
-	\end{tikzpicture}
-	\begin{tikzpicture}
-		\begin{axis}[
-			ybar,
-			ymajorgrids = true,
-			bar width=0.5cm,
-			ylabel = F1 score,
-			width=.5\textwidth,
-			height=.5\textwidth,
-			enlarge x limits=0.25,
-			symbolic x coords={Section 1, Section 2, Section 3},
-			xtick=data,
-			ymax = 1,
-			yticklabel style={
-				/pgf/number format/fixed,
-				/pgf/number format/precision=2,
-				/pgf/number format/fixed zerofill
-			},
-			scaled y ticks=false,
-			]
-			\addplot table[x=TestImage, y=Two]{\datafone};
-			\addplot table[x=TestImage, y=Three]{\datafone};
-			%\addplot[dotted, sharp plot, update limits=false] coordinates {(0, 0)(1, 0)}; 
-			\legend{Two Classes, Three Classes}
-		\end{axis}
-	\end{tikzpicture}
-	\caption{Performance comparison between two and three class classification}
-	\label{fig:comp}
+\begin{figure}[]
+    \begin{tikzpicture}
+        \begin{axis}[
+            ybar,
+            ymajorgrids = true,
+            bar width=0.5cm,
+            ylabel = Matthews Coefficient,
+            width=.5\textwidth,
+            height=.5\textwidth,
+            enlarge x limits=0.25,
+            symbolic x coords={Section 1, Section 2, Section 3},
+            xtick=data,
+            ymax = 1,
+            yticklabel style={
+                /pgf/number format/fixed,
+                /pgf/number format/precision=2,
+                /pgf/number format/fixed zerofill
+            },
+            scaled y ticks=false,
+            ]
+            \addplot table[x=TestImage, y=Two]{\datazero};
+            \addplot table[x=TestImage, y=Three]{\datazero};
+            %\addplot[dotted, sharp plot, update limits=false] coordinates {(0, 0)(1, 0)}; 
+            \legend{Two Classes, Three Classes}
+        \end{axis}
+    \end{tikzpicture}
+    \begin{tikzpicture}
+        \begin{axis}[
+            ybar,
+            ymajorgrids = true,
+            bar width=0.5cm,
+            ylabel = F1 score,
+            width=.5\textwidth,
+            height=.5\textwidth,
+            enlarge x limits=0.25,
+            symbolic x coords={Section 1, Section 2, Section 3},
+            xtick=data,
+            ymax = 1,
+            yticklabel style={
+                /pgf/number format/fixed,
+                /pgf/number format/precision=2,
+                /pgf/number format/fixed zerofill
+            },
+            scaled y ticks=false,
+            ]
+            \addplot table[x=TestImage, y=Two]{\datafone};
+            \addplot table[x=TestImage, y=Three]{\datafone};
+            %\addplot[dotted, sharp plot, update limits=false] coordinates {(0, 0)(1, 0)}; 
+            \legend{Two Classes, Three Classes}
+        \end{axis}
+    \end{tikzpicture}
+    \begin{tikzpicture}
+        \begin{axis}[
+            ybar,
+            ymajorgrids = true,
+            bar width=0.5cm,
+            ylabel = Precision,
+            width=.5\textwidth,
+            height=.5\textwidth,
+            enlarge x limits=0.25,
+            symbolic x coords={Section 1, Section 2, Section 3},
+            xtick=data,
+            ymax = 1,
+            yticklabel style={
+                /pgf/number format/fixed,
+                /pgf/number format/precision=2,
+                /pgf/number format/fixed zerofill
+            },
+            scaled y ticks=false,
+            ]
+            \addplot table[x=TestImage, y=Two]{\dataone};
+            \addplot table[x=TestImage, y=Three]{\dataone};
+            %\addplot[dotted, sharp plot, update limits=false] coordinates {(0, 0)(1, 0)}; 
+            \legend{Two Classes, Three Classes}
+        \end{axis}
+    \end{tikzpicture}
+    \begin{tikzpicture}
+        \begin{axis}[
+            ybar,
+            ymajorgrids = true,
+            bar width=0.5cm,
+            ylabel = Recall,
+            width=.5\textwidth,
+            height=.5\textwidth,
+            enlarge x limits=0.25,
+            symbolic x coords={Section 1, Section 2, Section 3},
+            xtick=data,
+            ymax = 1,
+            yticklabel style={
+                /pgf/number format/fixed,
+                /pgf/number format/precision=2,
+                /pgf/number format/fixed zerofill
+            },
+            scaled y ticks=false,
+            ]
+            \addplot table[x=TestImage, y=Two]{\datatwo};
+            \addplot table[x=TestImage, y=Three]{\datatwo};
+            %\addplot[dotted, sharp plot, update limits=false] coordinates {(0, 0)(1, 0)}; 
+            \legend{Two Classes, Three Classes}
+        \end{axis}
+    \end{tikzpicture}
+    \caption{Performance comparison between two and three class classification}
+    \label{fig:comp}
 \end{figure}
 
 
-We have provided a visualization for the three class of the detected slums in Figure \ref{fig:vis}. For the calculation of the performance and the visualization of the predictions, eventhough we use three classes, we collapse the three classes into two after classification. This is motivated by the fact that we are not interested in how well the vegetation or buildings are classified, we only care about the performance of the slum classification. We achieve this by combining all vegetation and building into a single class, just like the two class classification. Furthermore, this keeps the comparison between two class and three class classification fair. As a result, the images displayed in Figure \ref{fig:vis} display only two classes even though it was trained and tested using three classes.
+We have provided a visualization of the detected slums for the three-class method in Figure \ref{fig:comp}. In the calculation of the performance and the visualization of the predictions,  we collapse the three classes into two classes after classification. This is motivated by the fact that we are not interested in how well the vegetation or buildings are classified, we only care about the performance of the slum classification compared to everything that is not a slum, the three classes are only used during training and classification. We create two classes from three classes by combining all vegetation and building into a single class. This keeps the comparison between two class and three class classification fair. As a result, the images displayed in Figure \ref{fig:three_classes} display only two classes even though it was trained and tested using three classes.
 
-\begin{figure}[h]
-	\centering
-	\begin{tabular}{cc}
-		\subfloat[Section 1 Prediction]{\includegraphics[width=0.5\textwidth]{s1}}&
-		\subfloat[Section 1 Ground Truth]{\includegraphics[width=0.5\textwidth]{s1_g}}\\
-		\subfloat[Section 2 Prediction]{\includegraphics[width=0.5\textwidth]{s2}}&
-		\subfloat[Section 2 Ground Truth]{\includegraphics[width=0.5\textwidth]{s2_g}}\\
-		\subfloat[Section 3 Prediction]{\includegraphics[width=0.5\textwidth]{s3}}&
-		\subfloat[Section 3 Ground Truth]{\includegraphics[width=0.5\textwidth]{s3_g}}\\
-	\end{tabular}
-	\caption{Comparison of the three sections between the detected slums in the left column and the ground truth right column. The red patches indicate slums.}
-	\label{fig:vis}
+\begin{figure}[ht]
+    \centering
+    \begin{tabular}{ccc}
+        \subfloat[Section 1 Prediction]{\includegraphics[height=0.28\textwidth]{s1}}&
+        \subfloat[Section 2 Prediction]{\includegraphics[height=0.28\textwidth]{s2}}&
+        \subfloat[Section 3 Prediction]{\includegraphics[height=0.28\textwidth]{s3}}\\
+        \subfloat[Section 1 Ground Truth]{\includegraphics[height=0.28\textwidth]{s1_g}}&
+        
+        \subfloat[Section 2 Ground Truth]{\includegraphics[height=0.28\textwidth]{s2_g}}&
+    
+        \subfloat[Section 3 Ground Truth]{\includegraphics[height=0.28\textwidth]{s3_g}}\\
+    \end{tabular}
+    \caption{Comparison of the three sections between the detected slums in the left column and the ground truth right column. The red patches indicate slums.}
+    \label{fig:three_classes}
 \end{figure}
 
 
 \pgfplotstableread[col sep = comma]{results/block.csv}\datablock
 \pgfplotstableread[col sep = comma]{results/treshold.csv}\datatreshold
 
-\begin{figure}[h]
-	\begin{tikzpicture}
-	\begin{axis}[
-		ymajorgrids = true,
-		bar width=0.5cm,
-		ylabel = Matthews Coefficient,
-		xlabel = Block Size,
-		width=.5\textwidth,
-		height=.5\textwidth,
-		enlarge x limits=0.25,
-		symbolic x coords={10, 20, 30},
-		xtick=data,
-		ymax = 1,
-		yticklabel style={
-			/pgf/number format/fixed,
-			/pgf/number format/precision=2,
-			/pgf/number format/fixed zerofill
-		},
-		scaled y ticks=false,
-		]
-		\addplot table[x=BlockSize, y=Section]{\datablock};
-		%\addplot[dotted, sharp plot, update limits=false] coordinates {(0, 0)(1, 0)}; 
-		\legend{Section 3}
-		\end{axis}
-	\end{tikzpicture}
-	\begin{tikzpicture}
-	\begin{axis}[
-	ymajorgrids = true,
-	bar width=0.5cm,
-	ylabel = Matthews Coefficient,
-	xlabel = Threshold,
-	width=.5\textwidth,
-	height=.5\textwidth,
-	enlarge x limits=0.25,
-	symbolic x coords={0.34, 0.5, 0.8},
-	xtick=data,
-	ymax = 1,
-	yticklabel style={
-		/pgf/number format/fixed,
-		/pgf/number format/precision=2,
-		/pgf/number format/fixed zerofill
-	},
-	scaled y ticks=false,
-	]
-	\addplot table[x=Threshold, y=Section]{\datatreshold};
-	%\addplot[dotted, sharp plot, update limits=false] coordinates {(0, 0)(1, 0)}; 
-	\legend{Section 3}
-	\end{axis}
-	\end{tikzpicture}
-	\caption{Performance comparison between two and three class classification}
-	\label{fig:comp}
+\begin{figure}[ht]
+    \centering
+    \begin{tikzpicture}
+    \begin{axis}[
+        ymajorgrids = true,
+        bar width=0.5cm,
+        ylabel = Performance,
+        xlabel = Block Size,
+        width=.5\textwidth,
+        height=.5\textwidth,
+        enlarge x limits=0.25,
+        symbolic x coords={10, 20, 30},
+        xtick=data,
+        ymax = 1,
+        yticklabel style={
+            /pgf/number format/fixed,
+            /pgf/number format/precision=2,
+            /pgf/number format/fixed zerofill
+        },
+        scaled y ticks=false,
+        legend pos=north west,
+        ]
+        \addplot table[x=BlockSize, y=MCC]{\datablock};
+        \addplot table[x=BlockSize, y=Precision]{\datablock};
+        \addplot table[x=BlockSize, y=Recall]{\datablock};
+        %\addplot[dotted, sharp plot, update limits=false] coordinates {(0, 0)(1, 0)}; 
+        \legend{MCC, Precision, Recall}
+        \end{axis}
+    \end{tikzpicture}
+    \begin{tikzpicture}
+    \begin{axis}[
+    ymajorgrids = true,
+    bar width=0.5cm,
+    ylabel = Matthews Coefficient,
+    xlabel = Threshold,
+    width=.5\textwidth,
+    height=.5\textwidth,
+    enlarge x limits=0.25,
+    symbolic x coords={0.34, 0.5, 0.8},
+    xtick=data,
+    ymax = 1,
+    yticklabel style={
+        /pgf/number format/fixed,
+        /pgf/number format/precision=2,
+        /pgf/number format/fixed zerofill
+    },
+    scaled y ticks=false,
+    legend pos=north west,
+    ]
+    \addplot table[x=Threshold, y=MCC]{\datatreshold};
+    \addplot table[x=Threshold, y=Precision]{\datatreshold};
+    \addplot table[x=Threshold, y=Recall]{\datatreshold};
+    %\addplot[dotted, sharp plot, update limits=false] coordinates {(0, 0)(1, 0)}; 
+    \legend{MCC, Precision, Recall}
+    \end{axis}
+    \end{tikzpicture}
+    \caption{Performance effect of different block size and threshold for section 3}
+    \label{fig:block_comp}
+\end{figure}
+
+\begin{figure}[ht]
+    \centering
+    \begin{tabular}{cc}
+        \subfloat[Block Size 10]{\includegraphics[height=0.35\textwidth]{s3}}&
+        \subfloat[Block Size 20]{\includegraphics[height=0.35\textwidth]{s3_b20}}\\
+        \subfloat[Block Size 30]{\includegraphics[height=0.35\textwidth]{s3_b30}}&
+        \subfloat[Ground Truth]{\includegraphics[height=0.35\textwidth]{s3_g}}\\
+    \end{tabular}
+    \caption{Comparision of the visual difference with increased block size for section 3}
+    \label{fig:block}
 \end{figure}
 
 
-We further experimented with the effect of different blocksizes and tresholds on the performance. Block sizes larger than 10 seems to decrease the MCC. Larger values for the thresold seems to increase performance.
+We further experimented with different block sizes and thresholds to discover the effects on performance. These experiments are displayed in Figure \ref{fig:block_comp}. Block sizes larger than 10 seem to decrease the MCC and precision while increasing the recall. Increasing the threshold seems to be correlated with increased performance.
+
+\clearpage
+\pgfplotstableread[col sep = comma]{results/oversampling.csv}\dataoversampling
+
+\begin{figure}[ht]
+    \centering
+    \begin{tikzpicture}
+    \begin{axis}[
+    ybar,
+    ymajorgrids = true,
+    bar width=0.5cm,
+    ylabel = Matthews Coefficient,
+    xlabel = Amount of Oversampling,
+    width=.5\textwidth,
+    height=.5\textwidth,
+    enlarge x limits=0.25,
+    symbolic x coords={x2, x4, Equal},
+    xtick=data,
+    ymax = 1,
+    yticklabel style={
+        /pgf/number format/fixed,
+        /pgf/number format/precision=2,
+        /pgf/number format/fixed zerofill
+    },
+    scaled y ticks=false,
+    legend pos=north west,
+    ]
+    \addplot table[x=Performance, y=MCC]{\dataoversampling};
+    %\addplot[dotted, sharp plot, update limits=false] coordinates {(0, 0)(1, 0)}; 
+    \legend{}
+    \end{axis}
+    \end{tikzpicture}
+    \caption{Performance effect of oversampling of the slum class in section 3}
+\label{fig:oversampling_comp}
+\end{figure}
+
+Figure \ref{fig:oversampling_comp} visualizes the impact of oversampling the slum class. The cases of two times and four times refer to the size of the slum class that was multiplied by two and four respectively. The last column is the case where all classes are oversampled to have the same number of entries.
+

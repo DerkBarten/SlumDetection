@@ -28,7 +28,7 @@
 \renewcommand{\thesubsection}{\arabic{subsection}}
 \renewcommand{\thesubsubsection}{\arabic{subsubsection}}
 
-\titleformat{\section}{\LARGE\sc}{\thesection.}{1em}{}
+\titleformat{\section}{\LARGE\sc}{\thesection}{1em}{}
 \titleformat{\subsection}{\normalsize\it}{\thesection.\thesubsection}{0.9em}{}
 \titleformat{\subsubsection}{\small\it}{\thesection.\thesubsection.\thesubsubsection}{0.9em}{}
 
@@ -46,32 +46,22 @@
 \begin{titlepage}
 \input{title}
 \end{titlepage}
-%\thispagestyle{empty}
+\thispagestyle{empty}
 \clearpage
 
 \input{introduction}
 \input{method}
+\clearpage
 \input{results}
 \clearpage
 \input{discussion}
+%\input{conclusion}
 
-% previous work
-
-% method
-
-% results
-
-% conclusion
-
-% discussion
 
 % future work: make 4 classes, or even 5 using soil and water. perhaps more classes leads to diminishing returns eventually
 
-\addcontentsline{toc}{section}{References}
-\printbibliography
-
+%\addcontentsline{toc}{section}{References}
 \clearpage
-%\input{appendix}
-
+\printbibliography
 \end{document}
 
